@@ -120,10 +120,6 @@ theorem ball_bound (ω p n : ℕ) (l : List Fac) (T : ℚ) (v : ℚ × ℚ) (D :
     linarith
   · simp at h
 
-/-! ## Sector bounds -/
-
-/-! ## Upper half plane -/
-
 /-! ## Vertical rays -/
 
 /-- Box checks `Im Ψ' ≥ q` on `{X} × [y_i, y_{i+1}]` for consecutive breakpoints. -/

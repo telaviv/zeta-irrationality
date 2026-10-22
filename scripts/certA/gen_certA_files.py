@@ -11,22 +11,20 @@ import io, math, sys, os
 
 INST = {
     # Z7: 30,137 events in [1, 400); windows of width 3; chunks of 32 points; 1029 chunks in 30 EvSum files
-    # (6 import chains). Measured 2026-10-22: ~0.4 s per point (termUnitsG); full CertAK build 29 min wall
-    # with LEAN_NUM_THREADS=12 (~2-7 min per file).
+    # (6 import chains). About 0.4 s per point in the kernel (termUnitsG); the full CertAK build takes about
+    # 30 min wall with LEAN_NUM_THREADS=12 (2-7 min per file).
     'Z7': dict(ns='ZetaIrr.Z7.CertA', prefix='ZetaIrrational.Z7.CertAK', name='Z7',
                W=3, NW=133, CH=32, NWF=9, NWCH=3, SUMPER=36, NCH=6,
                total=778841997893779320302794447562),
 }
 
 inst = sys.argv[1] if len(sys.argv) > 1 else 'Z7'
-mode = sys.argv[2] if len(sys.argv) > 2 else 'data'
 C = dict(INST[inst])
-for a in sys.argv[3:]:            # overrides, e.g. SUMPER=40 NCH=4
+for a in sys.argv[2:]:            # overrides, e.g. SUMPER=40 NCH=4
     k, v = a.split('=', 1)
     C[k] = int(v) if v.isdigit() else v
 assert 1 + C['W'] * C['NW'] == 400
 NS, PFX, NW, W = C['ns'], C['prefix'], C['NW'], C['W']
-DEFS = C.get('defs', PFX)                # module prefix of the instance's Defs/Step (default: PFX)
 D = PFX.replace('.', '/') + '/'
 GENTXT = f'scripts/certA/gen_{inst}.txt'
 
@@ -40,11 +38,7 @@ def rd(path):
     return io.open(path, encoding='utf-8').read()
 
 
-if mode != 'data':
-    sys.exit('only the data mode exists; the lib files and GenCertA_Z7.lean are hand-written')
-
 # ---------------------------------------------------------------- data
-assert mode == 'data', mode
 lines = rd(GENTXT).strip().split('\n')
 wins = []   # list of list of (value, [events])
 total = None

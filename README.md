@@ -28,7 +28,7 @@ by the Lean kernel. See [TRUST.md](TRUST.md) for what a reader has to trust.
 
 Ball and Rivoal (2001) showed that infinitely many of the numbers ζ(2k+1) are irrational. Rivoal (2002) proved that one
 of ζ(5), …, ζ(21) is irrational, and Zudilin (Russian Math. Surveys 56, 2001) that one of ζ(5), ζ(7), ζ(9), ζ(11) is.
-Windows that also exclude ζ(5) are wider. Zudilin (Izv. Math. 66, 2002) proved that one of ζ(7), …, ζ(37) is
+Windows that also exclude ζ(5) are wider. Zudilin (arXiv:math/0104249; Izv. Math. 66, 2002) proved that one of ζ(7), …, ζ(37) is
 irrational. Lai and Zhou (Publ. Math. Debrecen 101, 2022) proved that two of ζ(5), …, ζ(35) are, which gives one of
 ζ(7), …, ζ(35).
 
@@ -46,15 +46,17 @@ Fix r = 11/12 and the eighteen offsets δ_j = j/80 (j = 1, …, 18). For n ∈ 2
 
 R_n has zeros of order 5 at 1, …, rn and at −n−1, …, −(1+r)n, and poles at −k for δ_1 n ≤ k ≤ (1 − δ_1) n, of order
 B_k ≤ 18 (the number of blocks containing k). Its degree is −Gn − 17, where G = Σ_j (1 − 2δ_j) − 10r = 547/120. In Lean
-these are `ZetaIrr.Z7.R`, `ZetaIrr.Z7.L` (`FamilyZ7.lean`), with n = 240(m+1); the namespace `Z7` is the name of this
-parameter set.
+these are `ZetaIrr.Z7.R`, `ZetaIrr.Z7.L` (`FamilyZ7.lean`), with n = 240(m+1). The method works for a whole family of
+parameter choices (r, the offsets δ_j, multiplicities); this particular choice is called Z7, which is the namespace and
+folder name of everything specific to it. Instance-independent material lives outside `Z7/`.
 
 ## Outline of the proof
 
 1. **Lemmas 1–3 (L_n is a linear form in ζ(7), …, ζ(21)).** Write R_n = Σ_k Σ_i a_{i,k}(t+k)^{−i} in partial fractions.
    - Lemma 1: since Σ_{t≥1}(t+k)^{−j} = ζ(j) − H_k^{(j)}, L_n = ρ_n + Σ_i i(i+1)(i+2)(i+3) τ_i ζ(i+4), with
      ρ_n ∈ ℚ and τ_i = Σ_k a_{i,k}.
-   - Lemma 2: R_n(−n−t) = −R_n(t) (the degree is odd), so τ_i = 0 for even i.
+   - Lemma 2: t ↦ −n−t maps the zeros and the poles to themselves and changes the sign of 2t + n, so
+     R_n(−n−t) = −R_n(t) (the degree is odd). Hence τ_i = 0 for even i.
    - Lemma 3: τ_1 = 0 because deg R_n ≤ −2, so ζ(5) does not occur, and i ≤ 18 leaves ζ(7), ζ(9), …, ζ(21).
 
    Files: `Expansion.lean`, `Concrete/`, `Z7/Concrete/`.
@@ -75,33 +77,36 @@ parameter set.
    - Uniform complex Stirling bounds show that, along z = nx, the integrand behaves like
      exp(−G log n! + n f(x) + O(log n)), with f(x) = Ψ(x) − 3πix and Ψ(x) = Σ c_i α_i(x) log α_i(x).
    - The contour is deformed onto a steepest-descent path through the saddle point x₀ ≈ 0.8922 + 0.1829i of f, and
-     Laplace's method is applied at x₀. This gives (i) log |L_n| ≤ −G log n! + n Re Ω + o(n), where Ω = f(x₀) and
-     Re Ω ≤ −10.1167485, and (ii) L_n ≠ 0 for infinitely many n, because the phase advances by 240·Im Ω between
+     Laplace's method is applied at x₀. This gives (i) log |L_n| ≤ −G log n! + n·V + o(n) for every V ≥ Re Ω, where
+     Ω = f(x₀) and Re Ω ≤ −10.1167485 (the Lean proof uses V = −10.1167), and (ii) L_n ≠ 0 for infinitely many n, because the phase advances by 240·Im Ω between
      consecutive admissible n and sin(240·Im Ω) ≈ −0.932 ≠ 0.
    - The saddle point, the path and all bounds along it (conditions (S0)–(S5), `Z7/Analytic/SaddleData.lean`) are
      certified by kernel-checked rational interval arithmetic.
 
    Files: `Analytic/`, `Stirling/`, `Fam/Analytic/`, `Z7/Analytic/`, `Interval/`, `Fam/Interval/`, `Z7/Interval/`,
    `Z7/Lemma6.lean`.
-5. **Conclusion.** Re Ω + A ≈ −0.198 < 0, so D_n L_n → 0. If ζ(7), …, ζ(21) were all rational with common
+5. **Conclusion.** V + A ≈ −0.198 < 0, so D_n L_n → 0. If ζ(7), …, ζ(21) were all rational with common
    denominator Q, the numbers Q·D_n·L_n would be integers, nonzero for infinitely many n by Lemma 6(ii), and tending
    to 0: a contradiction. Files: `Criterion.lean`, `Statement.lean`, `Assembly.lean`, `FamilyZ7.lean`,
    `Z7/MainCond.lean`, `Z7/MainUnconditional.lean`.
 
 ## Building and checking
 
-You need [elan](https://github.com/leanprover/elan). The toolchain (Lean v4.35.0) and Mathlib (v4.35.0) are pinned in
-`lean-toolchain`, `lakefile.toml` and `lake-manifest.json`.
+You need [git](https://git-scm.com/) and [elan](https://github.com/leanprover/elan). The toolchain (Lean v4.35.0) and
+Mathlib (v4.35.0) are pinned in `lean-toolchain`, `lakefile.toml` and `lake-manifest.json`.
 
 ```sh
+git clone <repository URL> lean_zeta7 && cd lean_zeta7
 lake exe cache get                  # download prebuilt Mathlib
-LEAN_NUM_THREADS=12 lake build      # about 50 minutes on a 32-core desktop; the A-certificate dominates
+LEAN_NUM_THREADS=12 lake build      # about 40 minutes on a 32-core desktop; the A-certificate dominates
 lake env lean Axioms.lean           # print the axioms of the main theorem and its ingredients
 ```
 
-Building needs at least 16 GB of RAM (more with more threads). On Windows, set `LEAN_NUM_THREADS` to 8–12: with one
-job per core, the parallel Lean processes can fail with "failed to read file ….olean" (a resource limit, not a proof
-error).
+In PowerShell, set the variable first: `$env:LEAN_NUM_THREADS = 12; lake build`. We built on a 32-core desktop with
+32 GB of RAM; the A-certificate files use up to about 2 GB each, so lower `LEAN_NUM_THREADS` on smaller machines. On
+Windows, keep it at 8–12: with one Lean process per core, `lake build` (and occasionally `lake env lean`) can fail with
+"failed to read file ….olean". This is a resource limit, not a proof error; rerunning the command continues where it
+stopped.
 
 ## Repository layout
 
@@ -118,8 +123,12 @@ Paths are relative to `ZetaIrrational/`.
 | `Interval/`, `Fam/Interval/`, `Z7/Interval/` | rational interval and complex-box arithmetic; the saddle-point certificate |
 | `Z7/Lemma6.lean`, `Z7/MainCond.lean`, `Z7/MainUnconditional.lean` | the final assembly |
 
-`scripts/` holds the (untrusted) generators of the certificate data, and `Axioms.lean` is the axiom audit. Every Lean file
-starts with a docstring saying what it proves.
+`Fam/` holds helpers that are stated for the general family of constructions rather than for Z7 but are only used by
+the `Z7/` files; `Analytic/`, `Interval/`, `Stirling/`, `PNT/`, `Arith/` and `Concrete/` are general-purpose.
+
+Outside `ZetaIrrational/`: `scripts/` holds the (untrusted) generators of the certificate data, `Axioms.lean` is the
+axiom audit, and `paper/` is a LaTeX manuscript describing the proof (see `paper/README.md` for how to build it). Every
+Lean file starts with a header comment saying what it proves.
 
 ## Status and caveats
 
@@ -128,18 +137,21 @@ starts with a docstring saying what it proves.
 - The construction, the proofs, the parameter search, the certificate programs and the Lean formalisation were produced
   largely by AI models (Claude, Anthropic), working under the direction of the author. Apart from the Lean kernel check,
   all verification so far has been done by AI systems.
-- The numerical margin is Re Ω + A ≈ −0.198. It is certified, not estimated.
+- The numerical margin is V + A ≈ −0.198. It is certified, not estimated.
 
 ## Acknowledgements
 
 - `PNT/Port/` is ported from [PrimeNumberTheoremAnd](https://github.com/AlexKontorovich/PrimeNumberTheoremAnd)
   (A. Kontorovich, T. Tao et al.), via the port in [domino14/zeta5](https://github.com/domino14/zeta5), under the
   Apache License 2.0 (see `ZetaIrrational/PNT/Port/LICENSE`).
-- The method follows K. Ball and T. Rivoal (Invent. Math. 146, 2001), T. Rivoal (Acta Arith. 103, 2002), T. Rivoal
-  and W. Zudilin (Math. Ann. 326, 2003), W. Zudilin (Izv. Math. 66, 2002), and X. Lai and L. Zhou (Publ. Math.
-  Debrecen 101, 2022).
+- The instance-independent infrastructure (complex Stirling, interval arithmetic, contour deformation and Laplace's
+  method, partial fractions, p-adic valuations) is adapted from the formalisation of "one of β(4), β(6), …, β(36) is
+  irrational", [telaviv/beta-irrationality](https://github.com/telaviv/beta-irrationality).
+- The construction is that of W. Zudilin, J. Théor. Nombres Bordeaux 16 (2004), §8, with a near-continuous profile of
+  pole blocks. The method goes back to K. Ball and T. Rivoal (Invent. Math. 146, 2001) and T. Rivoal (Acta Arith. 103,
+  2002); see also W. Zudilin (Izv. Math. 66, 2002) and L. Lai and L. Zhou (Publ. Math. Debrecen 101, 2022).
 
 ## License
 
-Apache License 2.0 (see [LICENSE](LICENSE)). `ZetaIrrational/PNT/Port/` is derived from PrimeNumberTheoremAnd, also
+Copyright 2026 Shawn Krisman. Apache License 2.0 (see [LICENSE](LICENSE)). `ZetaIrrational/PNT/Port/` is derived from PrimeNumberTheoremAnd, also
 Apache-2.0; its own `LICENSE` file and the provenance notes in its file headers are kept.

@@ -6,7 +6,17 @@ Run with `lake env lean Axioms.lean` (after `lake build`). Every line should pri
 standard axioms `[propext, Classical.choice, Quot.sound]`. A `sorryAx` would indicate a gap, and a
 `Lean.ofReduceBool` / `*.native_decide.ax_*` entry would indicate trust in the compiler. -/
 
--- The main theorem
+-- The main theorem, with its statement spelled out in Mathlib's names
+example : ∃ j ∈ ({7, 9, 11, 13, 15, 17, 19, 21} : Finset ℕ), Irrational (riemannZeta j).re :=
+  ZetaIrr.Z7.oneOfZeta7To21
+
+example : Irrational (riemannZeta 7).re ∨ Irrational (riemannZeta 9).re ∨ Irrational (riemannZeta 11).re ∨
+    Irrational (riemannZeta 13).re ∨ Irrational (riemannZeta 15).re ∨ Irrational (riemannZeta 17).re ∨
+    Irrational (riemannZeta 19).re ∨ Irrational (riemannZeta 21).re := by
+  obtain ⟨j, hj, h⟩ := ZetaIrr.Z7.oneOfZeta7To21
+  simp only [Finset.mem_insert, Finset.mem_singleton] at hj
+  rcases hj with rfl | rfl | rfl | rfl | rfl | rfl | rfl | rfl <;> simp_all
+
 #print axioms ZetaIrr.Z7.oneOfZeta7To21
 
 -- The statement and the irrationality criterion

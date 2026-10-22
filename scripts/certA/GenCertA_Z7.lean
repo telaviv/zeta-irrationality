@@ -1,7 +1,8 @@
 /-
 # Generator for the A-certificate data files (`ZetaIrrational/Z7/CertAK/Ev*.lean`).
 
-Run from the repository root: `lake env lean scripts/certA/GenCertA_Z7.lean` (writes `scripts/certA/gen_Z7.txt`),
+Run from the repository root, after `lake build ZetaIrrational.Z7.CertAK.Windows ZetaIrrational.Z7.CertAK.FastG`:
+`lake env lean scripts/certA/GenCertA_Z7.lean` (writes `scripts/certA/gen_Z7.txt`),
 then `python scripts/certA/gen_certA_files.py Z7`. The output is untrusted: every claim in the generated
 files is re-checked by `decide +kernel`.
 -/

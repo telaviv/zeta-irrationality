@@ -43,7 +43,6 @@ noncomputable def kk : ℕ → ℂ → ℂ
 /-- The entire function `T(z) = 8 cos(πz)(cos²(πz) + 2)`. -/
 noncomputable def Tfun (z : ℂ) : ℂ := 8 * Complex.cos (π * z) * (Complex.cos (π * z) ^ 2 + 2)
 
-lemma hπC' : (π : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
 
 lemma hasDerivAt_sinπ (w : ℂ) :
     HasDerivAt (fun w : ℂ => Complex.sin (π * w)) (π * Complex.cos (π * w)) w := by
@@ -340,7 +339,7 @@ lemma tendsto_sub_mul_kk0 (t : ℕ) :
   rw [hcos] at hd
   have hslope := hd.tendsto_slope
   have hne : (-1 : ℂ) ^ t * π ≠ 0 :=
-    mul_ne_zero (pow_ne_zero _ (by norm_num)) hπC'
+    mul_ne_zero (pow_ne_zero _ (by norm_num)) (by exact_mod_cast Real.pi_ne_zero)
   have hinv := hslope.inv₀ hne
   have hcosc : Tendsto (fun z : ℂ => Complex.cos (π * z)) (𝓝[≠] (t : ℂ))
       (𝓝 ((-1 : ℂ) ^ t)) := by

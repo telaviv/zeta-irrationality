@@ -11,7 +11,7 @@ With `n = 240(m+1)`: `rn = 220(m+1)`, `(1+r)n = 460(m+1)`, `δ n = 3k(m+1)`.
 Contents:
 * the concrete `R_n` and `L_n = Σ_{t ≥ 1} R_n⁗(t)`;
 * `S = 18`, `G > 0`, and the block offsets `0 < δ < 1/2`;
-* `H5_Z7`: `V + A < 0` for `V ≤ Vcert = -10.1167` and `A ≤ Acert` (margin ≈ 0.198);
+* `margin_Z7`: `V + A < 0` for `V ≤ Vcert = -10.1167` and `A ≤ Acert` (margin ≈ 0.198);
 * `Hyp`, collecting the conclusions of Lemmas 3–6 for these `R_n`, `L_n`, and
   `oneOfZeta7To21_of_hyp : Hyp → OneOfZeta7To21`.
 
@@ -35,7 +35,7 @@ def Vcert : ℚ := -101167 / 10000
 
 /-- **The final inequality for Z7.** `V + A < 0` for `V ≤ Vcert` and `A ≤ Acert`
 (margin about `0.198`). -/
-theorem H5_Z7 (V A : ℝ) (hV : V ≤ (Vcert : ℝ)) (hA : A ≤ (Acert : ℝ)) : V + A < 0 := by
+theorem margin_Z7 (V A : ℝ) (hV : V ≤ (Vcert : ℝ)) (hA : A ≤ (Acert : ℝ)) : V + A < 0 := by
   have h : (Vcert : ℝ) + (Acert : ℝ) < 0 := by norm_num [Vcert, Acert]
   linarith
 
@@ -125,7 +125,7 @@ theorem oneOfZeta7To21_of_hyp (H : Hyp) : OneOfZeta7To21 := by
     have hc' : (c m j : ℝ) = (H.D m : ℝ) * (H.τ m j : ℝ) := by exact_mod_cast hc m j
     rw [hc']
     ring
-  have hQ : (Vcert : ℝ) + H.A < 0 := H5_Z7 _ H.A le_rfl H.hA
+  have hQ : (Vcert : ℝ) + H.A < 0 := margin_Z7 _ H.A le_rfl H.hA
   apply oneOfZeta7To21_of_forms a c
   · refine Tendsto.congr (fun m => (hform m).symm) ?_
     refine tendsto_mul_zero_of_log_bound (fun m => (H.D m : ℝ)) L nOf

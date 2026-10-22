@@ -4,7 +4,7 @@ Instance Z7: r = 11/12, eighteen blocks delta = k/80 (k = 1..18, m = 1), q = 240
     f(x) = Psi(x) - 3 pi i x,   Psi(x) = sum_i c_i alpha_i log alpha_i,   alpha_i = s_i x + kappa_i,
 with the 40 factors (5, x), (5, 11/12 - x), (5, x + 23/12), (-5, x + 1), and per block (1, x + k/80), (-1, x + 1 - k/80).
 
-What it does (mpmath, 50 digits; nothing here is trusted):
+What it does (mpmath, 30 digits; nothing here is trusted):
  1. Newton for the saddle x0 (f'(x0) = 0) from the seed 0.8921643 + 0.1829121 i; rational centre c0 (25 digits) and
     Y ~ 1/Psi''(c0) for the contraction test.
  2. The descent direction d = v/|v|, v = 1 + u, u = -conj(Psi''(x0))/|Psi''(x0)| (so Psi''(x0) d^2 = -K), oriented

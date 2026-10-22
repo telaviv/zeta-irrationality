@@ -21,7 +21,7 @@ namespace ZetaIrr.Fam.Analytic
 open Complex Real Finset Filter Topology Metric
 open ZetaIrr.Analytic (norm_cexp_sub_one_le_mul_exp)
 
-/-! ### Γ-products (from `Analytic/GammaFactor.lean`) -/
+/-! ### Γ-products -/
 
 /-- `Γ(w + k) = Γ(w) Π_{j<k} (w + j)` for `w ∉ {0, -1, -2, …}`. -/
 lemma Gamma_add_nat_eq_mul_prod (w : ℂ) (hw : ∀ k : ℕ, w ≠ -k) (k : ℕ) :
@@ -77,13 +77,11 @@ lemma sum_list_blocks (I : ℕ × ℕ → Finset ℕ) (U : Finset ℕ) (L : List
     rw [Finset.sum_ite_mem, Finset.inter_eq_right.mpr (hsub b (List.mem_cons_self ..)),
       Finset.sum_const, smul_eq_mul, mul_comm]
 
-/-! ### Conjugation symmetry and triple zeros (from `Analytic/ConcreteIntegrand.lean`) -/
-
-/-! ### Logarithmic derivatives -/
+/-! ### Small facts about `π` -/
 
 lemma hπC : (π : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
 
-/-! ### The `q`-form and amplitude helpers (from `Analytic/FnPath.lean`) -/
+/-! ### Bounds for `exp` and `log` -/
 
 lemma norm_exp_le_three {e : ℂ} (he : ‖e‖ ≤ 1) : ‖Complex.exp e‖ ≤ 3 := by
   calc ‖Complex.exp e‖ ≤ Real.exp ‖e‖ := Complex.norm_exp_le_exp_norm e

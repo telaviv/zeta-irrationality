@@ -28,7 +28,7 @@ open ZetaIrr.Analytic ZetaIrr.Fam.Analytic
 theorem Gfn_eq_PT (m : ℕ) {z : ℂ} (hz : z.im ≠ 0) : Gfn m z = Pfun m z * Tfun z := by
   have hs := sin_pi_ne_zero_of_im hz
   have hk := sin_pow_five_mul_kk4 hs
-  have hπ := hπC'
+  have hπ := hπC
   unfold Gfn
   rw [RC_eq_Pfun m z hz]
   calc Pfun m z * Complex.sin (π * z) ^ 5 / (π : ℂ) ^ 5 * kk 4 z

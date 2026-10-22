@@ -13,6 +13,11 @@ declaration, no `native_decide` and no `implemented_by`, so nothing relies on th
 saddle-point certificate are decidable statements about rational data, proved by `decide +kernel`; every proof is
 checked by the kernel.
 
+Options that change elaboration but not what the kernel checks: `maxRecDepth` and `Elab.async false` in the
+certificate files, and `backward.isDefEq.respectTransparency false` in a few lemmas of the vendored PNT port
+(`PNT/Port/Wiener.lean`). There is no `debug.*` option, no `maxHeartbeats 0`, no custom `macro`/`syntax`/`elab`, and no
+file imports `Lean` itself.
+
 ## The statement
 
 The kernel checks the proof. It cannot check that the statement means what we claim, so read this definition:
@@ -61,6 +66,24 @@ These are not needed for correctness, but they agree:
   algorithm in Python and reproduces it.
 - **Saddle certificate.** The Lean enclosure Re Ω ∈ [−10.1167486, −10.1167485] and sin(240 Im Ω) ≈ −0.932 agree with an
   independent ball-arithmetic (Arb) computation (not included here).
+
+## Independent kernel checks
+
+Besides `lake build`, the proof was replayed by two kernels (on the build of an earlier commit whose Lean code differs
+from this one only in comments and two lemma names):
+- **Lean's kernel, `leanchecker`** (shipped with the toolchain), one module at a time:
+  `lake env leanchecker <Module>` replays the declarations each module adds. Run it per module: without a module argument
+  it replays every module at once and needs far more memory than a desktop has. 134 of the 141 modules were replayed,
+  including `ZetaIrrational.Z7.MainUnconditional`, `Z7.CertAK.CertCompute` and `Z7.Interval.SaddleDataZ7`, with no
+  error. The A-certificate modules need about 9 GB each.
+- **An independent kernel, `nanoda`** (Rust; also shipped with the toolchain), on a `leanexport` dump of the closure of
+  `ZetaIrr.Z7.oneOfZeta7To21` (81,055 declarations; the only axioms are `propext`, `Quot.sound` and
+  `Classical.choice`). The closure is too large for one run on a 32 GB machine, so it was checked in passes, each with a
+  different set of theorems replaced by axioms of the same name and type (sound because no check depends on the proof of
+  a theorem). 60,465 of the 61,819 theorems were checked, including the main theorem, `bodyUnits_400` with its
+  assembly, and every obligation of the saddle certificate, with no error.
+
+Every theorem was accepted by at least one of the two kernels, and they never disagreed.
 
 ## Cost
 
