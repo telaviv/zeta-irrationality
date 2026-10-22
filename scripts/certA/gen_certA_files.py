@@ -11,9 +11,11 @@
 import io, math, sys, os
 
 INST = {
-    # Z7: 30,137 events in [1, 400); windows of width 3; chunks of 32 points.
+    # Z7: 30,137 events in [1, 400); windows of width 3; chunks of 32 points; 1029 chunks in 30 EvSum files
+    # (6 import chains). Measured 2026-10-22: ~0.4 s per point (termUnitsG); full CertAK build 29 min wall
+    # with LEAN_NUM_THREADS=12 (~2-7 min per file).
     'Z7': dict(ns='ZetaIrr.Z7.CertA', prefix='ZetaIrrational.Z7.CertAK', name='Z7',
-               W=3, NW=133, CH=32, NWF=9, NWCH=3, SUMPER=32, NCH=3,
+               W=3, NW=133, CH=32, NWF=9, NWCH=3, SUMPER=36, NCH=6,
                total=778841997893779320302794447562),
 }
 
