@@ -90,7 +90,9 @@ must reproduce A_cert above (or be slightly larger and still give Q < 0).
 2. No `sorry` in delivered files (a `*WIP.lean` file not imported anywhere is fine), no `axiom`, **no
    `native_decide`**. Computations by `decide +kernel`.
 3. Every file starts with a docstring: what it proves, the PROOF_ZETA section, `Status:`.
-4. Build: `export PATH="$HOME/.elan/bin:$PATH"; lake build ZetaIrrational.<Module>` from `lean_zeta7/`. Long builds in
+4. Build: `export PATH="$HOME/.elan/bin:$PATH"; LEAN_NUM_THREADS=8 lake build ZetaIrrational.<Module>` from
+   `lean_zeta7/` (without the thread cap, ~32 parallel Lean processes fail on Windows with "failed to read file
+   ….olean"). Long builds in
    the background with output to a log file under your scratch dir. Do not run a bare `lake build` (the main session
    does full builds). At most one heavy build at a time per workstream (memory: 32 GB shared by all).
 5. Check axioms with a scratch file outside the repo (`lake env lean scratch.lean` with `#print axioms`). Expected:
@@ -104,4 +106,4 @@ must reproduce A_cert above (or be slightly larger and still give Q < 0).
 
 - 2026-10-21: project set up (toolchain, Mathlib v4.35.0 copied from lean_beta's `.lake/packages`); generic
   infrastructure copied; `Defs`, `Statement`, `FamilyZ7` (with `Hyp` and `oneOfZeta7To21_of_hyp`), `Expansion`,
-  `Z7/Concrete/Data` written.
+  `Z7/Concrete/Data` written; base built, axiom audit standard, committed (77bb872). Workstreams W1–W4 started.
