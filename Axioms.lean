@@ -6,7 +6,10 @@ Run with `lake env lean Axioms.lean` (after `lake build`). Every line should pri
 standard axioms `[propext, Classical.choice, Quot.sound]`. A `sorryAx` would indicate a gap, and a
 `Lean.ofReduceBool` / `*.native_decide.ax_*` entry would indicate trust in the compiler.
 
-The main theorem `ZetaIrr.Z7.oneOfZeta7To21` is not assembled yet; see PLAN.md. -/
+-/
+
+-- The main theorem
+#print axioms ZetaIrr.Z7.oneOfZeta7To21
 
 -- The statement and the conditional main theorem
 #print axioms ZetaIrr.riemannZeta_re_eq_zetaR      -- `(riemannZeta s).re = Σ 1/(m+1)^s`
@@ -28,3 +31,4 @@ The main theorem `ZetaIrr.Z7.oneOfZeta7To21` is not assembled yet; see PLAN.md. 
 #print axioms ZetaIrr.Z7.oneOfZeta7To21_of_parts     -- Lemmas 4–5 + assembly, given (H2)
 #print axioms ZetaIrr.Z7.CertA.certFact_of_units     -- (H2) from the unit count
 #print axioms ZetaIrr.Z7.oneOfZeta7To21_of_certUnits -- main theorem given the unit count
+#print axioms ZetaIrr.Z7.CertA.bodyUnits_400         -- (H2) the kernel-checked A-certificate sum

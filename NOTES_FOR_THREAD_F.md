@@ -37,3 +37,16 @@ via the route of §1 above. No gap in PROOF_ZETA §6 was found. Remarks for the 
   no singular kernel.
 * The size bound uses Stirling's upper bound log n! ≤ n log n − n + (log n)/2 + 1 (Mathlib's `stirlingSeq`
   monotonicity) and only Re Ω ≤ −10.1167; constants are explicit but crude.
+
+## 3. The Lean proof is complete (2026-10-22, main session) [Proved in Lean]
+
+`lean_zeta7`: `ZetaIrr.Z7.oneOfZeta7To21 : ∃ j ∈ {7, 9, …, 21}, Irrational (riemannZeta j).re`, standard axioms only,
+no `sorry`, no `native_decide`. The A-certificate in Lean equals the exact fraction of `f4_final.log`; the Lean saddle
+enclosure is Re Ω ∈ [−10.1167486, −10.1167485]. Small points for PROOF_ZETA:
+* §9 "events 30,971" for Z7: the event list has 30,138 points (30,137 intervals); 30,971 apparently counts chunk
+  endpoints twice (workstream W2). The value of A is unaffected.
+* Lemma A(b′) is only needed in its integrality form (a_{i,k} ∈ ℤ_p when no pole of a block lies at distance ≡ 0 mod p),
+  and holds without p² > 𝒩 (W1), as review A had observed.
+* The pointwise bound F_n(p) ≤ e*(n/p) of §5.1 holds for every prime p ≤ n, without √𝒩 < p (W1, W2).
+* With the integration-by-parts route of §1 above, §6.1–6.6 formalised with no gap (W3); the steepest-descent
+  certificate (S0)–(S5) formalised as written (W4).

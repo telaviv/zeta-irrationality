@@ -3,6 +3,13 @@
 Started 2026-10-21. Mathematical source: `../handoff/zeta7/PROOF_ZETA.md` (instance Z7, §9). Template:
 `../lean_beta/` (β(4..36), same toolchain). Labels as in `math/CLAUDE.md`.
 
+## Status: COMPLETE (2026-10-22)
+
+`ZetaIrr.Z7.oneOfZeta7To21 : OneOfZeta7To21` is proved; `lake env lean Axioms.lean` prints only
+`[propext, Classical.choice, Quot.sound]` for it and every audited ingredient. No `sorry`, `native_decide`,
+`axiom` or `implemented_by` in the sources. What remains is outside Lean: a human/expert read, and the publication
+decision (license, push). The rest of this file is the development record.
+
 ## Target
 
 ```lean
@@ -22,12 +29,12 @@ Standard axioms only, no `sorry`, no `native_decide`, all certificates `decide +
 | Lemmas 1–3 for partial-fraction data (integer poles, 4th derivative, ζ(i+4)) | `Expansion.lean` | done |
 | Z7 partial-fraction data (definitions) | `Z7/Concrete/Data.lean` | done |
 | copied generic infrastructure (namespace `ZetaIrr`) | `PNT/`, `Stirling/`, `Interval/`, `Analytic/`, `Arith/{Valuation,PSVal,Legendre}`, `Concrete/PartialFrac`, `Fam/`, `Size/`, `Assembly` | copied from lean_beta (docstrings still cite PROOF_BETA) |
-| W1: Lemma 3 for Z7, Lemma 4, Lemma 5 glue | `Z7/Concrete/`, `Z7/Arith/`, `Arith/` (new files), `Z7/Glue/` | todo |
-| W2: A-certificate (spec, soundness, kernel computation) | `Z7/CertA/`, `Z7/CertAK/`, `scripts/certA/` | todo |
+| W1: Lemma 3 for Z7, Lemma 4, Lemma 5 glue | `Z7/Concrete/`, `Z7/Arith/`, `Arith/` (new files), `Z7/Glue/` | **done** |
+| W2: A-certificate (spec, soundness, kernel computation) | `Z7/CertA/`, `Z7/CertAK/`, `scripts/certA/` | **done** (`bodyUnits_400`) |
 | W3: contour, Γ-form, Laplace; Lemma 6(i) and 6(ii) from `SaddleData` | `Analytic/` (new files), `Stirling/`, `Z7/Analytic/` | **done** (`size_of_saddleData`, `nonvan_of_saddleData`) |
 | Lemma 6 for Z7, unconditional | `Z7/Lemma6.lean` (`size_Z7`, `nonvan_Z7`) | **done** |
 | W4: kernel-checked saddle certificate | `Interval/`, `Fam/Interval/`, `Z7/Interval/`, `scripts/saddle/` | **done** (`Z7.Interval.Z7_saddleData`, standard axioms; verified by main) |
-| main assembly + audit | `Z7/MainCond.lean`, `Z7/MainUnconditional.lean`, `Axioms.lean` | todo |
+| main assembly + audit | `Z7/MainCond.lean`, `Z7/MainUnconditional.lean`, `Axioms.lean` | **done** |
 
 ## Z7 data
 
@@ -120,3 +127,7 @@ must reproduce A_cert above (or be slightly larger and still give Q < 0).
   Lemma 4, PNT step, glue `oneOfZeta7To21_of_parts`. Main added `Z7/MainCond.lean`:
   `oneOfZeta7To21_of_certUnits : CertA.UnitsFact → OneOfZeta7To21`, standard axioms only. The unit count
   778841997893779320302794447562 · 2⁻⁹⁶ + tail equals Acert exactly. Remaining: W2's kernel run `bodyUnits_400`.
+- 2026-10-22: W2 done (`9815d5f`, `5c3c524`): A-certificate spec and soundness, kernel run
+  `bodyUnits_400 = 778841997893779320302794447562` (30,137 intervals, 1,029 chunks; ~29 min wall at
+  LEAN_NUM_THREADS=12, ~3.3 CPU-h). **Main theorem assembled** (`Z7/MainUnconditional.lean`): full `lake build` OK,
+  axiom audit standard. Unused copied `Size/` and coordination marker files removed; README/TRUST final.
