@@ -1,16 +1,14 @@
 /-
-# Stirling along the contour for Z7 (PROOF_ZETA §6.4)
+# Stirling along the contour for Z7 (Lemma 6)
 
 For `x` in the sector region (`‖α_i(x)‖ ≥ a`, `|arg α_i(x)| ≤ π - η`, `α_i(x) = s_i x + u_i`)
 and `n = 240(m+1) ≥ 4/a`:
 
-* `Pfun_asymp` (6.4.2, first line): `P_n(nx) = n(2x + 1) exp(λ_n + nΨ(x) + ψ₀(x) + e)`,
+* `Pfun_asymp`: `P_n(nx) = n(2x + 1) exp(λ_n + nΨ(x) + ψ₀(x) + e)`,
   `|e| ≤ 56 (9 + 1/(6 sin²(η/2)))/(a n)`, with `λ_n = -G n log n + G n - 18 log n + 5 log 2π`.
 
 Here `Ψ(x) = Σ c_i α_i log α_i`, `ψ₀(x) = Σ c_i (β_i - 1/2) log α_i` (`Factors.lean`). Only the
-`log Γ` Stirling bound is used; no digamma bounds are needed for Z7.
-
-Status: complete (no `sorry`).
+`log Γ` Stirling bound is used.
 -/
 import ZetaIrrational.Z7.Analytic.Gamma
 import ZetaIrrational.Analytic.StirlingSum
@@ -46,7 +44,7 @@ lemma sectorHyp_of (a η : ℝ) (x : ℂ) (h : SectorAt a η x) :
     SectorHyp univ (fun i => alphaZ i x) βZ η a :=
   fun i _ => ⟨(h i).1, (h i).2, (βZ_bounds i).1, (βZ_bounds i).2⟩
 
-/-- **(6.4.2)** Stirling for `P_n` along the contour. -/
+/-- **Stirling for `P_n` along the contour.** -/
 theorem Pfun_asymp (m : ℕ) {a η : ℝ} (ha : 0 < a) (hη0 : 0 < η) (hη : η ≤ π) {x : ℂ}
     (hx : SectorAt a η x) (hn : 4 / a ≤ (Z7.nOf m : ℝ)) :
     ∃ e : ℂ, ‖e‖ ≤ 56 * ((9 + 1 / (6 * Real.sin (η / 2) ^ 2)) / (a * Z7.nOf m)) ∧

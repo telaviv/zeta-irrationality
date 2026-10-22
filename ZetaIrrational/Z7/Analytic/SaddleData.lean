@@ -1,19 +1,21 @@
 /-
 # The saddle data (S0)–(S5) for instance Z7
 
-`SaddleData` packages PROOF_ZETA §6.3 (S0)–(S5) for instance Z7 as finitely many `Prop`s about
-the explicit phase `phaseZ = Ψ - 3πix` (`Z7/Analytic/Factors.lean`) and an explicit polyline
-`v 0, …, v Ktop` (in `x = z/n` coordinates, `n = 240(m+1)`). Every field is a statement that
-interval arithmetic can certify. Fields carrying the parameters:
-* `S0 : Ψ'(x₀) = 3πi` (phase `3π`);
-* `H4 : sin(240 Im Ω) ≠ 0` (`q = 240`);
-* `v0_lt : Re (v 0) < 11/12` (`r = 11/12`: the start `x_c` lies before the end `r` of the zero run);
-* `ReΩ_le : Re Ω ≤ -101167/10000` (`= Vcert`, used for Lemma 6(i)).
-
-The structure is the one of lean_beta's I3 `SaddleData` with these changes. It is the interface
-between `Z7/Analytic/` (which consumes it) and `Z7/Interval/` (which certifies it).
-
-Status: complete (no `sorry`).
+`SaddleData` packages the saddle-point conditions of Lemma 6 for instance Z7 as finitely many
+`Prop`s about the explicit phase `f = phaseZ = Ψ - 3πix` (`Z7/Analytic/Factors.lean`) and an explicit
+polyline `v 0, …, v Ktop` (in `x = z/n` coordinates, `n = 240(m+1)`). Every field is a statement
+that interval arithmetic can certify (`Z7/Interval/` does; `Z7/Analytic/` consumes the structure).
+With `Ω = f(x₀)`:
+* (S0) `x₀` is a saddle: `Ψ'(x₀) = 3πi`; also `Re Ω ≤ Vcert = -10.1167` (`ReΩ_le`, used for
+  Lemma 6(i)) and `sin(240 Im Ω) ≠ 0` (field `sin_ne`: the phase moves by `240 Im Ω` from `n` to
+  `n + 240`, used for Lemma 6(ii));
+* (S1) the Taylor disc: `Ψ''(x₀) d² = -K` with `K > 0`, `|Ψ'''| ≤ M` on the disc of radius `ρ`,
+  `Mρ ≤ 3K/2`; (S1′) the disc and the path (except its start) lie in `Im x > 0`;
+* (S2) `Re f ≤ Re Ω - η_far` on the polyline outside the disc;
+* (S3) on the vertical top ray, `Re f` decreases at rate `rate` beyond height `Y₀`;
+* (S4) the sector conditions `|α_i| ≥ a`, `|arg α_i| ≤ π - η` along the whole contour;
+* (S5) the start `x_c = v 0` is real with `0 < x_c < r = 11/12`, and (S2) holds on the first
+  segment even when the start is moved by up to `δ₀` along `ℝ` (`S2_first`).
 -/
 import ZetaIrrational.Z7.Analytic.Factors
 
@@ -58,8 +60,8 @@ structure SaddleData where
   δ₀_pos : 0 < δ₀
   /-- (S0) `x₀` is a saddle: `f'(x₀) = Ψ'(x₀) - 3πi = 0`. -/
   S0 : Psi1Z x₀ = 3 * π * I
-  /-- (H4) `sin(240 Im Ω) ≠ 0`, `Ω = f(x₀)`. -/
-  H4 : Real.sin (240 * (phaseZ x₀).im) ≠ 0
+  /-- (S0) `sin(240 Im Ω) ≠ 0`, `Ω = f(x₀)` (nonvanishing of the oscillation). -/
+  sin_ne : Real.sin (240 * (phaseZ x₀).im) ≠ 0
   /-- (S0) the certified upper bound `Re Ω ≤ Vcert = -10.1167`. -/
   ReΩ_le : (phaseZ x₀).re ≤ -101167 / 10000
   /-- (S1) Taylor disc. -/
@@ -89,7 +91,7 @@ structure SaddleData where
   S2 : ∀ k < Ktop, 1 ≤ k → k ≠ Kd → ∀ t ∈ Icc (0 : ℝ) 1,
     (phaseZ (v k + t * (v (k + 1) - v k))).re ≤ (phaseZ x₀).re - ηfar ∧
       SectorAt a η (v k + t * (v (k + 1) - v k))
-  /-- (S2₀) + (S4) on the first segment, with start point moved by `|e| ≤ δ₀` along `ℝ`. -/
+  /-- (S5) + (S2) + (S4) on the first segment, with start point moved by `|e| ≤ δ₀` along `ℝ`. -/
   S2_first : ∀ e ∈ Icc (-δ₀) δ₀, ∀ t ∈ Ioc (0 : ℝ) 1,
     (phaseZ ((v 0 + e) + t * (v 1 - (v 0 + e)))).re ≤ (phaseZ x₀).re - ηfar ∧
       SectorAt a η ((v 0 + e) + t * (v 1 - (v 0 + e)))

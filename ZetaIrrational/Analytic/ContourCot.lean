@@ -1,5 +1,5 @@
 /-
-# The contour formula for `Σ_{t ≥ 1} f(t)` with the kernel `π cot(πz)` (PROOF_ZETA §6.1)
+# The contour formula for `Σ_{t ≥ 1} f(t)` with the kernel `π cot(πz)` (Lemma 6)
 
 **Theorem** (`hasSum_cot_eq_line_integral`). Let `f` be holomorphic on `{Re z > c₀}`, with
 `‖f z‖ ≤ C (1 + ‖z‖²)⁻¹` for `Re z ≥ c`, where `0 ≤ c₀ < c`, `c ∉ ℤ`, and `f(t) = 0` for the
@@ -8,14 +8,16 @@ integers `1 ≤ t < c`. Then
     Σ_{t ≥ 1} f(t) = -(1/2π) ∫_ℝ f(c + iy) π cot(π(c + iy)) dy
                    = -(1/2πi) ∫_{c-i∞}^{c+i∞} f(z) π cot(πz) dz.
 
-This is the proof of `Analytic/Contour.lean` (the alternating case, kernel `π/sin(πz)`) with the
-kernel `k₀ = π cot(πz)` of `CotKernel.lean`: its residue at every integer is `1`
-(`tendsto_sub_mul_kk0`), `‖k₀‖ ≤ π` on `Re z = N + 1/2`, `‖k₀‖ ≤ π/|sin(πc)|` on `Re z = c`, and
-`‖k₀‖ ≤ 2π` for `|Im z| ≥ 1`. The pole at `0` lies outside the strip `c ≤ Re z ≤ N + 1/2`.
-
-Status: complete (no `sorry`).
+**Route (Mathlib has no residue theorem).** For `N > c` put `X = N + 1/2` and subtract the principal
+parts at the integers `c < t ≤ N` (`GsubC`, with the model kernel `m_{t,s}` of `ContourModel.lean`).
+The difference has only removable singularities (`Removable.lean`), so Cauchy's theorem for the
+rectangle `[c, X] × [-Y, Y]` (`integral_boundary_rect_eq_zero_of_differentiableOn`) and `Y → ∞`
+(`norm_GsubC_horizontal_le`) give `line_identity_cot`; then `N → ∞`. The kernel `k₀ = π cot(πz)`
+(`CotKernel.lean`) has residue `1` at every integer (`tendsto_sub_mul_kk0`), `‖k₀‖ ≤ π` on
+`Re z = N + 1/2`, `‖k₀‖ ≤ π/|sin(πc)|` on `Re z = c`, and `‖k₀‖ ≤ 2π` for `|Im z| ≥ 1`. The pole at
+`0` lies outside the strip `c ≤ Re z ≤ N + 1/2`.
 -/
-import ZetaIrrational.Analytic.Contour
+import ZetaIrrational.Analytic.ContourCommon
 import ZetaIrrational.Analytic.CotKernel
 
 set_option autoImplicit false
@@ -445,7 +447,7 @@ theorem line_identity_cot (hf : DifferentiableOn ℂ f {z | c₀ < z.re})
     rw [Finset.sum_congr rfl this, Finset.sum_const_zero, sub_zero]
   rw [← hGc_val, ← heqG, hGX_val]
 
-/-- **Contour formula for `Σ_{t ≥ 1} f(t)`** (PROOF_ZETA §6.1). -/
+/-- **Contour formula for `Σ_{t ≥ 1} f(t)`.** -/
 theorem hasSum_cot_eq_line_integral (hf : DifferentiableOn ℂ f {z | c₀ < z.re})
     (hb : ∀ z : ℂ, c ≤ z.re → ‖f z‖ ≤ C * (1 + ‖z‖ ^ 2)⁻¹) (hc₀ : c₀ < c) (hc0 : 0 < c)
     (hcZ : ∀ k : ℤ, c ≠ k) (hz : ∀ t : ℕ, 1 ≤ t → (t : ℝ) < c → f t = 0) :

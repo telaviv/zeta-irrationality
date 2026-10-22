@@ -6,11 +6,9 @@ whose points other than `w 0` lie in the open upper half plane, with `Re (w K) >
 
     i ∫_0^∞ G_n(c + iy) dy = Σ_{k<K} ∫_{[w_k, w_{k+1}]} G_n + i ∫_0^∞ G_n(w_K + iy) dy,
 
-where `G_n = R_n k₄` is holomorphic on `{Im z > 0} ∪ B(c, δ)`. Mirrors lean_beta's
-`I3/Analytic/Deform.lean`; the kernel bound in the upper half plane is
+where `G_n = R_n k₄` is holomorphic on `{Im z > 0} ∪ B(c, δ)`. The kernel bound in the upper half
+plane is
 `‖k₄(z)‖ ≤ 24 π⁵ (1 + 1/(π y₀))⁵` for `Im z ≥ y₀` (`norm_kk4_le_of_im`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Analytic.ContourZ7
 import ZetaIrrational.Analytic.Deformation

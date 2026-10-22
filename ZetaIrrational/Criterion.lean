@@ -1,10 +1,8 @@
 /-
 # The irrationality criterion
 
-Formalises the contradiction step of `PROOF_BETA.md` §7.
-If integer linear forms `a n + ∑ c n i * x i` tend to `0` and are nonzero for infinitely many `n`,
-then some `x i` is irrational.
-Status: complete (no `sorry`).
+The contradiction step of the main theorem. If integer linear forms `a n + ∑ c n i * x i` tend
+to `0` and are nonzero for infinitely many `n`, then some `x i` is irrational.
 -/
 import Mathlib
 

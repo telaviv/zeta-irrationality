@@ -1,21 +1,19 @@
 /-
-# Contour deformation via primitives (PROOF_BETA100 §6.6, "Deformation")
+# Contour deformation via primitives (Lemma 6)
 
 Mathlib has primitives of holomorphic functions on discs (`DifferentiableOn.isExactOn_ball`).
 We extend this to
 * nested unions of discs (`exists_prim_iUnion_balls`), hence the upper half plane
   (`exists_prim_upperHalfPlane`);
 * unions `V ∪ W` of two open sets with preconnected nonempty intersection (`exists_prim_union`),
-  hence `{Im z > 0} ∪ B(c, δ)` (`exists_prim_upper_union_ball`): the region where
-  `F_n = R_n'' π / sin(πz)` is holomorphic around the certified contour, which starts at the real
-  point `c = n x_c`.
+  hence `{Im z > 0} ∪ B(c, δ)` (`exists_prim_upper_union_ball`): the region where the integrand
+  `G_n = R_n k⁗` is holomorphic around the certified contour, which starts at the real point
+  `c ≈ n x_c`.
 
 With a primitive, line integrals along segments are differences of the primitive
 (`integral_line_eq_sub`), and the vertical ray from `v₀` can be replaced by a polyline
 `v₀, v₁, …, v_K` followed by the vertical ray from `v_K` (`ray_eq_polyline_add_ray`), provided `F`
 is small on the horizontal connecting segments at large height.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib.Analysis.Complex.HasPrimitives
 import Mathlib.Analysis.Calculus.MeanValue

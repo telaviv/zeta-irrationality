@@ -1,30 +1,26 @@
 /-
-# The A-certificate for instance Z7: definitions
-
-`PROOF_ZETA.md` §5.1 and `handoff/zeta7/f4_certA_exact.py`.
+# The A-certificate for instance Z7: definitions (Lemma 5)
 
 Instance Z7: zero runs `[1, rn]` and `[-(1+r)n, -n-1]` of multiplicity 5, `r = 11/12`, blocks
 `δ_j = k_j/80` (`k_j = 1, …, 18`, multiplicity 1) from `ZetaIrr.Z7.blocks`, `G = 547/120`.
 
 This file contains
-* the **specification** of PROOF_ZETA §5.1 for `x = n/p`, `y = k/p`: block count `Sfun`, pole
+* the **specification** of the Lemma 5 bracket for `x = n/p`, `y = k/p`: block count `Sfun`, pole
   counts `Pfun`, `Ptot`, zero hits `cfun`, the three-case `bracket` (`y ≥ 1`; `y < 1` and
   `P ≥ 1`; `y < 1` and `P = 0`), and `gfun = bracket` where `S(y) > 0`, `0` where `S(y) = 0`.
   Since `S(0) = 0` (no block contains `0`), `sup_{0 ≤ y ≤ x} gfun x y = max(0, sup_{S(y)>0} bracket)`,
-  which is PROOF_ZETA's `e*(x) + G⌊x⌋`;
+  which is `e*(x) + G⌊x⌋`;
 * the **floor-data form** `Phi`: `gfun x y` only depends on the floors and ceilings of `y - c` for
   the finitely many offsets `c = σ/240 · x` listed in `offsets`;
 * the **computable** `eStarInt x`: a max over the residues `σP mod 240Q` (`x = P/Q`) of one
   closed-form candidate value each (`cand`), proved equal to `max_{0 ≤ y ≤ x} gfun x y` in
   `Z7/CertA/Sound.lean`, `Z7/CertA/Attain.lean`;
-* the **event points** in `[1, X]` (same set as `f4_certA_exact.py`: chunk cuts, integers, and
-  crossings `m/(s₁ - s₂)` of the breakpoint line families `y = s x + j`);
-* the rounded body sum `bodyUnits` (each term rounded *up* to a multiple of `2^-96`, as in the
-  Python) and the tail `(S+15)/X + G/(2(X-1))`.
+* the **event points** in `[1, X]` (chunk cuts, which include the integers, and the crossings
+  `m/(s₁ - s₂)` of the breakpoint line families `y = s x + j`);
+* the rounded body sum `bodyUnits` (each term rounded *up* to a multiple of `2^-96`) and the tail
+  `(S+15)/X + G/(2(X-1))`.
 
 Everything here is a definition; no proofs.
-
-Status: complete (definitions only, no `sorry`).
 -/
 import ZetaIrrational.FamilyZ7
 
@@ -32,7 +28,7 @@ namespace ZetaIrr.Z7.CertA
 
 open Finset
 
-/-! ## Specification (PROOF_ZETA §5.1) -/
+/-! ## Specification (the Lemma 5 bracket) -/
 
 /-- `δ = d/80`. -/
 def dlt (d : ℕ) : ℚ := (d : ℚ) / 80
@@ -44,7 +40,7 @@ def rr : ℚ := 11 / 12
 def Sfun (x y : ℚ) : ℕ :=
   (blocks.map fun b => if dlt b.1 * x ≤ y ∧ y ≤ (1 - dlt b.1) * x then b.2 else 0).sum
 
-/-- `P_j(y)` of §5.1, with the out-of-block indicator terms. -/
+/-- `P_j(y)` of the Lemma 5 bracket, with the out-of-block indicator terms. -/
 def Pfun (d : ℕ) (x y : ℚ) : ℤ :=
   if dlt d * x ≤ y ∧ y ≤ (1 - dlt d) * x then
     ⌊y - dlt d * x⌋ + ⌊(1 - dlt d) * x - y⌋
@@ -59,7 +55,7 @@ def Ptot (x y : ℚ) : ℤ := (blocks.map fun b => (b.2 : ℤ) * Pfun b.1 x y).s
 /-- The zero hits `c(y) = 5(⌊y + rx⌋ - ⌊y⌋) + 5(⌈y - x⌉ - ⌈y - (1+r)x⌉)`. -/
 def cfun (x y : ℚ) : ℤ := 5 * (⌊y + rr * x⌋ - ⌊y⌋) + 5 * (⌈y - x⌉ - ⌈y - (1 + rr) * x⌉)
 
-/-- The bracket of §5.1: `S + 4 - c + P` if `y ≥ 1`; `S - 1 - c + P` if `y < 1` and `P ≥ 1`;
+/-- The Lemma 5 bracket: `S + 4 - c + P` if `y ≥ 1`; `S - 1 - c + P` if `y < 1` and `P ≥ 1`;
 `0` if `y < 1` and `P = 0`. -/
 def bracket (x y : ℚ) : ℤ :=
   if 1 ≤ y then (Sfun x y : ℤ) + 4 - cfun x y + Ptot x y
@@ -186,7 +182,7 @@ def eStar (x : ℚ) : ℚ := if 1 ≤ x then (eStarInt x : ℚ) - G * ⌊x⌋ el
 
 /-! ## Event points -/
 
-/-- The slopes `s` of the breakpoint line families `y = s x + j` of `f4_certA_exact.py`
+/-- The slopes `s` of the breakpoint line families `y = s x + j`
 (`= σ/240` for the offsets `σ`). -/
 def fams : List ℚ :=
   (([0, -11 / 12, 1, 23 / 12] : List ℚ) ++
@@ -206,7 +202,7 @@ def crossPair (lo hi : ℚ) (s₁ s₂ : ℚ) : List ℚ :=
 def crossings (lo hi : ℚ) : List ℚ :=
   fams.flatMap fun s₁ => fams.flatMap fun s₂ => crossPair lo hi s₁ s₂
 
-/-- The chunk cuts of `f4_certA_exact.py`: `1 + j/20` (`j < 40`) and `3 + j/2`
+/-- The chunk cuts: `1 + j/20` (`j < 40`) and `3 + j/2`
 (`0 ≤ j ≤ 2(X-3)`). They include every integer in `[1, X]`. -/
 def cuts (X : ℕ) : List ℚ :=
   (List.range 40).map (fun j : ℕ => 1 + (j : ℚ) / 20) ++
@@ -237,7 +233,7 @@ def termUnits (a b : ℚ) : ℤ := ⌈eStar ((a + b) / 2) * (1 / a - 1 / b) * 2 
 /-- The rounded body, in units of `2^-96`. -/
 def bodyUnits (X : ℕ) : ℤ := pairSum termUnits (events X)
 
-/-- `E_tail = S + 15 = 33`; tail bound `E_tail/X + G/(2(X-1))` (PROOF_ZETA (5.2), (5.4)). -/
+/-- `E_tail = S + 15 = 33`; tail bound `E_tail/X + G/(2(X-1))` (`CertA/Tail.lean`). -/
 def tail (X : ℕ) : ℚ := 33 / X + G / (2 * ((X : ℚ) - 1))
 
 end ZetaIrr.Z7.CertA

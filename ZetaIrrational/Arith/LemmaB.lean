@@ -1,5 +1,5 @@
 /-
-# Lemma B and the assembly of ρ, τ (PROOF_ZETA §3–§4), for general `PFData`
+# Lemma B (harmonic sums) and the valuation bounds for ρ, τ (Lemma 4), for general `PFData`
 
 * elementary valuation facts: `padicValRat_int_le` (`|z| < p^{e+1}` gives `v_p(z) ≤ e`),
   `padicValRat_int_le_ind`, `vge_ind_int`, `padicValRat_int_eq_zero`;
@@ -9,8 +9,6 @@
   `ρ = -Σ a_{i,k} (i)_4 H_k^{(i+4)}`;
 * Legendre-type sums over intervals: `sub_one_mul_sum_Icc_ge` (lower bound) and `pole_sum_le`
   (upper bound for `Σ_{k' ∈ [a,b], k' ≠ k} v_p(k' - k)`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Arith.Valuation
 import ZetaIrrational.Arith.Legendre

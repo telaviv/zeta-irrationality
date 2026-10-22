@@ -1,19 +1,17 @@
 /-
-# The saddle value `Ω = f(x₀)` and (H4) for instance Z7 (PROOF_ZETA §6.3, §7 (H3), (H4))
+# The saddle value `Ω = f(x₀)` and `sin(240 Im Ω)` for instance Z7
 
 With `x₀` the certified saddle of `SaddleZ7.lean` and `Ω = f(x₀) = Ψ(x₀) - 3πi x₀`:
-* `Z7_ReOmega_le : Re Ω ≤ -10.1167485`, `Z7_ReOmega_ge : -10.1167486 ≤ Re Ω` — (S0)/(H3);
-* `Z7_ImOmega_mem : Im Ω ∈ [-7.704987202, -7.704987200]`;
-* `Z7_sinqtheta_le : sin(240 Im Ω) < -9/10` — (H4) (`sin(240 Im Ω) ≈ -0.932453`).
+* `Z7_ReOmega_le : Re Ω ≤ -10.1167485`, `Z7_ReOmega_ge : -10.1167486 ≤ Re Ω`;
+* `mem_ImΩI`: an enclosure `Im Ω ∈ [-7.704987202, -7.704987200]` (up to outward rounding);
+* `Z7_sinqtheta_le : sin(240 Im Ω) < -9/10` (`sin(240 Im Ω) ≈ -0.932453`).
 
 Method: a box evaluation of `f(c0)` at the rational centre (precision `2^{-80}`, 40 series terms),
-widened by the mean-value bound `‖f(x₀) - f(c0)‖ ≤ (10⁻¹⁶ + 30 R0) R0`. For (H4),
+widened by the mean-value bound `‖f(x₀) - f(c0)‖ ≤ (10⁻¹⁶ + 30 R0) R0`. For the sine,
 `240 Im Ω = (u - π/2) - 294 · 2π` with `|u| ≤ 0.38` (kernel check), so
 `sin(240 Im Ω) = -cos u ≤ -(1 - u²/2)`.
 
 All numerical checks are `decide +kernel` (no `native_decide`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Interval.SaddleZ7
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Bounds
@@ -59,10 +57,8 @@ lemma mem_ImΩI : ImΩI.mem Ω.im := by
 
 lemma chk_Re_hi : ReΩI.hiLe (-101167485 / 10 ^ 7) = true := by decide +kernel
 lemma chk_Re_lo : ReΩI.loGe (-101167486 / 10 ^ 7) = true := by decide +kernel
-lemma chk_Im_hi : ImΩI.hiLe (-7704987200 / 10 ^ 9) = true := by decide +kernel
-lemma chk_Im_lo : ImΩI.loGe (-7704987202 / 10 ^ 9) = true := by decide +kernel
 
-/-- **(H3)/(S0)**: `Re Ω ≤ -10.1167485`. -/
+/-- `Re Ω ≤ -10.1167485`. -/
 theorem Z7_ReOmega_le : Ω.re ≤ -101167485 / 10 ^ 7 := by
   have := le_of_hiLe mem_ReΩI chk_Re_hi
   push_cast at this; exact this
@@ -71,12 +67,7 @@ theorem Z7_ReOmega_ge : -101167486 / 10 ^ 7 ≤ Ω.re := by
   have := ge_of_loGe mem_ReΩI chk_Re_lo
   push_cast at this; exact this
 
-theorem Z7_ImOmega_mem : -7704987202 / 10 ^ 9 ≤ Ω.im ∧ Ω.im ≤ -7704987200 / 10 ^ 9 := by
-  have h1 := ge_of_loGe mem_ImΩI chk_Im_lo
-  have h2 := le_of_hiLe mem_ImΩI chk_Im_hi
-  push_cast at h1 h2; exact ⟨h1, h2⟩
-
-/-! ## (H4): `sin(240 Im Ω) < -0.9` -/
+/-! ## `sin(240 Im Ω) < -0.9` -/
 
 /-- `u = 240 Im Ω + (1177/2) π`, so that `240 Im Ω = (u - π/2) - 294 · 2π`. -/
 def uH4 : IV := (ImΩI.smul 240).add (piI.smul (1177 / 2))
@@ -87,7 +78,7 @@ lemma mem_uH4 : uH4.mem (240 * Ω.im + 1177 / 2 * π) := by
 
 lemma chk_u : uH4.absLe (38 / 100) = true := by decide +kernel
 
-/-- **(H4)** for Z7: `sin(q · Im Ω) < -0.9` with `q = 240`. -/
+/-- `sin(q · Im Ω) < -0.9` with `q = 240`, so `sin(240 Im Ω) ≠ 0`. -/
 theorem Z7_sinqtheta_le : Real.sin (240 * Ω.im) < -9 / 10 := by
   set u := 240 * Ω.im + 1177 / 2 * π with hu
   have hsin : Real.sin (240 * Ω.im) = -Real.cos u := by

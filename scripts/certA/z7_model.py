@@ -1,10 +1,11 @@
 """Untrusted Python model of the Lean A-certificate algorithm for Z7 (`ZetaIrrational/Z7/CertA/Defs.lean`).
 
-It mirrors the Lean definitions exactly (offsets, residues, the per-candidate closed form, events, rounding) and is
-used only to check the design against `handoff/zeta7/f4_certA_exact.py` before the kernel run.
-Usage: python z7_model.py [check N | total]
+It mirrors the Lean definitions exactly (offsets, residues, the per-candidate closed form, events, rounding) and
+recomputes the event list and the rounded body sum `bodyUnits 400` in exact rational arithmetic, as a cross-check of
+the value that the kernel verifies in `ZetaIrrational/Z7/CertAK/CertCompute.lean`. Not needed for the proof.
+
+Usage, from the repository root: python scripts/certA/z7_model.py
 """
-import sys
 from fractions import Fraction as Fr
 from math import floor, ceil
 
@@ -71,26 +72,7 @@ def term_units(a, b):
 
 
 if __name__ == '__main__':
-    mode = sys.argv[1] if len(sys.argv) > 1 else 'total'
-    if mode == 'check':
-        sys.path.insert(0, r'C:\Users\Shawn Krisman\math\handoff\zeta7')
-        import f4_certA_exact as ref
-        runs, Gr, fams = ref.setup(Fr(11, 12), [(Fr(d, 80), m) for d, m in BLOCKS])
-        assert Gr == G
-        import random
-        random.seed(1)
-        N = int(sys.argv[2]) if len(sys.argv) > 2 else 300
-        ev = events()
-        bad = 0
-        for i in range(N):
-            j = random.randrange(len(ev) - 1)
-            x = (ev[j] + ev[j + 1]) / 2
-            e1 = estar(x); e2 = ref.e_star(x, runs, [(Fr(d, 80), m) for d, m in BLOCKS], Gr, fams)
-            if e1 != e2:
-                bad += 1; print('MISMATCH', x, e1, e2)
-        print('checked', N, 'bad', bad)
-    else:
-        ev = events()
-        print('events', len(ev), 'intervals', len(ev) - 1)
-        tot = sum(term_units(a, b) for a, b in zip(ev[:-1], ev[1:]))
-        print('bodyUnits', tot, 'target 778841997893779320302794447562', tot == 778841997893779320302794447562)
+    ev = events()
+    print('events', len(ev), 'intervals', len(ev) - 1)
+    tot = sum(term_units(a, b) for a, b in zip(ev[:-1], ev[1:]))
+    print('bodyUnits', tot, 'target 778841997893779320302794447562', tot == 778841997893779320302794447562)

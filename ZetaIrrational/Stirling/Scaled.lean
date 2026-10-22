@@ -1,5 +1,5 @@
 /-
-# The scaled Stirling expansion used in PROOF_BETA100 §6.4 ("Application")
+# The scaled Stirling expansion (Lemma 6)
 
 `stirling_scaled`: for `0 < φ ≤ π`, `a > 0`, `α ∈ ℂ` with `‖α‖ ≥ a` and `|arg α| ≤ π - φ`,
 real `β ∈ [0, 2]`, and real `n ≥ 4/a`:
@@ -7,8 +7,6 @@ real `β ∈ [0, 2]`, and real `n ≥ 4/a`:
     Γ(nα + β) = exp (logGammaS (nα + β)),
     ‖logGammaS (nα + β) - [nα log n + n(α log α - α) + (β - 1/2)(log n + log α) + (1/2) log 2π]‖
         ≤ (9 + 1/(6 sin²(φ/2))) / (a n).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Stirling.Bound
 
@@ -68,7 +66,7 @@ lemma log_mul_one_add {α : ℂ} (hα : α ≠ 0) {β n : ℝ} (hβ : 0 ≤ β)
       linarith
     exact ⟨by linarith [neg_pi_lt_arg α], by linarith⟩
 
-/-- **Scaled uniform Stirling** (PROOF_BETA100 §6.4, the form used downstream). -/
+/-- **Scaled uniform Stirling.** -/
 theorem stirling_scaled {φ a : ℝ} (hφ0 : 0 < φ) (hφ : φ ≤ Real.pi) (ha : 0 < a) {α : ℂ}
     (hαa : a ≤ ‖α‖) (harg : |arg α| ≤ Real.pi - φ) {β : ℝ} (hβ0 : 0 ≤ β) (hβ2 : β ≤ 2) {n : ℝ}
     (hn : 4 / a ≤ n) :

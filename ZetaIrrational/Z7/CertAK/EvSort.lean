@@ -6,14 +6,13 @@ and does not reduce well in the kernel. Here:
 
 * `msort` is a merge sort by structural recursion (with fuel); for *every* fuel and comparator it
   only permutes its input (`mem_msort`), so no correctness proof of the comparator is needed;
-* `eq_of_pairwise_lt` — two strictly increasing lists with the same members are equal;
-* `events_eq_of_check` — if `dedupAdj (msort … (cuts X ++ crossings 1 X)) = L` and `L` is strictly
-  increasing (checked by `sortedLT`), then `events X = L`.
+* `sortedLT`, `pairwise_of_sortedLT` — a kernel-checkable test for being strictly increasing;
+* `eq_of_pairwise_lt` — two strictly increasing lists with the same members are equal.
+
+`Windows.lean` uses these to identify the window-by-window sorted list with `events 400`.
 
 The comparator `qleN` compares `a.num.toNat * b.den` with `b.num.toNat * a.den` (correct for
 `a, b ≥ 0`, which is all that is needed here; correctness is not used in any proof).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.CertA.Defs
 
@@ -127,18 +126,5 @@ lemma eq_of_pairwise_lt : ∀ (l₁ l₂ : List ℚ), l₁.Pairwise (· < ·) �
       rcases List.mem_cons.1 ((h z).2 (List.mem_cons_of_mem _ hz)) with rfl | hz'
       · exact absurd (h₂.1 z hz) (lt_irrefl z)
       · exact hz'
-
-/-- `events X` is any strictly increasing list with the same members as the (kernel-sortable)
-`dedupAdj (msort …)`. -/
-lemma events_eq_of_check (X n : ℕ) (L : List ℚ)
-    (hL : dedupAdj (msort qleN n (cuts X ++ crossings 1 X)) = L)
-    (hs : sortedLT L = true)
-    (hpw : (events X).Pairwise (· < ·))
-    (hmem : ∀ z, z ∈ events X ↔ z ∈ cuts X ∨ z ∈ crossings 1 X)
-    (hdd : ∀ (l : List ℚ) (z : ℚ), z ∈ dedupAdj l ↔ z ∈ l) :
-    events X = L := by
-  apply eq_of_pairwise_lt _ _ hpw (pairwise_of_sortedLT L hs)
-  intro z
-  rw [hmem, ← hL, hdd, mem_msort, List.mem_append]
 
 end ZetaIrr.Z7.CertA

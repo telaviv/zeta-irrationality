@@ -1,14 +1,15 @@
 /-
 # Lemma 5 (pointwise part) for instance Z7
 
-`PROOF_ZETA.md` §3 (definitions of `c_p(k)`, `P_{p,j}(k)`), §4 (`e_p(k)`) and §5.1 (Claim).
+The counts `c_p(k)`, `P_{p,j}(k)` of Lemma A, the per-`k` exponent `e_p(k)` of Lemma 4, and the
+pointwise bound of Lemma 5.
 
 For `n = nOf m = 240(m+1)`, every `0 < p ≤ n` (in particular every prime `√𝒩 < p ≤ n`) and every
 `k` with `B_k ≥ 1`:
 
   `e_p(k) - G ⌊n/p⌋ ≤ e*(n/p)`  (`pointwise_le_eStar`),
 
-where `e_p(k) = epk m p k` is PROOF_ZETA's per-`k` exponent with the counts below:
+where `e_p(k) = epk m p k` is the per-`k` exponent of Lemma 4 with the counts below:
 * `B_k + 4 - c_p(k) + P_p(k)` if `k ≥ p`;
 * `B_k - 1 - c_p(k) + P_p(k)` if `k < p` and `P_p(k) ≥ 1`;
 * `0` if `k < p` and `P_p(k) = 0`;
@@ -16,15 +17,13 @@ where `e_p(k) = epk m p k` is PROOF_ZETA's per-`k` exponent with the counts belo
 with
 * `c_p(k) = 5 · #{l ∈ [1, rn] : p ∣ k + l} + 5 · #{l ∈ [n+1, (1+r)n] : p ∣ l - k}` (the zeros
   `t = l` and `t = -l` of multiplicity 5, at distance `-(k+l)` resp. `l - k` from the pole `-k`;
-  the `e`-term of §3 is omitted, it only increases `c_p(k)` and so decreases `e_p(k)`),
+  the `e`-term `[p ∣ n - 2k]` is omitted, it only increases `c_p(k)` and so decreases `e_p(k)`),
 * `P_p(k) = Σ_j m_j P_{p,j}(k)`, `P_{p,j}(k) = #{k' ∈ [a_j, b_j], k' ≠ k : p ∣ k' - k}`,
   `a_j = 3 d_j (m+1) = δ_j n`, `b_j = n - a_j`.
 
 Proof: `B_k = S(k/p)`, `P_{p,j}(k) = P_j(k/p)` (`Pfun_eq_Ppj`) and `c_p(k) = c(k/p)` (`cfun_eq_cp`)
 exactly, and `k ≥ p ⟺ k/p ≥ 1`, so `e_p(k) = bracket(n/p, k/p) ≤ eStarInt(n/p)`
 (`bracket_le_eStarInt`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.CertA.Sound
 import ZetaIrrational.Z7.Concrete.Data
@@ -33,7 +32,7 @@ namespace ZetaIrr.Z7.CertA
 
 open Finset
 
-/-! ## Definitions (PROOF_ZETA §3, §4) -/
+/-! ## Definitions (Lemma A, Lemma 4) -/
 
 /-- `c_p(k)`: zeros `l ∈ [1, rn]` (distance `-(k+l)`) and `-l`, `l ∈ [n+1, (1+r)n]` (distance
 `l - k`), multiplicity 5; `rn = 220(m+1)`, `(1+r)n = 460(m+1)`. -/
@@ -49,7 +48,7 @@ def Ppj (m p d k : ℕ) : ℕ :=
 /-- `P_p(k) = Σ_j m_j P_{p,j}(k)`. -/
 def Pp (m p k : ℕ) : ℤ := (blocks.map fun b => (b.2 : ℤ) * (Ppj m p b.1 k : ℤ)).sum
 
-/-- The per-`k` exponent `e_p(k)` of PROOF_ZETA §4 (with `c_p` without the `e`-term). -/
+/-- The per-`k` exponent `e_p(k)` of Lemma 4 (with `c_p` without the `e`-term). -/
 def epk (m p k : ℕ) : ℤ :=
   if p ≤ k then (Bk m k : ℤ) + 4 - cp m p k + Pp m p k
   else if 1 ≤ Pp m p k then (Bk m k : ℤ) - 1 - cp m p k + Pp m p k
@@ -156,7 +155,7 @@ lemma card_block (A B k : ℤ) (hAB : A ≤ B) :
   · rw [Finset.erase_eq_of_notMem (by simp; omega), card_Icc_dvd hp A B k hAB]
     ring
 
-/-- The §5.1 formula for `P_j` at `x = n/p`, `y = k/p` equals the count `P_{p,j}(k)`. -/
+/-- The Lemma 5 formula for `P_j` at `x = n/p`, `y = k/p` equals the count `P_{p,j}(k)`. -/
 lemma Pgen_eq (A B k : ℕ) (hAB : A ≤ B) :
     (if (A : ℚ) / p ≤ (k : ℚ) / p ∧ (k : ℚ) / p ≤ (B : ℚ) / p then
         ⌊(k : ℚ) / p - (A : ℚ) / p⌋ + ⌊(B : ℚ) / p - (k : ℚ) / p⌋
@@ -289,7 +288,7 @@ lemma le_nOf_of_Bk (m k : ℕ) (hk : 1 ≤ Bk m k) : k ≤ nOf m := by
 
 /-! ## Lemma 5, pointwise part -/
 
-/-- `e_p(k)` is the §5.1 bracket at `x = n/p`, `y = k/p`. -/
+/-- `e_p(k)` is the Lemma 5 bracket at `x = n/p`, `y = k/p`. -/
 lemma epk_eq_bracket (m p k : ℕ) (hp : 0 < p) :
     epk m p k = bracket ((nOf m : ℚ) / p) ((k : ℚ) / p) := by
   have hp' : (0 : ℚ) < p := by exact_mod_cast hp
@@ -299,7 +298,7 @@ lemma epk_eq_bracket (m p k : ℕ) (hp : 0 < p) :
   rw [Sfun_eq_Bk m p k hp, Ptot_eq_Pp m p k hp, cfun_eq_cp m p k hp]
   simp only [hy]
 
-/-- **PROOF_ZETA §5.1 Claim (pointwise part) for Z7.** For `n = 240(m+1)`, `0 < p ≤ n` and `k` with
+/-- **Lemma 5, pointwise part, for Z7.** For `n = 240(m+1)`, `0 < p ≤ n` and `k` with
 `B_k ≥ 1`: `e_p(k) - G ⌊n/p⌋ ≤ e*(n/p)`. -/
 theorem pointwise_le_eStar (m p k : ℕ) (hp : 0 < p) (hpn : p ≤ nOf m) (hk : 1 ≤ Bk m k) :
     (epk m p k : ℚ) - G * ⌊(nOf m : ℚ) / p⌋ ≤ eStar ((nOf m : ℚ) / p) := by

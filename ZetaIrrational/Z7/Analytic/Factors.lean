@@ -1,5 +1,5 @@
 /-
-# The Z7 factor list and the phase (PROOF_ZETA §6.2, instance Z7: `r = 11/12`, 18 blocks)
+# The Z7 factor list and the phase (Lemma 6; `r = 11/12`, 18 blocks)
 
 Forty Γ-factors `(c_i, s_i, u_i, β_i)`, `α_i(x) = s_i x + u_i`, so that for `z` not an integer
 
@@ -16,11 +16,10 @@ Identities: `Σ c_i s_i = 0`, `Σ c_i u_i = -G = -547/120`, `Σ c_i (β_i - 1/2)
 
 Phase functions: `alphaZ`, `PsiZ = Σ c_i α_i log α_i`, `Psi1Z = Σ c_i s_i log α_i`,
 `Psi2Z = Σ c_i s_i²/α_i`, `Psi3Z = -Σ c_i s_i³/α_i²`, `psi0Z = Σ c_i (β_i - 1/2) log α_i`,
-`phaseZ = PsiZ - 3πi x` (PROOF_ZETA §6.3: `sin⁵` meets `e^{2πiz}`), `lamN`, `SectorAt`.
+`phaseZ = PsiZ - 3πi x` (the integrand carries `e^{-3πiz}`, `T_eq_exp` in `CotKernel.lean`),
+`lamN`, `SectorAt`.
 
 It imports only Mathlib.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib.Analysis.SpecialFunctions.Complex.Log
 import Mathlib.Analysis.SpecialFunctions.Complex.Arg
@@ -68,9 +67,6 @@ lemma sum_c : ∑ i, (cZ i : ℝ) = 10 := by
 
 lemma sum_abs_c : ∑ i, |(cZ i : ℝ)| = 56 := by
   norm_num [Fin.sum_univ_succ, cZ]
-
-lemma sum_abs_cs : ∑ i, |(cZ i : ℝ) * sZ i| = 56 := by
-  norm_num [Fin.sum_univ_succ, cZ, sZ]
 
 lemma sum_abs_cβ : ∑ i, |(cZ i : ℝ) * (βZ i - 1 / 2)| = 28 := by
   norm_num [Fin.sum_univ_succ, cZ, βZ]

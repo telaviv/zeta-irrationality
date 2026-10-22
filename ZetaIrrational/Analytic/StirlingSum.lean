@@ -1,5 +1,5 @@
 /-
-# Stirling for a product of Γ-factors (PROOF_BETA100 §6.4 (6.4.1); PROOF_ZETA §6.4)
+# Stirling for a product of Γ-factors (Lemma 6)
 
 For a finite factor list `(c_i, α_i, β_i, s_i)` (`c_i ∈ ℤ`, `α_i ∈ ℂ` the value `α_i(x)` at the
 current point, `β_i ∈ [0, 2]`, slope `s_i`), with the sector condition (S4)
@@ -10,14 +10,9 @@ current point, `β_i ∈ [0, 2]`, slope `s_i`), with the sector condition (S4)
   `‖Σ c_i (logΓ(nα_i + β_i) - main_i)‖ ≤ (Σ|c_i|) (9 + 1/(6 sin²(φ/2))) / (a n)`;
 * `sum_main_eq`: `Σ c_i main_i = (Σ c_i α_i) n log n + n Σ c_i (α_i log α_i - α_i)
      + (Σ c_i (β_i - 1/2)) log n + Σ c_i (β_i - 1/2) log α_i + (Σ c_i / 2) log 2π`.
-  With `Σ c_i α_i = -G` this is (6.4.1): `-G n log n + G n + nΨ(x) + κ' log n + ψ₀(x) + …`;
-
-lean_zeta7 change: `β_i ∈ [0, 2]` (the ζ factor list has `β = 0`), and the digamma sums of
-lean_beta (`Λ_n`, `Λ_n'`) are dropped: the ζ integrand `R_n k⁗` needs no logarithmic derivatives.
+  With `Σ c_i α_i = -G` this is `-G n log n + G n + nΨ(x) + κ' log n + ψ₀(x) + …`.
 
 These use the uniform complex Stirling bounds of `ZetaIrrational/Stirling/`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Stirling.All
 

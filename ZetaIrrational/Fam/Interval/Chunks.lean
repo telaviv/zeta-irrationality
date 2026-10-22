@@ -7,14 +7,10 @@ small `decide +kernel` pieces, so that they can live in separate files and build
 * `lastPt a pts` — the last vertex of the polyline `a, pts₀, pts₁, …`;
 * `polyChk_append`: `polyChk a (l₁ ++ l₂) = polyChk a l₁ && polyChk (lastPt a l₁) l₂`;
 * `sectorQ` / `sector_of_sectorQ`: the sector condition of (S4) (`|α_i| ≥ a`, `|arg α_i| ≤ A`) on a
-  box, as `sectorB` but skipping the (expensive) arctan whenever `Re α_i ≥ 0` on the box, since then
+  box, skipping the (expensive) arctan whenever `Re α_i ≥ 0` on the box, since then
   `|arg α_i| ≤ π/2 < 63/40 ≤ A` (requires `A ≥ 63/40`);
 * `polySectorQ` / `poly_sectorQ` / `polySectorQ_append`: the same along a polyline, plus
-  `Re z > -1/2` (the e-factor), as `polySector`.
-
-Used by the I3 saddle certificate (PROOF_BETA §6.3, (S2), (S4)); nothing here is I3-specific.
-
-Status: complete (no `sorry`).
+  `Re z > -1/2` (the e-factor `2z + 1`).
 -/
 import ZetaIrrational.Interval.Polyline
 
@@ -34,17 +30,6 @@ lemma polyChk_append (ω p n : ℕ) (l : List Fac) (T : ℚ) (a : ℚ × ℚ) (l
   induction l₁ generalizing a with
   | nil => simp [polyChk, lastPt]
   | cons b rest ih => simp [polyChk, lastPt, ih, Bool.and_assoc]
-
-lemma onPoly_append {a : ℚ × ℚ} {l₁ l₂ : List (ℚ × ℚ)} {z : ℂ} (h : onPoly a (l₁ ++ l₂) z) :
-    onPoly a l₁ z ∨ onPoly (lastPt a l₁) l₂ z := by
-  induction l₁ generalizing a with
-  | nil => right; simpa [lastPt] using h
-  | cons b rest ih =>
-    rcases h with h | h
-    · left; left; exact h
-    · rcases ih h with h' | h'
-      · left; right; exact h'
-      · right; simpa [lastPt] using h'
 
 /-! ## The cheap sector check -/
 

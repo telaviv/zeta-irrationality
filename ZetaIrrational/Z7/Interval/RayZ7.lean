@@ -1,5 +1,5 @@
 /-
-# The top ray of the Z7 contour: (S3) and (S4) (PROOF_ZETA §6.3)
+# The top ray of the Z7 contour: (S3) and (S4)
 
 The contour ends with the vertical ray `X0 + i y`, `y ≥ Im xtop ≈ 12.0012`, `X0 = Re xtop ≈ 2.0512`.
 
@@ -7,12 +7,9 @@ The contour ends with the vertical ray `X0 + i y`, `y ≥ Im xtop ≈ 12.0012`, 
   `[12.0012, 20]`, `[20, 40]` (`chk_ray`), and beyond `40` the analytic tail
   `Im Ψ' ≥ (π/2) Σ c - Σ |c| |s X0 + κ| / y = 5π - 142.86…/y` (`im_dpsiL_ge_tail`, `Σ c = 10`).
   Hence `∂h/∂y = 3π - Im Ψ' ≤ -(q0 - 3π) < -2.5` (`S3_h_decreasing`, `q0_sub_three_pi`).
-* **(S4)** `S4_ray`: `|α_i| ≥ 12 ≥ 1/100` and `|arg α_i| ≤ π/2 + 1/3 ≤ 2.76` on the ray;
-  `S4_ray_efactor`: `Re(2z + 1) > 0`.
+* **(S4)** `S4_ray`: `|α_i| ≥ 12 ≥ 1/100` and `|arg α_i| ≤ π/2 + 1/3 ≤ 2.76` on the ray.
 
 All numerical checks are `decide +kernel` (no `native_decide`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Interval.PolyDataZ7
 
@@ -105,8 +102,5 @@ theorem S4_ray (y : ℝ) (hy : (xtop.2 : ℝ) ≤ y) :
       rw [arg_eq_of_im_neg hn]
       rw [abs_le] at hat ⊢
       constructor <;> norm_num [Amax] <;> linarith [hat.1, hat.2]
-
-theorem S4_ray_efactor (y : ℝ) : 0 < (2 * (⟨X0, y⟩ : ℂ) + 1).re := by
-  simp [X0, xtop]; norm_num
 
 end ZetaIrr.Z7.Interval

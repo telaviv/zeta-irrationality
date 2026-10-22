@@ -1,5 +1,5 @@
 /-
-# Nonvanishing from an oscillating asymptotic (PROOF_BETA §6.6(ii), PROOF_BETA100 §6.6(ii))
+# Nonvanishing from an oscillating asymptotic (Lemma 6(ii))
 
 The last step of Lemma 6(ii). Suppose that along an arithmetic progression `n_m = n_0 + q m`
 
@@ -10,9 +10,7 @@ and `sin(q θ) ≠ 0`. Then `L_m ≠ 0` for infinitely many `m`. The key inequal
 
 The complex form `frequently_ne_zero_of_im_asymptotic` takes the hypothesis
 `L_m = c_m · (Im(C₀ e^{n_m Ω}) + ε_m e^{n_m Re Ω})` with `C₀ ≠ 0`,
-which is the shape (6.6.1) delivers.
-
-Status: complete (no `sorry`).
+which is the shape the saddle-point analysis delivers.
 -/
 import Mathlib.Analysis.SpecialFunctions.Complex.Log
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Basic
@@ -86,7 +84,7 @@ lemma im_mul_exp_eq (C₀ w : ℂ) (hC : C₀ ≠ 0) :
     Real.exp_add, Real.exp_log (norm_pos_iff.2 hC)]
   ring_nf
 
-/-- **Nonvanishing, complex form** (the shape of PROOF_BETA100 (6.6.1)). If eventually
+/-- **Nonvanishing, complex form** (the shape of the saddle-point asymptotic). If eventually
 `L m = c m * (Im (C₀ e^{n_m Ω}) + ε m · e^{n_m Re Ω})` with `c m ≠ 0`, `C₀ ≠ 0`, `ε m → 0`,
 `n (m+1) = n m + q` and `sin (q Im Ω) ≠ 0`, then `L m ≠ 0` for infinitely many `m`. -/
 theorem frequently_ne_zero_of_im_asymptotic (L c ε n : ℕ → ℝ) (C₀ Ω : ℂ) (q : ℝ)

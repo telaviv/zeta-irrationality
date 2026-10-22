@@ -1,17 +1,16 @@
 /-
-# Step-function property of `e*` between event points (PROOF_ZETA §5.3), instance Z7
+# Step-function property of `e*` between event points (Lemma 5), instance Z7
 
-For consecutive event points `a < b` of `events 400` and any `x ∈ (a, b)`:
-
-  `∀ y ∈ [0, x], gfun(x, y) ≤ eStarInt((a+b)/2)`  (`gfun_le_eStarInt_mid`).
+For consecutive event points `a < b` of `events 400` and any `x, x' ∈ (a, b)`, the breakpoints
+at `x` and at `x'` are in the same relative order (`sameType_of_consec`), and then
+`gfun(x, y) ≤ eStarInt x'` for every `y ∈ [0, x]` (`gfun_le_eStarInt_of_sameType`). With
+`x' = (a+b)/2` this gives `eStar_eq_mid` (`Attain.lean`).
 
 Proof. Every breakpoint line `y = offVal x o + j` (`o ∈ offsets`) belongs to one of the line
 families `fams` (slope `o/240`). Between two events no two lines cross and no integer is passed, so
 the relative order of all breakpoints (and `⌊x⌋`) is the same at `x` and at `mid` (`SameType`). Map
 `y` to the corresponding point `y'` at `mid` (`gfun_le_eStarInt_of_sameType`): the floor data, hence
 `gfun`, agree.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.CertA.Sound
 
@@ -438,14 +437,5 @@ lemma sameType_of_consec (a b x x' : ℚ) (hc : Consec (events 400) a b) (hx : a
       push_neg at hlt
       exact this ⟨by linarith, by linarith⟩
     exact le_antisymm (key x x' hx hx') (key x' x hx' hx)
-
-/-- **Step-function property (PROOF_ZETA §5.3).** For consecutive events `a < b` and any
-`x ∈ (a, b)`: `gfun(x, y) ≤ eStarInt((a+b)/2)` for all `0 ≤ y ≤ x`. -/
-theorem gfun_le_eStarInt_mid (a b : ℚ) (hc : Consec (events 400) a b) (x : ℚ) (hax : a < x)
-    (hxb : x < b) (y : ℚ) (hy0 : 0 ≤ y) (hyx : y ≤ x) : gfun x y ≤ eStarInt ((a + b) / 2) := by
-  have hab := hc.lt (events_pairwise 400)
-  have hm : a < (a + b) / 2 ∧ (a + b) / 2 < b := ⟨by linarith, by linarith⟩
-  obtain ⟨hst, -⟩ := sameType_of_consec a b x ((a + b) / 2) hc ⟨hax, hxb⟩ hm
-  exact gfun_le_eStarInt_of_sameType x _ hst y hy0 hyx
 
 end ZetaIrr.Z7.CertA

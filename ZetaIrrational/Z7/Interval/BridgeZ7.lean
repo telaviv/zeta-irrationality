@@ -5,9 +5,7 @@
 `alphaZ`) and defines `PsiZ`, `Psi1Z`, `Psi2Z`, `Psi3Z`, `phaseZ`, `SectorAt`. This file proves that
 they agree with the list-based `Ψ`, `dpsiL`, `d2psiL`, `d3psiL`, `f` of the interval certificate
 (through the enumeration `facA` of `facZ7` and the generic `Fam/Interval/ListSum.lean`), and
-restates the certified saddle data (S0)–(S5) in those terms. (PROOF_ZETA §6.2–6.3.)
-
-Status: complete (no `sorry`).
+restates the certified saddle data (S0)–(S5) in those terms.
 -/
 import ZetaIrrational.Z7.Interval.ContourZ7
 import ZetaIrrational.Z7.Analytic.Factors
@@ -122,8 +120,6 @@ theorem saddle_Psi1Z : Psi1Z x₀ = 3 * π * I := by
 theorem saddle_Psi2Z_dir : Psi2Z x₀ * dir ^ 2 = -(Kx : ℂ) := by
   rw [Psi2Z_eq]; exact dir_sq
 
-theorem Kx_eq : Kx = ‖Psi2Z x₀‖ := by rw [Psi2Z_eq]; rfl
-
 theorem Psi3Z_bound {z : ℂ} (hz : z ∈ closedBall x₀ (ρ : ℝ)) : ‖Psi3Z z‖ ≤ (Mcert : ℝ) := by
   rw [Psi3Z_eq]; exact Z7_M_bound hz
 
@@ -136,32 +132,5 @@ theorem sector_disc {z : ℂ} (hz : z ∈ closedBall x₀ (ρ : ℝ)) :
   sectorAt_of (S4_disc z hz)
 
 /-! ## (S2), (S4) along the contour in `Z7/Analytic/` notation -/
-
-/-- Points of the certified contour other than the Taylor segment. -/
-def OnFar (z : ℂ) : Prop :=
-  onPoly upStart upPts z ∨ onPoly dnStart dnPts z ∨ z ∈ segment ℝ ePlus (toC upStart) ∨
-    z ∈ segment ℝ eMinus (toC dnStart) ∨ ∃ y : ℝ, (xtop.2 : ℝ) ≤ y ∧ z = ⟨X0, y⟩
-
-theorem far_phase {z : ℂ} (hz : OnFar z) : (phaseZ z).re ≤ Ω.re - ηfar := by
-  rw [phaseZ_eq]
-  refine S2_le_ReOmega ?_
-  rcases hz with h | h | h | h | ⟨y, hy, rfl⟩
-  · exact S2_up z h
-  · exact S2_dn z h
-  · exact S2_conn_up z h
-  · exact S2_conn_dn z h
-  · exact S2_ray y hy
-
-theorem far_sector {z : ℂ} (hz : OnFar z) : SectorAt (1 / 100) (π - 276 / 100) z := by
-  rcases hz with h | h | h | h | ⟨y, hy, rfl⟩
-  · exact sectorAt_of (S4_up z h).1
-  · exact sectorAt_of (S4_dn z h).1
-  · exact sectorAt_of (S4_conn_up z h)
-  · exact sectorAt_of (S4_conn_dn z h)
-  · exact sectorAt_of (S4_ray y hy)
-
-/-- (S3) in `Z7/Analytic/` notation: `Im Ψ' ≥ q0 = 12 > 3π + 2.5` on the top ray. -/
-theorem top_ray_Psi1Z (y : ℝ) (hy : (xtop.2 : ℝ) ≤ y) : (q0 : ℝ) ≤ (Psi1Z ⟨X0, y⟩).im := by
-  rw [Psi1Z_eq]; exact S3_ray y hy
 
 end ZetaIrr.Z7.Interval

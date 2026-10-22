@@ -15,8 +15,6 @@ sum over *all* primes `p ≤ n/x 0 = n` of `h(n/p) log p`. We apply it to
 in the sharp range has `p² ≤ 𝒩`, hence `n/p ≥ X` and `h'(n/p) ≥ 0`; so dropping those primes only
 decreases the sum. On the sharp primes, `E_p - G⌊n/p⌋ ≤ e*(n/p) ≤ h'(n/p)`. No lower bound on
 `e*` is needed. (Irrational `y` never occur as `n/p`; there `h'` is set to a value below every `u i`.)
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Glue.Errors
 import ZetaIrrational.PNT.PrimeSums

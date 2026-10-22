@@ -1,5 +1,5 @@
 /-
-# Z7 contour certificate: upper polyline, chunk 2 (PROOF_ZETA §6.3, (S2), (S4))
+# Z7 contour certificate: upper polyline, chunk 2 ((S2), (S4))
 
 Kernel checks (`decide +kernel`) on the segments of `upA2, upC2` (`PolyDataZ7.lean`):
 * `chk_up2`: `Re f ≤ T0` on every segment (`polyChk`, second-order Taylor bound per segment);
@@ -7,8 +7,6 @@ Kernel checks (`decide +kernel`) on the segments of `upA2, upC2` (`PolyDataZ7.le
   (`polySectorQ`).
 
 Combined with the other chunks in `ContourZ7.lean`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Interval.PolyDataZ7
 

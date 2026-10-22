@@ -5,12 +5,8 @@ For a factor list `l : List Fac` (`Interval/Psi.lean`), the recursively defined 
 `d2psiL`, `d3psiL` equal the sums of `l.map` of their summands, and a `Fin n`-indexed sum over an
 enumeration `A` of the list (`List.ofFn A = l`) equals the list sum. This turns the bridge between
 the interval certificate (list form) and the `Fin n`-indexed `Analytic/` definitions into
-per-index identities of the factor data, avoiding a large `ring_nf` over all factors.
-
-Used by the I3 bridge (`I3/Interval/BridgeI3.lean`, PROOF_BETA §6.2–6.3); nothing here is
-I3-specific.
-
-Status: complete (no `sorry`).
+per-index identities of the factor data, avoiding a large `ring_nf` over all factors
+(used in `Z7/Interval/BridgeZ7.lean`).
 -/
 import ZetaIrrational.Interval.Psi
 

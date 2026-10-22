@@ -1,16 +1,13 @@
 /-
-# The uniform tail bound for `e*` (PROOF_ZETA §5.2) for instance Z7
+# The uniform tail bound for `e*` (Lemma 5) for instance Z7
 
 For `x ≥ 1`: `e*(x) ≤ 32 + G{x} ≤ 33 + G{x}` (`eStar_le_tail`), with `E_tail = S + 15 = 33` the
 constant used in `CertA.tail`.
 
-Proof (PROOF_ZETA §5.2, at real `x, y`): per block `j`, `[in block] + P_j ≤ 1 + (1 - 2δ_j) x`
+Proof (at real `x, y`): per block `j`, `[in block] + P_j ≤ 1 + (1 - 2δ_j) x`
 (in block: `⌊y-δx⌋ + ⌊(1-δ)x-y⌋ ≤ (1-2δ)x`; out of block: `⌊a⌋ - ⌊b⌋ + [b ∈ ℤ] ≤ a - b + 1`);
 each zero run has `≥ rx - 1` hits, so `c ≥ 10rx - 10`; and `Σ_j m_j (1 - 2δ_j) = G + 10r`,
 `Σ_j m_j = 18`. Hence every bracket value is `≤ max(0, 18 + 4 + 10 + Gx) = 32 + Gx`.
-(The Python's `S/p` slack for out-of-block counts is not needed at real points.)
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.CertA.Attain
 
@@ -89,7 +86,7 @@ lemma blocks_weight (x : ℚ) :
   push_cast
   ring
 
-/-- **PROOF_ZETA §5.2 for Z7.** `gfun(x, y) ≤ 32 + Gx` for `x ≥ 1`. -/
+/-- **Uniform bound for Z7.** `gfun(x, y) ≤ 32 + Gx` for `x ≥ 1`. -/
 theorem gfun_le_tail (x y : ℚ) (hx : 1 ≤ x) : (gfun x y : ℚ) ≤ 32 + G * x := by
   have hc := cfun_ge x y
   have hsum := blocks_sum_le x y blocks

@@ -1,21 +1,19 @@
 /-
 # An instance of `Z7.Analytic.SaddleData` from the Z7 interval certificate
 
-`Z7_saddleData : ZetaIrr.Z7.Analytic.SaddleData` — every field of PROOF_ZETA §6.3 (S0)–(S5) for
-instance Z7, with
+`Z7_saddleData : ZetaIrr.Z7.Analytic.SaddleData` — the saddle conditions (S0)–(S5) for instance Z7,
+with
 * `x₀` the certified saddle (`SaddleZ7.lean`), `d = dir`, `K = |Ψ''(x₀)|`, `M = Mcert ≈ 310.2`,
   `ρ = 1/20`;
 * the path `v 0 = x_c, …, v 4 = dnStart, v 5 = x₀ - ρ d, v 6 = x₀ + ρ d, v 7 = upStart, …,
   v 23 = xtop` (`Kd = 5`, `Ktop = 23`), from `ContourZ7.lean`;
 * `a = 1/100`, `η = π - 2.76`, `ηfar = 0.0199414`, `rate = q0 - 3π = 12 - 3π`, `Y₀ = 0`,
   `δ₀ = 10⁻⁷`;
-* (H4) from `Z7_sinqtheta_le : sin(240 Im Ω) < -0.9`;
+* the field `sin_ne` (`sin(240 Im Ω) ≠ 0`) from `Z7_sinqtheta_le : sin(240 Im Ω) < -0.9`;
 * `ReΩ_le` from `Z7_ReOmega_le : Re Ω ≤ -10.1167485`.
 
 The first segment (moved start point, field `S2_first`) is handled by a mean-value bound on the
 box around `[x_c, v 1]` widened by `δ₀` (`ConnZ7.lean`), costing `G δ₀ ≤ 10⁻⁵` of the far margin.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Interval.BridgeZ7
 import ZetaIrrational.Z7.Analytic.SaddleData
@@ -289,7 +287,7 @@ noncomputable def Z7_saddleData : SaddleData where
   rate_pos := by linarith [q0_sub_three_pi]
   δ₀_pos := by norm_num [δ0]
   S0 := saddle_Psi1Z
-  H4 := by
+  sin_ne := by
     rw [phase_saddle]; exact (lt_trans Z7_sinqtheta_le (by norm_num)).ne
   ReΩ_le := by
     rw [phase_saddle]; linarith [Z7_ReOmega_le]

@@ -3,8 +3,6 @@
 
 `sqrtIV I`: rational Newton iterates (rounded to `2^{-64}`) give candidate endpoints, which are
 then *checked* by squaring (`sqrtWith`), so soundness does not depend on the iteration.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Interval.CBox
 import Mathlib.Analysis.SpecialFunctions.Sqrt

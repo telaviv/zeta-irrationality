@@ -7,10 +7,6 @@ In the upper half plane every `α_i(x) = s_i x + u_i` lies in the slit plane, an
 
 (`hasDerivAt_PsiZ`, `hasDerivAt_Psi1Z`, `hasDerivAt_Psi2Z`; the first uses `Σ c_i s_i = 0`).
 `Alim` (the limiting amplitude) is holomorphic there (`differentiableAt_Alim`).
-
-Mirrors lean_beta's `I3/Analytic/PhaseDeriv.lean`, with phase `3π` and `A(x) = (2x+1) e^{ψ₀(x)}`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Analytic.Path
 
@@ -20,7 +16,6 @@ namespace ZetaIrr.Z7.Analytic
 
 open Complex Real Finset Filter Topology
 open ZetaIrr.Analytic ZetaIrr.Fam.Analytic
-
 
 lemma sZ_ne_zero (i : Fin 40) : sZ i ≠ 0 := by
   intro h; have := sZ_sq i; rw [h] at this; norm_num at this
@@ -109,8 +104,5 @@ lemma differentiableAt_Alim {x : ℂ} (hx : x.im ≠ 0) : DifferentiableAt ℂ A
 
 lemma differentiableOn_Alim : DifferentiableOn ℂ Alim {x : ℂ | 0 < x.im} :=
   fun x hx => (differentiableAt_Alim (ne_of_gt hx)).differentiableWithinAt
-
-lemma continuousOn_phaseZ : ContinuousOn phaseZ {x : ℂ | 0 < x.im} :=
-  fun x hx => (hasDerivAt_phaseZ (ne_of_gt hx)).continuousAt.continuousWithinAt
 
 end ZetaIrr.Z7.Analytic

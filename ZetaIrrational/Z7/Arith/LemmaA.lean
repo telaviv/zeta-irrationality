@@ -1,5 +1,5 @@
 /-
-# Lemma A for instance Z7 (PROOF_ZETA §3): valuations of the Taylor coefficients `a_{i,k}`
+# Lemma A for instance Z7: valuations of the Taylor coefficients `a_{i,k}`
 
 For the data of `Z7/Concrete/Data.lean`:
 
@@ -15,8 +15,6 @@ an exponent `eZ z ≤ λ` with `v_p(-k-z) ≥ eZ z`, each pole factor (only thos
 (b), (b′), (c) are instances (file `Ep.lean`). Because the pole hypothesis only concerns the
 poles *in a block* (the factors actually present), (b′) — "no pole at a distance `≡ 0 (mod p)`
 gives `a_{i,k} ∈ ℤ_p`" — is the instance `λ = 0`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Arith.PSVal
 import ZetaIrrational.Z7.Concrete.Expansion

@@ -1,5 +1,5 @@
 /-
-# `L_n` as a contour integral of `G_n = R_n · k⁗` (PROOF_ZETA §6.1, PLAN.md)
+# `L_n` as a contour integral of `G_n = R_n · k⁗` (Lemma 6)
 
 `L_eq_half_line`: for every non-integer `c ∈ (0, 220(m+1) + 1)`,
 
@@ -12,10 +12,7 @@ i.e. `L_n = -(1/π) Im ∫_c^{c+i∞} G_n(z) dz`. Steps:
    `∫ R_n⁗ k₀ = ∫ R_n k₄`;
 3. conjugation symmetry (`integral_eq_two_re_Ioi`).
 
-There is no boundary term `-R_n‴(c)` (compare PROOF_ZETA (6.6.0)): it is absorbed exactly by the
-integration by parts, which moves all derivatives onto the kernel.
-
-Status: complete (no `sorry`).
+The integration by parts moves all four derivatives onto the kernel; no boundary term arises.
 -/
 import ZetaIrrational.Z7.Analytic.Bound
 import ZetaIrrational.Analytic.ContourCot

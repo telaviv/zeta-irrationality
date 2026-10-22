@@ -7,8 +7,6 @@
 * `RCd_bound`: for every `j` and every `c > -1` there is `C` with
   `‖R_n⁽ʲ⁾(z)‖ ≤ C (1 + ‖z‖²)⁻¹` on `Re z ≥ c` (Cauchy estimates `norm_iterate_deriv_le_of_decay`
   and compactness `exists_bound_of_decay`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Analytic.Integrand
 

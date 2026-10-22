@@ -1,5 +1,5 @@
 /-
-# The integrand on the contour: `G_n(nx) = e^{λ_n + n f(x)} · n · A_n(x)` (PROOF_ZETA §6.5)
+# The integrand on the contour: `G_n(nx) = e^{λ_n + n f(x)} · n · A_n(x)` (Lemma 6)
 
 `G_n = R_n k₄` (`ContourZ7.lean`). Off the real axis,
 `G_n(z) = P_n(z) T(z)` with `T(z) = 8 cos(πz)(cos²(πz) + 2) = e^{-3πiz}(1 + 11q + 11q² + q³)`,
@@ -9,15 +9,10 @@ Stirling (`Pfun_asymp`), for `Im x > 0`, the sector condition at `x`, and `n ≥
     G_n(nx) = e^{λ_n + n f(x)} · n · A_n(x),   A_n(x) = (2x + 1) e^{ψ₀(x) + e} Q(q),     (`Gfn_path`)
 
 `f = Ψ - 3πix`, `Q(q) = 1 + 11q + 11q² + q³`, `|e| ≤ c_e/n`. The abstract bounds
-* `amp_bound` (for (U)): `|A_n(x)| ≤ 72 B²` (`|q| ≤ 1`, `|e| ≤ 1`);
-* `amp_diff_bound` (for (M)): `|A_n(x) - A(x)| ≤ 100 B² δ`, `A(x) = (2x + 1) e^{ψ₀(x)}`,
+* `amp_bound` (for `norm_Gfn_le`): `|A_n(x)| ≤ 72 B²` (`|q| ≤ 1`, `|e| ≤ 1`);
+* `amp_diff_bound` (for `Gfn_disc_approx`): `|A_n(x) - A(x)| ≤ 100 B² δ`, `A(x) = (2x + 1) e^{ψ₀(x)}`,
 for any `B ≥ 1` dominating `|2x+1|`, `|e^{ψ₀(x)}|`, and `δ ≤ 1` dominating `|e|`, `|q|`.
 `growth_bounds` gives such a `B` from `‖x‖` alone.
-
-Compared with lean_beta's `FnPath.lean` there are no logarithmic derivatives `μ, μ'`: the four
-derivatives of `R_n⁗` were moved onto the kernel (`ContourZ7.lean`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Analytic.PathAsymp
 import ZetaIrrational.Z7.Analytic.ContourZ7
@@ -91,7 +86,7 @@ noncomputable def Amp (x e q : ℂ) : ℂ := (2 * x + 1) * Complex.exp (psi0Z x 
 /-- The limiting amplitude `A(x) = (2x+1) e^{ψ₀(x)}`. -/
 noncomputable def Alim (x : ℂ) : ℂ := (2 * x + 1) * Complex.exp (psi0Z x)
 
-/-- **(U)-type bound** for the amplitude. -/
+/-- **Upper bound** for the amplitude. -/
 theorem amp_bound {x e q : ℂ} {B : ℝ} (hB : 1 ≤ B) (hX : ‖2 * x + 1‖ ≤ B)
     (hE : ‖Complex.exp (psi0Z x)‖ ≤ B) (hq : ‖q‖ ≤ 1) (he : ‖e‖ ≤ 1) :
     ‖Amp x e q‖ ≤ 72 * B ^ 2 := by
@@ -103,7 +98,7 @@ theorem amp_bound {x e q : ℂ} {B : ℝ} (hB : 1 ≤ B) (hX : ‖2 * x + 1‖ �
         ‖1 + 11 * q + 11 * q ^ 2 + q ^ 3‖ ≤ B * (B * 3) * 24 := by gcongr
     _ = 72 * B ^ 2 := by ring
 
-/-- **(M)-type bound**: `|A_n - A| ≤ 100 B² δ`. -/
+/-- **Approximation bound**: `|A_n - A| ≤ 100 B² δ`. -/
 theorem amp_diff_bound {x e q : ℂ} {B δ : ℝ} (hB : 1 ≤ B) (hδ0 : 0 ≤ δ) (hδ : δ ≤ 1)
     (hX : ‖2 * x + 1‖ ≤ B) (hE : ‖Complex.exp (psi0Z x)‖ ≤ B) (he : ‖e‖ ≤ δ) (hq : ‖q‖ ≤ δ) :
     ‖Amp x e q - Alim x‖ ≤ 100 * B ^ 2 * δ := by
@@ -178,9 +173,6 @@ lemma norm_psi0Z_le {a : ℝ} (ha : 0 < a) {x : ℂ} (hx : ∀ i, a ≤ ‖alpha
 
 /-- A single bound `B(r) ≥ 1` dominating `‖2x+1‖` and `‖e^{ψ₀(x)}‖` for `‖x‖ ≤ r`. -/
 noncomputable def Bgrowth (a r : ℝ) : ℝ := Real.exp (28 * ellA a r) + 2 * r + 1
-
-lemma ellA_pos (a : ℝ) {r : ℝ} (hr : 0 ≤ r) : 0 < ellA a r := by
-  unfold ellA; have := Real.pi_pos; positivity
 
 lemma one_le_Bgrowth (a : ℝ) {r : ℝ} (hr : 0 ≤ r) : 1 ≤ Bgrowth a r := by
   unfold Bgrowth

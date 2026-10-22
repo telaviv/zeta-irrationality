@@ -1,7 +1,7 @@
 /-
 # Lemma 6 for Z7: `SaddleData → (size bound) ∧ ∃ᶠ m, L_m ≠ 0`
 
-The chain (PROOF_ZETA §6.6, with the integrand `G_n = R_n k₄` of `ContourZ7.lean`):
+The chain (with the integrand `G_n = R_n k₄` of `ContourZ7.lean`):
 1. `L_eq_J`: `L_n = -(1/π) Im J_n`, `J_n = i ∫_0^∞ G_n(c_n + iy) dy`, `c_n = ⌊n x_c⌋ + 1/2`
    (`L_eq_half_line`).
 2. `J_split`: deformation onto the polyline `c_n, n v_1, …, n v_Ktop` plus the top ray
@@ -11,16 +11,13 @@ The chain (PROOF_ZETA §6.6, with the integrand `G_n = R_n k₄` of `ContourZ7.l
    `taylor_phase_bound`, `Gfn_disc_approx`).
 5. `E_bound`: the rest is `≤ εf_n e^{λ_n + log n + n Re Ω} √n`, `εf → 0` (`norm_Gfn_le`,
    (S2), (S3)).
-6. `nonvan_of_saddleData`: `frequently_ne_zero_of_saddle'` with `sin(240 Im Ω) ≠ 0` (H4).
+6. `nonvan_of_saddleData`: `frequently_ne_zero_of_saddle'` with `sin(240 Im Ω) ≠ 0` (field `sin_ne`).
 7. `size_of_saddleData`: `|L_n| ≤ |J_n|/π ≤ e^{λ_n + log n + n Re Ω} √n · C`, Stirling's upper bound
    `log n! ≤ n log n - n + (log n)/2 + 1`, and `Re Ω ≤ Vcert` (`ReΩ_le`) give Lemma 6(i):
    `log |L_n| ≤ -G log n! + n (Vcert + εL_n)`, `εL → 0`.
 
 The progression is `n = 240(m+1)` (`q = 240`), the zero run ends at `rn = 220(m+1)` (so
-`x_c < r = 11/12`). Mirrors lean_beta's `I3/Analytic/NonvanI3.lean`; the amplitude is
-`A(x) = (2x+1) e^{ψ₀(x)}` and there is no boundary term.
-
-Status: complete (no `sorry`).
+`x_c < r = 11/12`). The amplitude is `A(x) = (2x+1) e^{ψ₀(x)}`.
 -/
 import ZetaIrrational.Z7.Analytic.Pointwise
 import ZetaIrrational.Z7.Analytic.Deform
@@ -32,7 +29,6 @@ namespace ZetaIrr.Z7.Analytic
 
 open Complex Real Finset Filter Topology Set MeasureTheory
 open ZetaIrr.Analytic ZetaIrr.Fam.Analytic
-
 
 namespace SaddleData
 
@@ -491,7 +487,7 @@ theorem D_bound : ∃ εD : ℕ → ℝ, Tendsto εD atTop (𝓝 0) ∧ ∀ᶠ m
 
 /-! ### Step 5: the far part -/
 
-/-- A segment of the far part: pointwise (U) along the segment. -/
+/-- A segment of the far part: the pointwise upper bound `norm_Gfn_le` along the segment. -/
 lemma seg_bound (m : ℕ) (hL : LargeN S.a S.η (nn m)) (A B : ℂ) (R : ℝ)
     (hpt : ∀ t ∈ Ioc (0 : ℝ) 1, ∃ x : ℂ, A + t * (B - A) = (nn m : ℂ) * x ∧ 0 < x.im ∧
       SectorAt S.a S.η x ∧ ‖x‖ ≤ R ∧ (phaseZ x).re ≤ S.Ω.re - S.ηfar) :
@@ -536,10 +532,6 @@ noncomputable def E (m : ℕ) : ℂ :=
 
 /-- A radius dominating every vertex. -/
 noncomputable def Rall : ℝ := (∑ k ∈ range (S.Ktop + 1), ‖S.v k‖) + S.δ₀
-
-lemma norm_v_le {k : ℕ} (hk : k ≤ S.Ktop) : ‖S.v k‖ ≤ ∑ j ∈ range (S.Ktop + 1), ‖S.v j‖ :=
-  single_le_sum (f := fun j => ‖S.v j‖) (fun j _ => norm_nonneg _)
-    (mem_range.2 (Nat.lt_succ_of_le hk))
 
 lemma sum_two_le {j k : ℕ} (hj : j ≤ S.Ktop) (hk : k ≤ S.Ktop) (hjk : j ≠ k) :
     ‖S.v j‖ + ‖S.v k‖ ≤ ∑ i ∈ range (S.Ktop + 1), ‖S.v i‖ := by
@@ -786,7 +778,7 @@ theorem nonvan_of_saddleData (S : SaddleData) : ∃ᶠ m in atTop, Z7.L m ≠ 0 
   have hfreq := frequently_ne_zero_of_saddle' (fun m => -(1 / π) * (S.J m).im)
     SaddleData.nn SaddleData.lam' εf S.J S.D S.E S.Ω S.d (Alim S.x₀) S.K 240 (-(1 / π)) εD
     S.K_pos (by intro h; have := S.d_norm; rw [h, norm_zero] at this; norm_num at this)
-    S.Alim_x₀_ne_zero (neg_ne_zero.2 (one_div_pos.2 Real.pi_pos).ne') S.H4
+    S.Alim_x₀_ne_zero (neg_ne_zero.2 (one_div_pos.2 Real.pi_pos).ne') S.sin_ne
     (fun m => by rw [SaddleData.nn_eq, SaddleData.nn_eq]; push_cast; ring)
     SaddleData.tendsto_nn (fun m => rfl) (Eventually.of_forall S.J_decomp) hD hεD hE hεf
   exact hfreq.mono (fun m hm => by rw [S.L_eq_J m]; exact hm)

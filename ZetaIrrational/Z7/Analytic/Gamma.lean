@@ -1,7 +1,7 @@
 /-
-# Γ-factorisation of `R_n` for instance Z7 (PROOF_ZETA §6.2)
+# Γ-factorisation of `R_n` for instance Z7 (Lemma 6)
 
-The complex extension `RC m` of `Z7.R m` (`RC_ofReal`), the Γ-product `En m` (the `E_n` of §6.2,
+The complex extension `RC m` of `Z7.R m` (`RC_ofReal`), the Γ-product `En m` (`E_n`,
 with `q = rn = 220(m+1)`, `Q = (1+r)n = 460(m+1)`), and
 
     RC m z = (2z + n) · E_n(z) · sin⁵(πz) / π⁵        (`RC_eq_En`)
@@ -9,8 +9,6 @@ with `q = rn = 220(m+1)`, `Q = (1+r)n = 460(m+1)`), and
 for `z` not an integer (`(-1)^{5q} = 1` since `q` is even). In factor-list form (`Factors.lean`):
 `RC m z = P_n(z) sin⁵(πz)/π⁵` with `P_n(z) = (2z + n) Π_i Γ(s_i z + n u_i + β_i)^{c_i}`
 (`RC_eq_Pfun`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.FamilyZ7
 import ZetaIrrational.Z7.Analytic.Factors
@@ -38,7 +36,7 @@ lemma RC_ofReal (m : ℕ) (t : ℝ) : RC m t = (Z7.R m t : ℂ) := by
   push_cast
   rfl
 
-/-- The Γ-product `E_n(z)` of PROOF_ZETA §6.2 for Z7. -/
+/-- The Γ-product `E_n(z)` for Z7. -/
 noncomputable def En (m : ℕ) (z : ℂ) : ℂ :=
   Complex.Gamma z ^ 5 * Complex.Gamma (((220 * (m + 1) : ℕ) : ℂ) + 1 - z) ^ 5 *
     Complex.Gamma (z + ((460 * (m + 1) : ℕ) : ℂ) + 1) ^ 5 /

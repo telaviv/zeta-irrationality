@@ -8,8 +8,6 @@ Main result: `exp_logGammaS : w ∈ slitPlane → exp (logGammaS w) = Gamma w`.
 Route: Euler's limit `GammaSeq w n → Γ(w)` (Mathlib), an exact Euler–Maclaurin identity for
 `Σ_{j ≤ n} log(w + j)` (`sum_log_eq`, by an explicit antiderivative on each `[k, k+1]`), and
 Stirling's formula for `n!` (Mathlib).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Stirling.Basic
 import Mathlib.Analysis.SpecialFunctions.Gamma.Beta

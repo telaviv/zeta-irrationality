@@ -1,7 +1,7 @@
 /-
 # Instance Z7: the concrete partial-fraction data
 
-The partial-fraction data of `R_n` (`FamilyZ7.lean`). PROOF_ZETA §3 local formula. With
+The partial-fraction data of `R_n` (`FamilyZ7.lean`), from the local expansion at each pole. With
 `t₀ = -k` and `f_k(t) = R_n(t) (t + k)^{B_k}`: `a_{i,k} = [ε^{B_k - i}] f_k(t₀ + ε)`, where
 
 `f_k(t₀+ε) = (u_e + 2ε) · Π_{l=1}^{rn} (-k-l + ε)^5 · Π_{l=n+1}^{(1+r)n} (l-k + ε)^5 ·`
@@ -12,8 +12,6 @@ The partial-fraction data of `R_n` (`FamilyZ7.lean`). PROOF_ZETA §3 local formu
 * `d_{k'} = k' - k` (one factor per block containing `k'`).
 
 This file only *defines* things (`Bk`, `numSeries`, `denSeries`, `fSeries`, `a`, `pf`).
-
-Status: complete (definitions only, no `sorry`).
 -/
 import ZetaIrrational.Expansion
 import ZetaIrrational.FamilyZ7

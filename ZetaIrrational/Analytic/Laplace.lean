@@ -1,5 +1,5 @@
 /-
-# Laplace's method for a complex phase on a short segment (PROOF_BETA100 §6.6, "Disc part")
+# Laplace's method for a complex phase on a short segment (Lemma 6, the disc part)
 
 Abstract form of the disc estimate. Parametrise the steepest-descent segment through the saddle as
 `s ↦ x₀ + s d`, `|s| ≤ ρ`, and write the phase as
@@ -12,16 +12,14 @@ with `K > 0` and `M ρ ≤ 3K/2` (the condition `ρ ≤ 3K/(2M)` of (S1)). For a
     | ∫_{-ρ}^{ρ} e^{n φ(s)} a(s) ds - a(0) √(2π/(nK)) |
         ≤ (16√(2π)/3 · A₀ M / K² + 2√(2π) A₁ / K) / n + A₀ e^{-nKρ²/4} √(4π/(nK)).
 
-This is `laplace_bound`. The proof follows PROOF_BETA100 §6.6:
+This is `laplace_bound`. The proof combines
 * `|e^{nT} - 1| ≤ n|T| e^{n|T|}` and `n|T| ≤ nK s²/4` (from `Mρ ≤ 3K/2`);
 * `|a(s) - a(0)| ≤ A₁|s|`;
 * the Gaussian tail outside `[-ρ, ρ]`;
 each bounded by an explicit Gaussian integral (`integral_gaussian`).
 
-`laplace_taylor_bound` derives the hypothesis `|T(s)| ≤ M|s|³/6` from complex differentiability of
+`taylor_phase_bound` derives the hypothesis `|T(s)| ≤ M|s|³/6` from complex differentiability of
 the phase `F` along the segment with `F'(x₀) = 0`, `F''(x₀) d² = -K`, `|F'''| ≤ M`, `|d| = 1`.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib.Analysis.SpecialFunctions.Gaussian.GaussianIntegral
 import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic

@@ -11,8 +11,6 @@ This makes every correctness theorem unconditional:
 Endpoints are exact rationals; `IV.round p` rounds outward to the grid `2^{-p} ℤ` to control
 their size. Final certified inequalities are read off with the Boolean checks `hiLe`, `loGe`, …,
 whose soundness lemmas turn `check = true` (proved by `decide`) into real inequalities.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib.Algebra.Order.Archimedean.Real.Basic
 import Mathlib.Data.Rat.Cast.Order
@@ -35,10 +33,6 @@ namespace IV
 def mem : IV → ℝ → Prop
   | top, _ => True
   | ival a b, x => (a : ℝ) ≤ x ∧ x ≤ (b : ℝ)
-
-@[simp] lemma mem_top (x : ℝ) : top.mem x := trivial
-
-lemma mem_ival {a b : ℚ} {x : ℝ} : (ival a b).mem x ↔ (a : ℝ) ≤ x ∧ x ≤ (b : ℝ) := Iff.rfl
 
 /-! ## Constructors and operations -/
 
@@ -81,11 +75,6 @@ def sq : IV → IV
       else if b ≤ 0 then ival (b * b) (a * a)
       else ival 0 (max (a * a) (b * b))
 
-/-- Union hull. -/
-def join : IV → IV → IV
-  | ival a b, ival c d => ival (min a c) (max b d)
-  | _, _ => top
-
 /-- Widen by a rational radius `e ≥ 0` (only used with `e ≥ 0`; for `e < 0` it may shrink). -/
 def widen (e : ℚ) : IV → IV
   | top => top
@@ -118,15 +107,6 @@ def loGt (I : IV) (q : ℚ) : Bool :=
   match I with
   | top => false
   | ival a _ => decide (q < a)
-
-/-- The upper endpoint (or `0` for `top`; only meaningful together with a `hiLe`-type check). -/
-def hiOr0 : IV → ℚ
-  | top => 0
-  | ival _ b => b
-
-def loOr0 : IV → ℚ
-  | top => 0
-  | ival a _ => a
 
 /-- `|x| ≤ q` on the interval. -/
 def absLe (I : IV) (q : ℚ) : Bool :=
@@ -175,9 +155,6 @@ lemma abs_le_of_absLe {I : IV} {x : ℝ} {q : ℚ} (hx : I.mem x) (h : I.absLe q
     have h2' : (b : ℝ) ≤ q := by exact_mod_cast h2
     push_cast at h1'
     rw [abs_le]; exact ⟨by linarith [hx.1], by linarith [hx.2]⟩
-
-lemma mem_ival_of_hiLe {I : IV} {x : ℝ} (hx : I.mem x) (h : I.hiLe I.hiOr0 = true) :
-    x ≤ (I.hiOr0 : ℝ) := le_of_hiLe hx h
 
 /-! ## Soundness of the operations -/
 
@@ -298,28 +275,6 @@ lemma mem_sq {I : IV} {x : ℝ} (hx : I.mem x) : I.sq.mem (x ^ 2) := by
       · exact le_trans (by nlinarith) (le_max_right _ _)
       · exact le_trans (by nlinarith) (le_max_left _ _)
 
-lemma mem_join_left {I J : IV} {x : ℝ} (hx : I.mem x) : (I.join J).mem x := by
-  cases I with
-  | top => cases J <;> trivial
-  | ival a b =>
-    cases J with
-    | top => trivial
-    | ival c d =>
-      obtain ⟨h1, h2⟩ := hx
-      simp only [join, mem, Rat.cast_min, Rat.cast_max]
-      exact ⟨(min_le_left _ _).trans h1, h2.trans (le_max_left _ _)⟩
-
-lemma mem_join_right {I J : IV} {x : ℝ} (hx : J.mem x) : (I.join J).mem x := by
-  cases I with
-  | top => cases J <;> trivial
-  | ival a b =>
-    cases J with
-    | top => trivial
-    | ival c d =>
-      obtain ⟨h1, h2⟩ := hx
-      simp only [join, mem, Rat.cast_min, Rat.cast_max]
-      exact ⟨(min_le_right _ _).trans h1, h2.trans (le_max_right _ _)⟩
-
 /-- Widening by `e`: if `|x - y| ≤ e` and `y ∈ I` then `x ∈ widen e I`. -/
 lemma mem_widen {I : IV} {x y : ℝ} {e : ℚ} (hy : I.mem y) (hxy : |x - y| ≤ e) :
     (I.widen e).mem x := by
@@ -345,13 +300,6 @@ lemma mem_round (p : ℕ) {I : IV} {x : ℝ} (hx : I.mem x) : (I.round p).mem x 
     · have : b ≤ (⌈b * 2 ^ p⌉ : ℚ) / 2 ^ p := by
         rw [le_div_iff₀ hp]; exact Int.le_ceil _
       exact h2.trans (by exact_mod_cast this)
-
-/-- Monotone image: if `F` is monotone on the real line and `F a ∈ Ia`, `F b ∈ Ib`, then for
-`x ∈ [a, b]`, `F x ∈ ival (lo Ia) (hi Ib)`. Used for `log`, `arctan`. -/
-lemma mem_of_monotoneOn {F : ℝ → ℝ} {S : Set ℝ} (hF : MonotoneOn F S) {a b : ℚ} {x : ℝ}
-    (ha : (a : ℝ) ∈ S) (hb : (b : ℝ) ∈ S) (hxS : x ∈ S) (hx : (ival a b).mem x)
-    {lo hi : ℚ} (hlo : (lo : ℝ) ≤ F a) (hhi : F b ≤ hi) : (ival lo hi).mem (F x) :=
-  ⟨hlo.trans (hF ha hxS hx.1), (hF hxS hb hx.2).trans hhi⟩
 
 end IV
 

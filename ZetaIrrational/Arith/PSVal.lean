@@ -1,5 +1,5 @@
 /-
-# Coefficient valuations of power series (PROOF_BETA §3, Lemma A: the binomial argument)
+# Coefficient valuations of power series (Lemma A: the binomial argument)
 
 `psge p e λ f` says: every coefficient satisfies `v_p([X^M] f) ≥ e - λ M`.
 
@@ -10,8 +10,6 @@
   Lemma A for the e-factor.
 * `psge_inv`: a pole factor `(C d + X)⁻¹`, `d ≠ 0`, satisfies `psge e λ` under
   precisely `e ≤ -v_p(d)` and `v_p(d) ≤ λ`. Its coefficients are `(-1)^M d^{-(M+1)}`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Arith.Valuation
 import Mathlib.RingTheory.PowerSeries.Inverse
@@ -27,13 +25,6 @@ def psge (p : ℕ) (e lam : ℤ) (f : PowerSeries ℚ) : Prop :=
   ∀ M : ℕ, vge p (e - lam * M) (coeff M f)
 
 variable {p : ℕ} [hp : Fact p.Prime]
-
-theorem psge_mono {f : PowerSeries ℚ} {e e' lam lam' : ℤ} (h : psge p e lam f) (he : e' ≤ e)
-    (hl : lam ≤ lam') : psge p e' lam' f := fun M =>
-  vge_mono (h M) (by nlinarith [(Nat.cast_nonneg M : (0 : ℤ) ≤ M)])
-
-theorem psge_coeff {f : PowerSeries ℚ} {e lam : ℤ} (h : psge p e lam f) (M : ℕ) :
-    vge p (e - lam * M) (coeff M f) := h M
 
 theorem psge_mul {f g : PowerSeries ℚ} {e₁ e₂ lam : ℤ} (hf : psge p e₁ lam f)
     (hg : psge p e₂ lam g) : psge p (e₁ + e₂) lam (f * g) := by
@@ -88,10 +79,6 @@ theorem psge_lin {u c : ℚ} {e lam : ℤ} (hu : vge p e u) (hc : vge p (e - lam
   · simpa using hu
   · simpa using hc
   · simpa using vge_zero (p := p) _
-
-theorem psge_C {u : ℚ} {e lam : ℤ} (hu : vge p e u) : psge p e lam (C u) := by
-  have := psge_lin (p := p) (c := 0) (lam := lam) hu (vge_zero _)
-  simpa using this
 
 /-- The coefficients of `(C d + X)⁻¹`. -/
 theorem inv_C_add_X_eq {d : ℚ} (hd : d ≠ 0) :

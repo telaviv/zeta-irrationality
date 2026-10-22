@@ -1,13 +1,11 @@
 /-
-# Z7 contour certificate: lower polyline (PROOF_ZETA §6.3, (S2), (S4), (S5))
+# Z7 contour certificate: lower polyline ((S2), (S4))
 
 Kernel checks (`decide +kernel`) on the segments of `dnStart, dnPts` (`PolyDataZ7.lean`), from
 `x₀ - ρ d` down to the real point `x_c`:
 * `chk_dn`: `Re f ≤ T0` on every segment (`polyChk`);
 * `chk_sec_dn`: `|α_i| ≥ 1/100`, `|arg α_i| ≤ 2.76` for every factor and `Re z > -1/2`
   (`polySectorQ`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Interval.PolyDataZ7
 

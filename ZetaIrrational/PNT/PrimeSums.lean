@@ -1,22 +1,19 @@
 import ZetaIrrational.PNT.Theta
 
 /-!
-# Prime sums with step-function weights (parts (b)–(d))
+# Prime sums with step-function weights
 
-PNT input for Lemma 5 of `PROOF_BETA.md` §5.
+The prime number theorem input for Lemma 5.
 
 `θ` is Mathlib's `Chebyshev.theta`. All prime sums are written with `primeSum w c d`,
 `= ∑_{p prime, c < p ≤ d} w p · log p`; `primeSum_eq_sum_filter` converts it to a sum over any
 finset containing the relevant primes.
 
-Main results (all in `namespace ZetaIrr.PNT`, all fully proved):
-* `eventually_abs_primeSum_interval_sub_le`: `∑_{n/b < p ≤ n/a} log p = n(1/a − 1/b) + o(n)`.
+Main results (namespace `ZetaIrr.PNT`):
+* `eventually_primeSum_cell_le`: for a weight with `h ≤ u` on `(a, b)`,
+  `∑_{n/b < p ≤ n/a} h(n/p) log p ≤ n u (1/a − 1/b) + o(n)`.
 * `eventually_primeSum_step_le`: upper bound for a weight `h(n/p)` dominated on the open cells
   `(x i, x (i+1))` by constants `u i` (no condition at the breakpoints).
-* `eventually_abs_primeSum_step_sub_le`: the two-sided step-function statement
-  `∑_{n/x_L < p ≤ n/x_0} g(n/p) log p = n ∑_i v_i (1/x_i − 1/x_{i+1}) + o(n)`, ε-form.
-* `eventually_theta_div_le`, `eventually_primeSum_tail_le`: `θ(n/X) ≤ c·n/X` for any `c > 1`
-  (in particular `1.02`).
 * `eventually_primeSum_tail_frac_le`: tail with `h ≤ C + G·{x}` on `[X, ∞)`:
   `∑_{p ≤ n/X} h(n/p) log p ≤ n (C/X + G/(2(X−1))) + o(n)`.
 * `eventually_primeSum_lemma5_le`: the combination used in Lemma 5 (step part on `[x_0, X]`
@@ -119,10 +116,6 @@ theorem primeSum_const (u : ℝ) {c d : ℝ} (hc : 0 ≤ c) (hcd : c ≤ d) :
   rw [Finset.mul_sum]
   simp
 
-theorem primeSum_neg (w : ℕ → ℝ) (c d : ℝ) :
-    primeSum (fun p => -w p) c d = -primeSum w c d := by
-  simp [primeSum, neg_mul, Finset.sum_neg_distrib]
-
 theorem primeSum_mono {w w' : ℕ → ℝ} {c d : ℝ} (hd : 0 ≤ d)
     (h : ∀ p : ℕ, p.Prime → c < (p : ℝ) → (p : ℝ) ≤ d → w p ≤ w' p) :
     primeSum w c d ≤ primeSum w' c d := by
@@ -189,31 +182,7 @@ lemma tendsto_log_nat_div_div {a : ℝ} (ha : 0 < a) :
   congr 1
   field_simp
 
-/-- From `f n / n → I` to the ε-form `|f n − n I| ≤ ε n` eventually. -/
-lemma eventually_abs_sub_le_of_tendsto {f : ℕ → ℝ} {I : ℝ}
-    (hf : Tendsto (fun n : ℕ => f n / n) atTop (𝓝 I)) {ε : ℝ} (hε : 0 < ε) :
-    ∀ᶠ n : ℕ in atTop, |f n - n * I| ≤ ε * n := by
-  filter_upwards [Metric.tendsto_nhds.mp hf ε hε, eventually_gt_atTop 0] with n hn hn0
-  have hn0' : (0 : ℝ) < n := by exact_mod_cast hn0
-  rw [Real.dist_eq] at hn
-  have : f n - n * I = n * (f n / n - I) := by field_simp
-  rw [this, abs_mul, abs_of_pos hn0', mul_comm ε]
-  exact mul_le_mul_of_nonneg_left hn.le hn0'.le
-
-/-! ### (b) Interval and step-function sums -/
-
-/-- **(b), one interval:** `∑_{n/b < p ≤ n/a} log p = n(1/a − 1/b) + o(n)`, for `0 < a < b`. -/
-theorem eventually_abs_primeSum_interval_sub_le {a b : ℝ} (ha : 0 < a) (hab : a < b)
-    {ε : ℝ} (hε : 0 < ε) :
-    ∀ᶠ n : ℕ in atTop,
-      |primeSum (fun _ => 1) ((n : ℝ) / b) ((n : ℝ) / a) - n * (1 / a - 1 / b)| ≤ ε * n := by
-  have hb : 0 < b := ha.trans hab
-  have hT := (theta_nat_div_tendsto ha).sub (theta_nat_div_tendsto hb)
-  have hT' : Tendsto (fun n : ℕ => (θ ((n : ℝ) / a) - θ ((n : ℝ) / b)) / n) atTop
-      (𝓝 (1 / a - 1 / b)) := hT.congr fun n => (sub_div _ _ _).symm
-  filter_upwards [eventually_abs_sub_le_of_tendsto hT' hε] with n hn
-  have hn0 : (0 : ℝ) ≤ n := n.cast_nonneg
-  rwa [primeSum_one (div_nonneg hn0 hb.le) (div_le_div_of_nonneg_left hn0 ha hab.le)]
+/-! ### Cell and step-function sums -/
 
 /-- One cell, asymptotic upper form. `h ≤ u` is needed only on the open interval `(a, b)`. -/
 theorem eventually_primeSum_cell_le (h : ℝ → ℝ) {a b u : ℝ} (ha : 0 < a) (hab : a < b)
@@ -297,61 +266,7 @@ theorem eventually_primeSum_step_le (h : ℝ → ℝ) (x u : ℕ → ℝ) (L : �
       (div_le_div_of_nonneg_left hn0 hx0 hxL), sum_range_succ, mul_add]
     linarith
 
-/-- **(b), step function, two-sided ε-form.** `g = v i` on each open cell `(x i, x (i+1))`;
-`g` is arbitrary at the breakpoints (no global bound on `g` is needed). -/
-theorem eventually_abs_primeSum_step_sub_le (g : ℝ → ℝ) (x v : ℕ → ℝ) (L : ℕ) (hx0 : 0 < x 0)
-    (hx : ∀ i < L, x i < x (i + 1))
-    (hg : ∀ i < L, ∀ y, x i < y → y < x (i + 1) → g y = v i) {ε : ℝ} (hε : 0 < ε) :
-    ∀ᶠ n : ℕ in atTop,
-      |primeSum (fun p => g ((n : ℝ) / p)) ((n : ℝ) / x L) ((n : ℝ) / x 0) -
-        n * ∑ i ∈ range L, v i * (1 / x i - 1 / x (i + 1))| ≤ ε * n := by
-  have h1 := eventually_primeSum_step_le g x v L hx0 hx
-    (fun i hi y hy1 hy2 => (hg i hi y hy1 hy2).le) hε
-  have h2 := eventually_primeSum_step_le (fun y => -g y) x (fun i => -v i) L hx0 hx
-    (fun i hi y hy1 hy2 => by rw [hg i hi y hy1 hy2]) hε
-  filter_upwards [h1, h2] with n h1 h2
-  have e : primeSum (fun p => (fun y => -g y) ((n : ℝ) / p)) ((n : ℝ) / x L) ((n : ℝ) / x 0) =
-      -primeSum (fun p => g ((n : ℝ) / p)) ((n : ℝ) / x L) ((n : ℝ) / x 0) :=
-    primeSum_neg _ _ _
-  have e2 : ∑ i ∈ range L, -v i * (1 / x i - 1 / x (i + 1)) =
-      -∑ i ∈ range L, v i * (1 / x i - 1 / x (i + 1)) := by
-    simp [neg_mul, sum_neg_distrib]
-  rw [e, e2] at h2
-  rw [abs_le]
-  constructor <;> nlinarith
-
-/-! ### (c) The tail `p ≤ n/X` -/
-
-/-- `θ(n/X) ≤ c·(n/X)` for all large `n`, for any `c > 1` (from PNT). -/
-theorem eventually_theta_div_le {X c : ℝ} (hX : 0 < X) (hc : 1 < c) :
-    ∀ᶠ n : ℕ in atTop, θ ((n : ℝ) / X) ≤ c * ((n : ℝ) / X) := by
-  have hlt : 1 / X < c / X := div_lt_div_of_pos_right hc hX
-  filter_upwards [(theta_nat_div_tendsto hX).eventually (Iio_mem_nhds hlt),
-    eventually_gt_atTop 0] with n hn hn0
-  have hn0' : (0 : ℝ) < n := by exact_mod_cast hn0
-  have := (div_lt_iff₀ hn0').mp hn
-  have e : c / X * n = c * (n / X) := by ring
-  linarith
-
-/-- **(c)** `∑_{p ≤ n/X} log p ≤ 1.02·n/X` for all large `n`. -/
-theorem eventually_primeSum_tail_le {X : ℝ} (hX : 0 < X) :
-    ∀ᶠ n : ℕ in atTop, primeSum (fun _ => 1) 0 ((n : ℝ) / X) ≤ 1.02 * ((n : ℝ) / X) := by
-  filter_upwards [eventually_theta_div_le hX (by norm_num : (1 : ℝ) < 1.02)] with n hn
-  rwa [primeSum_one_zero]
-
-/-- **(c), weighted.** If `w p ≤ B` (with `B ≥ 0`) for primes `p ≤ n/X`, the tail is
-`≤ 1.02·B·n/X` for all large `n`. -/
-theorem eventually_primeSum_tail_weighted_le {X B : ℝ} (hX : 0 < X) (hB : 0 ≤ B)
-    (w : ℕ → ℕ → ℝ) (hw : ∀ n p : ℕ, p.Prime → (p : ℝ) ≤ (n : ℝ) / X → w n p ≤ B) :
-    ∀ᶠ n : ℕ in atTop, primeSum (w n) 0 ((n : ℝ) / X) ≤ 1.02 * B * ((n : ℝ) / X) := by
-  filter_upwards [eventually_theta_div_le hX (by norm_num : (1 : ℝ) < 1.02)] with n hn
-  have hd : (0 : ℝ) ≤ n / X := div_nonneg n.cast_nonneg hX.le
-  have := primeSum_le_mul_theta (w := w n) (B := B) le_rfl hd
-    (fun p hp _ hpd => hw n p hp hpd)
-  rw [Chebyshev.theta_zero, sub_zero] at this
-  nlinarith
-
-/-! ### (d) The tail with `h ≤ C + G·{x}` on `[X, ∞)` -/
+/-! ### The tail with `h ≤ C + G·{x}` on `[X, ∞)` -/
 
 lemma sum_range_succ_cast (K : ℕ) :
     ∑ j ∈ range K, ((j : ℝ) + 1) = (K : ℝ) * (K + 1) / 2 := by
@@ -499,9 +414,9 @@ theorem eventually_primeSum_block_frac_le (h : ℝ → ℝ) (C G : ℝ) (hG : 0 
     have key3 := mul_le_mul_of_nonneg_left key2 hn0
     nlinarith
 
-/-- **(d)** Tail with `h ≤ C + G·{x}` on `[X, ∞)` (`X ≥ 2` an integer, `C, G ≥ 0`):
+/-- **Tail** with `h ≤ C + G·{x}` on `[X, ∞)` (`X ≥ 2` an integer, `C, G ≥ 0`):
 `∑_{p ≤ n/X} h(n/p) log p ≤ n (C/X + G/(2(X−1))) + ε n` for all large `n`.
-(For Lemma 5: `C = S + 9`, the bound of PROOF_BETA §5.2.) -/
+(For Lemma 5: `C = 33`, the uniform bound of `Z7/CertA/Tail.lean`.) -/
 theorem eventually_primeSum_tail_frac_le (h : ℝ → ℝ) (C G : ℝ) (hC : 0 ≤ C) (hG : 0 ≤ G)
     (X : ℕ) (hX : 2 ≤ X) (hh : ∀ y, (X : ℝ) ≤ y → h y ≤ C + G * Int.fract y)
     {ε : ℝ} (hε : 0 < ε) :

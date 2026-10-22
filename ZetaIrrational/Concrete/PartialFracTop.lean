@@ -1,12 +1,10 @@
 /-
-# The top coefficient of a partial-fraction decomposition (for PROOF_ZETA Lemma 3)
+# The top coefficient of a partial-fraction decomposition (for Lemma 3)
 
 In the setting of `Concrete/PartialFrac.lean` (`N/D = Σ_k Σ_{j<B_k} [X^j]f_k (t-c_k)^j/(t-c_k)^{B_k}`),
 the coefficient of `(t - c_k)^{-1}` is `[X^{B_k - 1}] f_k`, and the sum of these residues is the
 coefficient of `X^{deg D - 1}` in `N`. So if `deg N + 1 < deg D` (i.e. `deg(N/D) ≤ -2`) the residues
-sum to zero (`pf_top_coeff`). This is the `τ₁ = 0` of PROOF_ZETA Lemma 3.
-
-Status: complete (no `sorry`).
+sum to zero (`pf_top_coeff`). This is the `τ₁ = 0` of Lemma 3.
 -/
 import ZetaIrrational.Concrete.PartialFrac
 

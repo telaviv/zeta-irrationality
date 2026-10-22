@@ -3,12 +3,9 @@
 
 * `eStarInt_realized`: for `x ≥ 1`, `eStarInt x = gfun x y` for some `0 ≤ y ≤ x`;
 * `eStar_isGreatest`: for `x ≥ 1`, `eStar x` is the greatest element of
-  `{gfun x y - G⌊x⌋ | 0 ≤ y ≤ x}` (PROOF_ZETA §5.1: `e*(x) := max(0, sup_y bracket) - G⌊x⌋`; the
-  sup is attained, and `0 = gfun x 0` because no block contains `0`);
-* `eStar_eq_mid`: for consecutive events `a < b` and `x ∈ (a, b)`, `e*(x) = e*((a+b)/2)`
-  (PROOF_ZETA §5.3).
-
-Status: complete (no `sorry`).
+  `{gfun x y - G⌊x⌋ | 0 ≤ y ≤ x}` (`e*(x) = max(0, sup_y bracket) - G⌊x⌋`; the sup is attained,
+  and `0 = gfun x 0` because no block contains `0`);
+* `eStar_eq_mid`: for consecutive events `a < b` and `x ∈ (a, b)`, `e*(x) = e*((a+b)/2)`.
 -/
 import ZetaIrrational.Z7.CertA.Step
 
@@ -220,7 +217,7 @@ lemma eStarInt_realized (x : ℚ) (hx : 1 ≤ x) : Realized x (eStarInt x) := by
       (realized_cand x hx _ hr0 hrM true))
   · exact realized_zero x (by linarith)
 
-/-- **`e*(x) = max_{0 ≤ y ≤ x} gfun(x, y) - G⌊x⌋`** (PROOF_ZETA §5.1), for `x ≥ 1`. -/
+/-- **`e*(x) = max_{0 ≤ y ≤ x} gfun(x, y) - G⌊x⌋`**, for `x ≥ 1`. -/
 theorem eStar_isGreatest (x : ℚ) (hx : 1 ≤ x) :
     IsGreatest {v | ∃ y, 0 ≤ y ∧ y ≤ x ∧ (gfun x y : ℚ) - G * ⌊x⌋ = v} (eStar x) := by
   refine ⟨?_, ?_⟩
@@ -231,7 +228,7 @@ theorem eStar_isGreatest (x : ℚ) (hx : 1 ≤ x) :
     have : (gfun x y : ℚ) ≤ eStarInt x := by exact_mod_cast gfun_le_eStarInt x y hy0 hyx
     linarith
 
-/-- **Step function (PROOF_ZETA §5.3).** `e*` is constant on each open event interval:
+/-- **Step function.** `e*` is constant on each open event interval:
 `e*(x) = e*((a+b)/2)` for consecutive events `a < b` and `a < x < b`. -/
 theorem eStar_eq_mid (a b : ℚ) (hc : Consec (events 400) a b) (x : ℚ) (hax : a < x)
     (hxb : x < b) : eStar x = eStar ((a + b) / 2) := by

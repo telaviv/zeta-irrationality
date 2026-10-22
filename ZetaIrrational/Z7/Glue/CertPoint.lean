@@ -5,11 +5,9 @@ Here `Arith` is `ZetaIrr.Z7.Arith` and `CertA` is `ZetaIrr.Z7.CertA`.
 
 The two files define `c_p(k)` and `P_{p,j}(k)` separately: `Arith.cp ≥ CertA.cp` (Arith also
 counts the `e`-factor; `cp_le`) and `Arith.Ppj = CertA.Ppj` (`Ppj_eq`), so the per-`k` exponent
-satisfies `Arith.eK ≤ CertA.epk` (`eK_le_epk`). With `eStarInt ≥ 0` (the `max(0, ·)` of
-PROOF_ZETA §4) this gives `E_p - G⌊n/p⌋ ≤ e*(n/p)` for every prime `p ≤ n`
+satisfies `Arith.eK ≤ CertA.epk` (`eK_le_epk`). With `eStarInt ≥ 0` (which covers the `max(0, ·)`
+in the definition of `E_p`, Lemma 4) this gives `E_p - G⌊n/p⌋ ≤ e*(n/p)` for every prime `p ≤ n`
 (`Esharp_sub_le_eStar`; the restriction `√𝒩 < p` is not needed here).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.CertA.Pointwise
 import ZetaIrrational.Z7.Arith.Size

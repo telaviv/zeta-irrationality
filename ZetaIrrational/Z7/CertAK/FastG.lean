@@ -12,8 +12,6 @@ so that the kernel does only `Nat` primitive operations per block (it has GMP-ba
 operations but none for `Int`), plus a few `Int` operations per candidate.
 
 Main results: `cand_eq_G`, `eStarInt_eq_G`, `termUnits_eq_G : termUnits = termUnitsG`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.CertA.Sound
 

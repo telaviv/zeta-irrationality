@@ -2,11 +2,7 @@
 # Glue (Z7): the small-prime error term of `log_D_sub_le` is `o(n)`
 
 With `n = 240(m+1)` and `𝒩 = 700(m+1) + 1 ≤ 3n`:
-* `tendsto_err2`: the small-prime error `182 ⌊√𝒩⌋ log 𝒩 / n → 0`.
-
-(PROOF_ZETA (4.1). There is no `p = 2` main term here, unlike PROOF_BETA (4.4).)
-
-Status: complete (no `sorry`).
+* `tendsto_err2`: the small-prime error `182 ⌊√𝒩⌋ log 𝒩 / n → 0` (Lemma 4).
 -/
 import ZetaIrrational.Z7.Arith.Lemma4
 import Mathlib.Analysis.SpecialFunctions.Pow.Asymptotics
@@ -18,10 +14,6 @@ open Filter Topology Finset Asymptotics
 
 lemma nOf_pos (m : ℕ) : (0 : ℝ) < nOf m := by
   unfold nOf; positivity
-
-lemma tendsto_nOf_atTop : Tendsto (fun m => (nOf m : ℝ)) atTop atTop := by
-  refine tendsto_atTop_mono (fun m => ?_) tendsto_natCast_atTop_atTop
-  unfold nOf; push_cast; nlinarith
 
 lemma tendsto_NN_atTop : Tendsto (fun m => (Arith.NN m : ℝ)) atTop atTop := by
   refine tendsto_atTop_mono (fun m => ?_) tendsto_natCast_atTop_atTop

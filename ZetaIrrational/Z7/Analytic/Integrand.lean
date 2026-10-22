@@ -9,10 +9,8 @@ For `RC m` (the complex extension of `Z7.R m`, `Gamma.lean`):
 * holomorphy off the poles `-k`, `1 ≤ k ≤ n` (`RC_differentiableOn`), and of all derivatives
   `RCd m j = deriv^[j] (RC m)`;
 * `RCd_re_eq`: `Re R_n⁽ʲ⁾(t) = (Z7.R m)⁽ʲ⁾(t)` for real `t > -1`;
-* `RCd_conj`: `R_n⁽ʲ⁾(z̄) = conj R_n⁽ʲ⁾(z)`;
-* `RCd4_nat_zero`: `R_n⁗(t) = 0` for integers `1 ≤ t ≤ 220(m+1)` (zeros of order 5).
-
-Status: complete (no `sorry`).
+* `RC_conj`: `R_n(z̄) = conj R_n(z)`;
+* `RCd_nat_zero`: `R_n⁽ʲ⁾(t) = 0` for `j ≤ 4` and integers `1 ≤ t ≤ 220(m+1)` (zeros of order 5).
 -/
 import ZetaIrrational.Z7.Analytic.Gamma
 import Mathlib.Analysis.Complex.RealDeriv
@@ -153,25 +151,10 @@ lemma RCd_re_eq (m j : ℕ) {t : ℝ} (ht : -1 < t) :
     have hd := (hasDerivAt_RCd m j (mem_compl_poles_of_re (z := (t : ℂ)) (by simpa using ht)))
     exact hd.real_of_complex.deriv.symm
 
-lemma conj_mem_compl_poles (m : ℕ) {z : ℂ} (hz : z ∈ (poles m)ᶜ) :
-    (starRingEnd ℂ) z ∈ (poles m)ᶜ := by
-  rintro ⟨k, hk1, hk, h⟩
-  apply hz
-  refine ⟨k, hk1, hk, ?_⟩
-  have := congrArg (starRingEnd ℂ) h
-  rw [Complex.conj_conj] at this
-  rw [this]
-  simp
-
 lemma RC_conj (m : ℕ) (z : ℂ) : RC m ((starRingEnd ℂ) z) = (starRingEnd ℂ) (RC m z) := by
   rw [RC_eq, RC_eq, map_div₀]
   unfold NC DC
   simp [map_prod, map_pow, map_mul, map_add, map_sub, map_natCast, map_ofNat]
-
-lemma RCd_conj (m j : ℕ) {z : ℂ} (hz : z ∉ poles m) :
-    RCd m j ((starRingEnd ℂ) z) = (starRingEnd ℂ) (RCd m j z) :=
-  iterate_deriv_conj_symm (isOpen_compl_poles m) (fun z hz => conj_mem_compl_poles m hz)
-    (RC_differentiableOn m) (fun z _ => RC_conj m z) j z hz
 
 /-- `R_n⁽ʲ⁾(t) = 0` for `j ≤ 4` and integers `1 ≤ t ≤ 220(m+1)` (zeros of order 5). -/
 lemma RCd_nat_zero (m t j : ℕ) (hj : j < 5) (ht1 : 1 ≤ t) (ht : t ≤ 220 * (m + 1)) :

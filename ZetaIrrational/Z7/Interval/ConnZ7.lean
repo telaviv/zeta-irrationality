@@ -1,5 +1,5 @@
 /-
-# Connector, disc and first-segment box checks for the Z7 contour (PROOF_ZETA §6.3)
+# Connector, disc and first-segment box checks for the Z7 contour
 
 Small kernel checks that depend only on the contour data (`PolyDataZ7.lean`), kept apart from the
 saddle files so that they build in parallel:
@@ -12,8 +12,6 @@ saddle files so that they build in parallel:
 * the first segment `[x_c, firstB]` widened by `δ0 = 10⁻⁷` (`firstBox`): slit-plane condition,
   sector condition, and `|Ψ' - 3πi| δ0 ≤ 10⁻⁵` (`chk_first_G`), used for the moved start point
   (field `S2_first` of `SaddleData`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Interval.PolyDataZ7
 

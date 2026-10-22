@@ -1,7 +1,7 @@
 /-
 # The steepest-descent direction `d` at the Z7 saddle, and the Taylor-segment endpoints
 
-(PROOF_ZETA §6.3, (S1).)
+Used for the Taylor disc condition (S1).
 
 With `w = Ψ''(x₀)`, `K = |w|`, `u = -conj(w)/K` (a unit number) and `v = 1 + u`, put
 
@@ -11,8 +11,6 @@ Then `|dir| = 1` and `Ψ''(x₀) · dir² = -K` (`dir_norm`, `dir_sq`). `dB` is 
 `dir`, and `ePlus = x₀ + ρ dir`, `eMinus = x₀ - ρ dir` (the Taylor segment endpoints, `ρ = 1/20`)
 are within `Dc = 10⁻⁹` of the rational points `upStart`, `dnStart` (`PolyDataZ7.lean`) where the
 certified polylines begin.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Interval.SaddleZ7
 import ZetaIrrational.Z7.Interval.PolyDataZ7

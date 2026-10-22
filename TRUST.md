@@ -38,32 +38,36 @@ a false theorem true.
 
 ## How the A-certificate is kernel-checked
 
-Same route as `lean_beta` (see its TRUST.md). The specification (`Z7/CertA/Defs.lean`: the bracket of PROOF_ZETA §5.1,
-`eStar`, and `events` built with `List.mergeSort`) is what the soundness proofs use. The kernel evaluates equivalent
-forms instead, each with a general proof:
-* `Z7/CertAK/FastG.lean`: `termUnits = termUnitsG`, a closed form of e* in `Nat` arithmetic (about 0.4 s per point in
-  the kernel);
-* `Z7/CertAK/EvSort.lean`, `Windows.lean`: a structural merge sort; if each window's sort equals a literal list and
-  the concatenation is strictly increasing, that concatenation is `events 400`; `pairSum` splits over chunks.
+The specification (`Z7/CertA/Defs.lean`: the step function `eStar`, and `events` built with `List.mergeSort`) is what
+the soundness proofs use. The kernel cannot evaluate it directly: `List.mergeSort` is well-founded recursion, and the
+naive `eStar` is slow. So the proof goes through equivalent forms, each with a general proof:
 
-`CertCompute.lean` assembles these into `bodyUnits 400 = 778841997893779320302794447562` (units of 2⁻⁹⁶).
+| step | file | statement |
+|---|---|---|
+| fast e* | `Z7/CertAK/FastG.lean` | `termUnits = termUnitsG`: e* is a maximum of closed forms in `Nat` arithmetic (about 0.4 s per point in the kernel) |
+| sort | `Z7/CertAK/EvSort.lean` | `msort`, a structural merge sort that permutes its input whatever the comparator |
+| windows | `Z7/CertAK/Windows.lean` | if each window's sort equals a literal list and their concatenation is strictly increasing, that concatenation is `events 400` |
+| chunks | `Z7/CertAK/Windows.lean` | `pairSum` over concatenated chunks equals the sum of the chunk sums |
+
+The generated files check each window, the monotonicity of the concatenation and each chunk sum by `decide +kernel`, and
+`CertCompute.lean` assembles them into `bodyUnits 400 = 778841997893779320302794447562` (units of 2⁻⁹⁶).
 
 ## Cross-checks outside Lean
 
-Not needed for correctness, but they agree:
-- **A-certificate.** `bodyUnits 400 · 2⁻⁹⁶ + 33/400 + G/798` equals the exact fraction
-  A = 11757994664484187722611840743096153/1185451381619680151243401356902400 ≈ 9.9185803 printed by the independent
-  Python implementation `handoff/zeta7/f4_certA_exact.py` (`f4_final.log`).
-- **Saddle certificate.** The Lean enclosure Re Ω ∈ [−10.1167486, −10.1167485] and sin(240 Im Ω) ≈ −0.932 agree with
-  the Arb certificate `handoff/zeta7/f5_saddle_cert.py`.
+These are not needed for correctness, but they agree:
+- **A-certificate.** `bodyUnits 400 · 2⁻⁹⁶ + 33/400 + G/798` equals
+  A = 11757994664484187722611840743096153/1185451381619680151243401356902400 ≈ 9.9185803 exactly, the value of an
+  independent exact-rational Python implementation (not included here). `scripts/certA/z7_model.py` mirrors the Lean
+  algorithm in Python and reproduces it.
+- **Saddle certificate.** The Lean enclosure Re Ω ∈ [−10.1167486, −10.1167485] and sin(240 Im Ω) ≈ −0.932 agree with an
+  independent ball-arithmetic (Arb) computation (not included here).
 
 ## Cost
 
 With Mathlib cached (`lake exe cache get`), on a 32-core desktop with 32 GB RAM:
 - the A-certificate (`Z7/CertAK`) takes about 30 min wall at `LEAN_NUM_THREADS=12` (about 3.3 CPU-hours of chunk sums);
 - the saddle certificate (`Z7/Interval`) takes about 5 min wall;
-- the rest takes about 15 min.
+- everything else takes about 15 min wall.
 
-On Windows, run Lake with `LEAN_NUM_THREADS=8` (or 12). With the default of one job per core, the parallel Lean
-processes fail with "failed to read file ….olean" or exit code 0xC0000142; this is a resource limit, not a proof
-error.
+On Windows, keep `LEAN_NUM_THREADS` at 8–12. With one job per core, the parallel Lean processes fail with
+"failed to read file ….olean" or exit code 0xC0000142; this is a resource limit, not a proof error.

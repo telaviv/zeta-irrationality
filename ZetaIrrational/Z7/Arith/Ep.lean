@@ -1,5 +1,5 @@
 /-
-# Lemma 4 for instance Z7 (PROOF_ZETA §4): the exponents `E_p` and `D_n`
+# Lemma 4 for instance Z7: the exponents `E_p` and `D_n`
 
 With `n = nOf m = 240(m+1)` and `𝒩 = NN m = (2+r)n + 1 = 700(m+1) + 1`:
 
@@ -16,12 +16,10 @@ with the per-`k` exponent (`eK`, only for `B_k ≥ 1`)
              0                            if k < p and P_p(k) = 0,
 
 `c_p(k) = Σ_z 5 [p ∣ k+z] + [p ∣ n-2k]` (`cp`), `P_p(k) = Σ_j m_j P_{p,j}(k)` (`Ptot`).
-`ν_p(k) = 5 Σ_z v_p(k+z) - Σ_j m_j Σ_{k' ∈ block j, k' ≠ k} v_p(k'-k)` (`nuSmall`; PROOF_ZETA's
-`ν_p` also counts `v_p(n-2k)`; dropping it only weakens the bound).
+`ν_p(k) = 5 Σ_z v_p(k+z) - Σ_j m_j Σ_{k' ∈ block j, k' ≠ k} v_p(k'-k)` (`nuSmall`; this omits the
+nonnegative term `v_p(n-2k)` of the e-factor, which only weakens the bound).
 
 `D m = Π_{p ≤ n} p^{E_p}` (a positive rational).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Arith.LemmaA
 import ZetaIrrational.Arith.LemmaB
@@ -119,7 +117,7 @@ lemma not_dvd_of_Ptot_eq_zero {m p k : ℕ} (h : Ptot m p k = 0) :
 def nuSmall (m p k : ℕ) : ℤ :=
   etot m k 0 (fun z => (padicValInt p (zv k z) : ℤ)) (fun k' => -(padicValInt p ((k' : ℤ) - k) : ℤ))
 
-/-- The per-`k` sharp exponent `e_p(k)` of PROOF_ZETA §4 (`0` where `B_k = 0`). -/
+/-- The per-`k` sharp exponent `e_p(k)` of Lemma 4 (`0` where `B_k = 0`). -/
 def eK (m p k : ℕ) : ℤ :=
   if Bk m k = 0 then 0
   else if p ≤ k then (Bk m k : ℤ) + 4 - cp m p k + Ptot m p k
@@ -134,7 +132,7 @@ def Esmall (m p : ℕ) : ℤ :=
   (range (nOf m + 1)).sup' nonempty_range_add_one (fun k => -nuSmall m p k) +
     22 * (Nat.log p (NN m) : ℤ)
 
-/-- The exponent `E_p` of PROOF_ZETA §4. -/
+/-- The exponent `E_p` of Lemma 4. -/
 def Ep (m p : ℕ) : ℤ :=
   if nOf m < p then 0
   else if NN m < p ^ 2 then Esharp m p

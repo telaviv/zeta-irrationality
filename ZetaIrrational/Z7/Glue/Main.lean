@@ -9,13 +9,12 @@
 * Lemmas 4–5 (`arith`, with `A = Acert`): `arith_Z7`, from the split `Arith.log_D_sub_le`
   (`O(√n log n)` + the sharp sum) and `sharp_Z7` (PNT step `sharp_of_pointwise` with the CertA
   data: pointwise bound, step function on the events of `[1, 400]`, tail `33 + G{y}`);
-* (H2): the single computational fact `hcert : CertA.CertFact` (`ABody 400 + tail 400 ≤ Acert`,
-  `Z7/CertA/Cert.lean`), taken as a hypothesis;
+* the A-certificate: the single computational fact `hcert : CertA.CertFact`
+  (`ABody 400 + tail 400 ≤ Acert`, `Z7/CertA/Cert.lean`), taken as a hypothesis (proved by the
+  kernel in `Z7/CertAK/CertCompute.lean`);
 * Lemma 6(i) (`size`) and 6(ii) (`nonvan`): hypotheses (discharged by `Z7/Lemma6.lean`).
 
 Main result: `oneOfZeta7To21_of_parts (hcert) (εL) (hεL) (hsize) (hnon) : OneOfZeta7To21`.
-
-Status: complete (no `sorry`). PROOF_ZETA §3–§5, §7, §9 (Z7 column).
 -/
 import ZetaIrrational.Z7.Glue.CertInst
 import ZetaIrrational.Z7.CertA.Cert
@@ -41,7 +40,7 @@ lemma cert_Z7 (hcert : CertA.CertFact) :
   push_cast at h' ⊢
   linarith
 
-/-- **Lemma 5 for Z7** (given (H2)). `Σ_{√𝒩 < p ≤ n} (E_p - G⌊n/p⌋) log p ≤ n (Acert + o(1))`. -/
+/-- **Lemma 5 for Z7** (given the A-certificate `hcert`). `Σ_{√𝒩 < p ≤ n} (E_p - G⌊n/p⌋) log p ≤ n (Acert + o(1))`. -/
 theorem sharp_Z7 (hcert : CertA.CertFact) :
     ∃ εS : ℕ → ℝ, Tendsto εS atTop (𝓝 0) ∧
     ∀ᶠ m in atTop,
@@ -56,7 +55,7 @@ theorem sharp_Z7 (hcert : CertA.CertFact) :
     tail_le
     (Acert : ℝ) (cert_Z7 hcert)
 
-/-- **Lemmas 4–5 for Z7** (given (H2)): `log D_n ≤ G log n! + n (Acert + εA)` with `εA → 0`. -/
+/-- **Lemmas 4–5 for Z7** (given the A-certificate `hcert`): `log D_n ≤ G log n! + n (Acert + εA)` with `εA → 0`. -/
 theorem arith_Z7 (hcert : CertA.CertFact) :
     ∃ εA : ℕ → ℝ, Tendsto εA atTop (𝓝 0) ∧
     ∀ᶠ m in atTop, Real.log ((Arith.D m : ℚ) : ℝ)
@@ -81,7 +80,8 @@ theorem arith_Z7 (hcert : CertA.CertFact) :
     rw [e3, e2]
     linarith
 
-/-- `Z7.Hyp` from the parts: (H2) `hcert`, Lemma 6(i) `hsize`, Lemma 6(ii) `hnon`. -/
+/-- `Z7.Hyp` from the parts: the A-certificate `hcert`, Lemma 6(i) `hsize`, Lemma 6(ii)
+`hnon`. -/
 noncomputable def hypOfParts (hcert : CertA.CertFact)
     (εL : ℕ → ℝ) (hεL : Tendsto εL atTop (𝓝 0))
     (hsize : ∀ᶠ m in atTop, L m ≠ 0 → Real.log |L m| ≤
@@ -104,8 +104,8 @@ noncomputable def hypOfParts (hcert : CertA.CertFact)
   size := hsize
   nonvan := hnon
 
-/-- **Main theorem for Z7 from the parts.** Given the single computational fact (H2) `hcert`,
-Lemma 6(i) (`hsize`, with `V_cert = -10.1167`) and Lemma 6(ii) (`hnon`), one of
+/-- **Main theorem for Z7 from the parts.** Given the single computational fact `hcert`
+(the A-certificate), Lemma 6(i) (`hsize`, with `V_cert = -10.1167`) and Lemma 6(ii) (`hnon`), one of
 `ζ(7), ζ(9), …, ζ(21)` is irrational. -/
 theorem oneOfZeta7To21_of_parts (hcert : CertA.CertFact)
     (εL : ℕ → ℝ) (hεL : Tendsto εL atTop (𝓝 0))

@@ -8,13 +8,12 @@ If `w k` is a power series inverse of `Q_k(c_k + X)`, and `f_k := N(c_k + X) · 
 
   `N / D = Σ_k Σ_{j < B_k} [X^j] f_k · (t - c_k)^j / (t - c_k)^{B_k}`.
 
-This is PROOF_BETA §3 ("a_{i,k} = [ε^{B_k - i}] f_k(t₀ + ε)") in general form.
+This is the local formula `a_{i,k} = [ε^{B_k - i}] f_k(t₀ + ε)` for the partial-fraction
+coefficients, in general form.
 
 * `pf_identity`: the polynomial identity `N = Σ_k P_k Q_k`;
 * `pf_eval`, `pf_eval'`: the evaluated identity at real `t` off the centres;
 * `pf_symm`: behaviour of the coefficients under a mirror symmetry `t ↦ α - t`.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib
 
@@ -161,13 +160,6 @@ theorem pf_identity (N : ℚ[X]) (hinj : Set.InjOn c s) (hdeg : N.natDegree < �
 
 /-! ### Evaluation at real points -/
 
-omit [DecidableEq ι] in
-lemma aeval_den_ne_zero {t : ℝ} (ht : ∀ k ∈ s, t ≠ (c k : ℝ)) : aeval t (den s c B) ≠ 0 := by
-  unfold den
-  rw [map_prod]
-  refine Finset.prod_ne_zero_iff.mpr (fun k hk => ?_)
-  simp only [map_pow, map_sub, aeval_X, aeval_C, eq_ratCast]
-  exact pow_ne_zero _ (sub_ne_zero.mpr (ht k hk))
 
 lemma aeval_cof_ne_zero {t : ℝ} (ht : ∀ k ∈ s, t ≠ (c k : ℝ)) (k : ι) :
     aeval t (cof s c B k) ≠ 0 := by
@@ -333,20 +325,5 @@ theorem pf_symm (N : ℚ[X]) (π : ι → ι) (α ε : ℚ)
     - (PowerSeries.coeff j (shiftPS (c (π k)) N * w (π k)) * ε * ε) * hσ2
 
 /-! ### Derivatives of a rational function -/
-
-/-- The numerator of `(N/D)' = (N'D - ND')/D²`. -/
-noncomputable def dnum (N D : ℚ[X]) : ℚ[X] := derivative N * D - N * derivative D
-
-lemma hasDerivAt_ratfun (N D : ℚ[X]) (t : ℝ) (hD : aeval t D ≠ 0) :
-    HasDerivAt (fun x => aeval x N / aeval x D) (aeval t (dnum N D) / aeval t (D ^ 2)) t := by
-  have := (N.hasDerivAt_aeval t).div (D.hasDerivAt_aeval t) hD
-  convert this using 1
-  simp [dnum, map_sub, map_mul, map_pow]
-
-/-- A triple zero of `N` at `l` kills the second derivative of `N/D` at `l`. -/
-lemma aeval_dnum_dnum_eq_zero (N D M : ℚ[X]) (l : ℚ) (hN : N = (X - C l) ^ 3 * M) :
-    aeval (l : ℝ) (dnum (dnum N D) (D ^ 2)) = 0 := by
-  subst hN
-  simp [dnum, derivative_mul, derivative_pow]
 
 end ZetaIrr.PF

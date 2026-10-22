@@ -1,5 +1,5 @@
 /-
-# Contour data for the Z7 saddle certificate (PROOF_ZETA §6.3, instance Z7)
+# Contour data for the Z7 saddle certificate (instance Z7)
 
 Rational vertices of the steepest-descent contour of `h = Re f`, `f = Ψ - 3πi x`:
 * the upper polyline `upStart, upPts` (16 vertices) from (the rounding of) `x₀ + ρ d` to `xtop`,
@@ -13,8 +13,6 @@ checks); every claim is re-checked by `decide +kernel` in the files that use thi
 
 Constants: far threshold `T0 = -10136700000000 / 10 ^ 12` (`Re Ω ≈ -10.1167485`), sector constants `amin = 1/100`,
 `Amax = 2.76` (`η = π - 2.76 > 0.38`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Interval.FacZ7
 import ZetaIrrational.Fam.Interval.Chunks

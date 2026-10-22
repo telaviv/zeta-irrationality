@@ -9,9 +9,7 @@
 * `log_D_sub_le`: the explicit split
   `log D_n - G log n! ≤ 182 ⌊√𝒩⌋ log 𝒩 + Σ_{p prime, p ≤ n, 𝒩 < p²} (Esharp_p - G ⌊n/p⌋) log p`,
   where the last sum is the one integrated by the A-certificate (Lemma 5). The primes `p > n`
-  contribute nothing (`E_p = 0`), and there is no exceptional prime.
-
-Status: complete (no `sorry`).
+  contribute nothing (`E_p = 0`).
 -/
 import ZetaIrrational.Z7.Arith.Size
 

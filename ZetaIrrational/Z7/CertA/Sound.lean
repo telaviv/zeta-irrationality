@@ -1,7 +1,7 @@
 /-
 # The A-certificate for instance Z7: soundness of the computable `e*`
 
-`PROOF_ZETA.md` §5.1. We prove that the computable `eStarInt x` of `Z7/CertA/Defs.lean` bounds
+Lemma 5. We prove that the computable `eStarInt x` of `Z7/CertA/Defs.lean` bounds
 `gfun x y` for every `0 ≤ y ≤ x` (`x ≥ 1`): `gfun_le_eStarInt`. The scaling is `M = 240 Q`
 (`x = P/Q`), so that every breakpoint `σ/240 · x + j` lies on the grid `(1/M) ℤ`.
 
@@ -9,8 +9,6 @@ Route: `gfun` equals `Phi` of the floor/ceiling data (`gfun_eq_Phi`); the larges
 `b ≤ y` is a grid point `k + r_i/M` with `r_i` the residue of some offset, and `y` has the same
 floor data as `b` (if `y = b`) or as the right limit `b + 0`; `Phi` there is `phiAt … k r_i`,
 which is at most `max 0 (cand … r_i)` for every valid `k` (`phiAt_le_cand`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.CertA.Defs
 

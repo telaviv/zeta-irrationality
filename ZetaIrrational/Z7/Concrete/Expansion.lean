@@ -1,11 +1,11 @@
 /-
 # Instance Z7: the partial-fraction expansion of `R_n` (discharges `Hyp.expansion`)
 
-PROOF_ZETA §1–§3 for the concrete `Z7.R m` of `FamilyZ7.lean`, with the coefficients `Z7.a` of
+Lemmas 1–3 for the concrete `Z7.R m` of `FamilyZ7.lean`, with the coefficients `Z7.a` of
 `Z7/Concrete/Data.lean` (Taylor coefficients of `f_k(t₀ + ε)`, `t₀ = -k`).
 
 * `Zs`, `prod_Zs`: the zero set `[1, rn] ∪ [-(1+r)n, -n-1]` (multiplicity 5) as one `Finset ℤ`;
-* `R_eq_pfR`: `R m t = (pf m).R t` off the poles (partial-fraction identity, PROOF_ZETA §3);
+* `R_eq_pfR`: `R m t = (pf m).R t` off the poles (partial-fraction identity);
 * `pf_symmetric`, `pf_supported`: the data is mirror-symmetric (Lemma 2, `t ↦ -n-t`, `deg R` odd)
   and supported in `i ≤ 18`;
 * `pf_tau_one`: `τ₁ = 0` (Lemma 3: `deg R ≤ -2`, via `PF.pf_top_coeff`);
@@ -15,8 +15,6 @@ PROOF_ZETA §1–§3 for the concrete `Z7.R m` of `FamilyZ7.lean`, with the coef
 
 Method: `R m = N/D` for explicit polynomials over `ℚ` (`Npoly`, `Dpoly`), then the general
 theory of `Concrete/PartialFrac.lean`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Concrete.PartialFracTop
 import ZetaIrrational.Z7.Concrete.Blocks
@@ -198,7 +196,7 @@ lemma nonpole_iff (m : ℕ) (t : ℝ) :
     simp only [cen]; push_cast; ring
   simp only [Finset.mem_range, Nat.lt_succ_iff, h]
 
-/-- **Partial-fraction identity** (PROOF_ZETA §3): off the poles, `R_n` equals the partial-fraction
+/-- **Partial-fraction identity**: off the poles, `R_n` equals the partial-fraction
 sum with the Taylor-coefficient data `Z7.a`. -/
 theorem R_eq_pfR (m : ℕ) (t : ℝ) (ht : ∀ k ≤ nOf m, t ≠ -(k : ℝ)) :
     R m t = (pf m).R t := by

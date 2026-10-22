@@ -6,8 +6,6 @@
   with `sectorBound_of_arg`: `|arg w| ≤ π - φ` gives `SectorBound (sin (φ/2)) w`;
 * `Jm m w = ∫_0^∞ kerQ t / (t + w)^m dt`, integrability and the basic bound
   `‖Jm m w‖ ≤ (1/8) / (s^m (m-1) ‖w‖^(m-1))`.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib.Analysis.SpecialFunctions.Complex.Arg
 import Mathlib.Analysis.SpecialFunctions.Complex.LogDeriv
@@ -219,27 +217,5 @@ theorem integrable_Jm {s : ℝ} (hs : 0 < s) {w : ℂ} (hw : w ≠ 0) (h : Secto
         apply div_le_div₀ (by norm_num) (kerQ_le t) (by positivity)
         exact pow_le_pow_left₀ hst.le hb m
     _ = (1 / 8) / s ^ m * (1 / (t + ‖w‖) ^ m) := by rw [mul_pow]; field_simp
-
-theorem norm_Jm_le {s : ℝ} (hs : 0 < s) {w : ℂ} (hw : w ≠ 0) (h : SectorBound s w) {m : ℕ}
-    (hm : 2 ≤ m) :
-    ‖Jm m w‖ ≤ (1 / 8) / (s ^ m * ((m - 1) * ‖w‖ ^ (m - 1))) := by
-  have hr : 0 < ‖w‖ := norm_pos_iff.mpr hw
-  obtain ⟨hint, hval⟩ := integral_inv_add_pow hr hm
-  unfold Jm
-  calc ‖∫ t in Ioi (0 : ℝ), (kerQ t : ℂ) / ((t : ℂ) + w) ^ m‖
-      ≤ ∫ t in Ioi (0 : ℝ), (1 / 8) / s ^ m * (1 / (t + ‖w‖) ^ m) := by
-        apply norm_integral_le_of_norm_le (hint.const_mul _)
-        rw [ae_restrict_iff' measurableSet_Ioi]
-        refine ae_of_all _ (fun t ht => ?_)
-        simp only [mem_Ioi] at ht
-        have hb := h t ht.le
-        rw [norm_div, norm_pow, Complex.norm_of_nonneg (kerQ_nonneg t)]
-        have hst : 0 < s * (t + ‖w‖) := mul_pos hs (by linarith)
-        calc kerQ t / ‖(t : ℂ) + w‖ ^ m ≤ (1 / 8) / (s * (t + ‖w‖)) ^ m := by
-              apply div_le_div₀ (by norm_num) (kerQ_le t) (by positivity)
-              exact pow_le_pow_left₀ hst.le hb m
-          _ = (1 / 8) / s ^ m * (1 / (t + ‖w‖) ^ m) := by rw [mul_pow]; field_simp
-    _ = (1 / 8) / (s ^ m * ((m - 1) * ‖w‖ ^ (m - 1))) := by
-        rw [integral_const_mul, hval]; field_simp
 
 end ZetaIrr.Stirling

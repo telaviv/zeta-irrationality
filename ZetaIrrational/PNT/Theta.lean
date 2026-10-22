@@ -1,7 +1,7 @@
 import ZetaIrrational.PNT.Port.Consequences
 
 /-!
-# The prime number theorem, Chebyshev form (part (a))
+# The prime number theorem, Chebyshev form
 
 `θ` is **Mathlib's** `Chebyshev.theta`: `θ x = ∑_{p ∈ Ioc 0 ⌊x⌋₊, p prime} log p`.
 
@@ -9,8 +9,6 @@ Mathlib v4.35.0 has `Chebyshev.theta` and Chebyshev's bound `Chebyshev.theta_le_
 the prime number theorem itself. The proof of `θ ~ id` (`Port.chebyshev_asymptotic`) is the
 Wiener–Ikehara route of PrimeNumberTheoremAnd (A. Kontorovich, T. Tao, et al., Apache-2.0),
 ported via domino14/zeta5; see `ZetaIrrational/PNT/Port/` and its `LICENSE`.
-
-Status: fully proved, no `sorry`.
 -/
 
 open Filter Topology

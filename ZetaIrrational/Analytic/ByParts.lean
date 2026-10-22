@@ -1,5 +1,5 @@
 /-
-# Four integrations by parts on a vertical line (PLAN.md, "Key simplification")
+# Four integrations by parts on a vertical line (Lemma 6)
 
 `integral_line_by_parts4`: let `g j`, `k j` (`j ≤ 4`) be chains of derivatives at every point of
 the line `Re z = c` (`(g j)' = g (j+1)`, `(k j)' = k (j+1)`), with `g 4 · k 0` and `g 0 · k 4`
@@ -11,8 +11,6 @@ for `j ≤ 3`. Then
 Proof: `W = g₃k₀ - g₂k₁ + g₁k₂ - g₀k₃` has `W' = g₄k₀ - g₀k₄` and tends to `0` at both ends, so the
 fundamental theorem of calculus on `ℝ` (`integral_of_hasDerivAt_of_tendsto`) gives
 `∫ (g₄k₀ - g₀k₄) = 0`.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 import Mathlib.Analysis.Calculus.Deriv.Comp

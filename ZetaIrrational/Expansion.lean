@@ -1,5 +1,5 @@
 /-
-# Expansion lemmas (PROOF_ZETA §2: Lemmas 1–3)
+# Expansion lemmas (Lemmas 1–3)
 
 We work with *partial-fraction data*: rational coefficients `a i k` of `(t + k)^(-i)`, for
 `1 ≤ i ≤ I` and `0 ≤ k ≤ K`. The rational function is `R t = ∑ₖ ∑ᵢ a i k / (t + k)^i`.
@@ -14,8 +14,6 @@ We work with *partial-fraction data*: rational coefficients `a i k` of `(t + k)^
   `τ_i = 0` for even `i`.
 * `tsum_R4_odd` (Lemma 3): if moreover `τ_1 = 0`, then
   `∑_{t≥1} R⁗(t) = ρ + ∑_{j=3}^{J} τ_{2j-3} ζ(2j+1)`. `ζ(3)` and `ζ(5)` never occur.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Defs
 
@@ -181,7 +179,7 @@ theorem tsum_R4 :
 
 /-! ### Lemma 2: symmetry kills the even τ -/
 
-/-- The mirror symmetry `t ↦ -K-t` of PROOF_ZETA Lemma 2 (`deg R` odd), at the level of the
+/-- The mirror symmetry `t ↦ -K-t` of Lemma 2 (`deg R` odd), at the level of the
 data: `a_{i,K-k} = (-1)^{i+1} a_{i,k}`. -/
 def Symmetric : Prop :=
   ∀ i k, k ≤ P.K → P.a i (P.K - k) = (-1) ^ (i + 1) * P.a i k

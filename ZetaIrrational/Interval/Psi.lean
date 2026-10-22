@@ -2,17 +2,17 @@
 # The phase function `Ψ(x) = Σ c_i α_i log α_i` and its box enclosures
 
 A factor `⟨c, s, κ⟩` stands for `c · F(α(x))` with `α(x) = s x + κ` and `F(y) = y log y`
-(principal `Complex.log`), as in PROOF_BETA §6.2–6.3. For a factor list `l`:
+(principal `Complex.log`). For a factor list `l`:
 
 * `psiL l z   = Σ c α log α`,
 * `dpsiL l z  = Σ c s (log α + 1)`  (`= Ψ'`),
 * `d2psiL l z = Σ c s² / α`          (`= Ψ''`),
+* `d3psiL l z = -Σ c s³ / α²`        (`= Ψ'''`),
 
-and `hasDerivAt_psiL`, `hasDerivAt_dpsiL` prove these derivative relations wherever every
+and `hasDerivAt_psiL`, `hasDerivAt_dpsiL` prove the first two derivative relations wherever every
 `α_i(z)` lies in the slit plane (e.g. `Im z ≠ 0` when all `s ≠ 0`).
-`psiB`, `dpsiB`, `d2psiB` are the computable box versions, with unconditional soundness lemmas.
-
-Status: complete (no `sorry`).
+`psiB`, `dpsiB`, `d2psiB` are the computable box versions, with unconditional soundness lemmas;
+`d3chk` / `norm_d3psiL_le` bound `|Ψ'''|` on a disc from lower bounds on `|α_i|`.
 -/
 import ZetaIrrational.Interval.Elem
 import Mathlib.Analysis.SpecialFunctions.Complex.LogDeriv
@@ -179,24 +179,6 @@ lemma mem_d2psiB (l : List Fac) {B : CB} {z : ℂ} (hz : B.mem z) :
 noncomputable def d3psiL : List Fac → ℂ → ℂ
   | [], _ => 0
   | a :: l, z => (a.c : ℂ) * (-((a.s : ℂ) * (a.s : ℂ) * (a.s : ℂ)) / a.α z ^ 2) + d3psiL l z
-
-lemma hasDerivAt_d2psiL (l : List Fac) {z : ℂ} (hz : Good l z) :
-    HasDerivAt (d2psiL l) (d3psiL l z) z := by
-  induction l with
-  | nil => simpa [d2psiL, d3psiL] using hasDerivAt_const z (0 : ℂ)
-  | cons a l ih =>
-    have hgood : Good l z := fun b hb => hz b (List.mem_cons_of_mem a hb)
-    have ha : a.α z ∈ slitPlane := hz a List.mem_cons_self
-    have hne : a.α z ≠ 0 := slitPlane_ne_zero ha
-    have h1 := ((a.hasDerivAt_α z).inv hne).const_mul ((a.c : ℂ) * ((a.s : ℂ) * (a.s : ℂ)))
-    have h4 := h1.add (ih hgood)
-    have hfun : (fun w => (a.c : ℂ) * ((a.s : ℂ) * (a.s : ℂ)) * (a.α w)⁻¹ + d2psiL l w)
-        = d2psiL (a :: l) := by
-      funext w; simp only [d2psiL]; ring
-    rw [← hfun]
-    convert h4 using 1
-    simp only [d3psiL]
-    ring
 
 /-- `Σ |c| |s|³ / m²`. -/
 def d3bnd : List (Fac × ℚ) → ℚ

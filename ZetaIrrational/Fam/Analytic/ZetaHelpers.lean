@@ -1,16 +1,14 @@
 /-
-# Instance-independent helpers for the ζ analytic part (PROOF_ZETA §6.1–6.2)
+# Instance-independent helpers for the ζ analytic part (Lemma 6)
 
 * Γ-products with integer shifts: `prod_Icc_one_sub_eq_Gamma`
   (`Π_{l=1}^{q} (z - l) = (-1)^q Γ(z) Γ(q+1-z) sin(πz)/π`, `z ∉ ℤ`) and `prod_Icc_add_eq_Gamma`
   (`Π_{k=A}^{B} (z + k) = Γ(z+B+1)/Γ(z+A)`);
 * `iterate_deriv_eq_zero_of_pow`: a zero of order `p` kills the derivatives of order `< p`;
-* `iterate_deriv_conj_symm`: iterated derivatives of a conjugation-symmetric function;
+* `differentiableOn_iterate_deriv`: iterated derivatives of a holomorphic function are holomorphic;
 * Cauchy-estimate decay: `norm_iterate_deriv_le_of_decay` (`‖f‖ ≤ C/‖w‖²` far out gives
   `‖f⁽ʲ⁾‖ ≤ 8ʲ C/‖w‖²` further out) and `exists_bound_of_decay` (the form
   `‖g z‖ ≤ C (1 + ‖z‖²)⁻¹` on a closed half plane).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Fam.Analytic.Helpers
 import Mathlib.Analysis.Complex.Liouville
@@ -122,23 +120,6 @@ lemma iterate_deriv_eq_zero_of_pow {g h : ℂ → ℂ} {t : ℂ} {r : ℝ} (hr :
   rw [hk t (mem_ball_self hr), sub_self, zero_pow (by omega), zero_mul]
 
 /-! ### Conjugation symmetry -/
-
-lemma iterate_deriv_conj_symm {g : ℂ → ℂ} {U : Set ℂ} (hU : IsOpen U)
-    (hUc : ∀ z ∈ U, (starRingEnd ℂ) z ∈ U) (hg : DifferentiableOn ℂ g U)
-    (hsym : ∀ z ∈ U, g ((starRingEnd ℂ) z) = (starRingEnd ℂ) (g z)) :
-    ∀ j, ∀ z ∈ U, deriv^[j] g ((starRingEnd ℂ) z) = (starRingEnd ℂ) (deriv^[j] g z) := by
-  intro j
-  induction j with
-  | zero => simpa using hsym
-  | succ j ih =>
-    intro z hz
-    rw [Function.iterate_succ_apply']
-    have hd : DifferentiableOn ℂ (deriv^[j] g) U := by
-      clear ih
-      induction j with
-      | zero => simpa using hg
-      | succ j ihj => rw [Function.iterate_succ_apply']; exact ihj.deriv hU
-    exact deriv_conj_symm hU hUc hd ih z hz
 
 lemma differentiableOn_iterate_deriv {g : ℂ → ℂ} {U : Set ℂ} (hU : IsOpen U)
     (hg : DifferentiableOn ℂ g U) : ∀ j, DifferentiableOn ℂ (deriv^[j] g) U := by

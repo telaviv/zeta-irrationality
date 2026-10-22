@@ -2,13 +2,11 @@
 # The target statement
 
 `OneOfZeta7To21`: at least one of ζ(7), ζ(9), …, ζ(21) is irrational, stated with Mathlib's
-`riemannZeta` (as in domino14/zeta5's `Claim.lean`).
+`riemannZeta`.
 
 Proved here: the reduction of the statement to the existence of small integer linear forms in
-`zetaR 7, zetaR 9, …, zetaR 21` that are nonzero infinitely often (PROOF_ZETA §7, the
-contradiction step). The forms are constructed and bounded in `FamilyZ7.lean` and `Z7/`.
-
-Status: complete (no `sorry`).
+`zetaR 7, zetaR 9, …, zetaR 21` that are nonzero infinitely often (the
+contradiction step of the main theorem). The forms are constructed and bounded in `FamilyZ7.lean` and `Z7/`.
 -/
 import ZetaIrrational.Defs
 import ZetaIrrational.Criterion

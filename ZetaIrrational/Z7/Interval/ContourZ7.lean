@@ -1,5 +1,5 @@
 /-
-# Certified contour data (S1′)–(S5) for instance Z7 (PROOF_ZETA §6.3)
+# Certified contour data (S2), (S4) for instance Z7
 
 The contour `Γ_+` (from the real point `x_c` to `+i∞`) consists of
 * the lower polyline `dnPts` reversed: `x_c → … → dnStart`, then the connector `[dnStart, eMinus]`;
@@ -7,19 +7,18 @@ The contour `Γ_+` (from the real point `x_c` to `+i∞`) consists of
 * the connector `[ePlus, upStart]` and the upper polyline `upStart → … → xtop`;
 * the vertical ray `xtop + i y`, `y ≥ 0` (`RayZ7.lean`).
 
-This file assembles the kernel checks of `UpChunk1..2.lean`, `DnChunk.lean`, `ConnZ7.lean`,
-`RayZ7.lean` (all `decide +kernel`) into statements about every point of the contour
-(`f z = Ψ z - 3πi z`, `h = Re f`, `T0 = -10.1367 = -10.1167486 - ηfar`, `ηfar = 0.0199514`,
-so `h ≤ T0` gives `h ≤ Re Ω - ηfar` by `Z7_ReOmega_ge`):
-* **(S2)** `S2_up`, `S2_dn`, `S2_conn_up`, `S2_conn_dn`, `S2_ray`: `h ≤ T0` off the Taylor
-  segment; `S2_le_ReOmega` converts to `h ≤ Re Ω - ηfar`.
-* **(S4)** `S4_up`, `S4_dn`, `S4_disc`, `S4_conn_up`, `S4_conn_dn` (and `S4_ray`): `|α_i| ≥ 1/100`
-  and `|arg α_i| ≤ 2.76` (`π - 2.76 > 0.38`) for every factor; `Re(2z+1) > 0` (e-factor).
-* **(S1′)** `S1'_up`, `S1'_dn`, `xtop_im`: the polylines lie in `Im z > 0` except at `x_c`;
-  `xc_mem`: `0 < x_c < 11/12`.
-* **(S5)** `S5`: `h(x_c) = Re Ψ(x_c) ≤ T0 < Re Ω`.
+This file assembles the kernel checks of `UpChunk1..2.lean`, `DnChunk.lean` and `ConnZ7.lean`
+(all `decide +kernel`) into statements about every point of the polylines, the connectors and the
+Taylor disc (`f z = Ψ z - 3πi z`, `h = Re f`, `T0 = -10.1367 = -10.1167486 - ηfar`,
+`ηfar = 0.0199514`, so `h ≤ T0` gives `h ≤ Re Ω - ηfar` by `Z7_ReOmega_ge`):
+* **(S2)** `S2_up`, `S2_dn`, `S2_conn_up`, `S2_conn_dn`: `h ≤ T0` off the Taylor segment;
+  `S2_le_ReOmega` converts to `h ≤ Re Ω - ηfar`.
+* **(S4)** `S4_up`, `S4_dn`, `S4_disc`, `S4_conn_up`, `S4_conn_dn`: `|α_i| ≥ 1/100` and
+  `|arg α_i| ≤ 2.76` (`π - 2.76 > 0.38`) for every factor; `Re(2z+1) > 0` (e-factor).
 
-Status: complete (no `sorry`).
+The top ray (S3) is in `RayZ7.lean`; the remaining path conditions (the polylines lie in `Im z > 0`
+except at `x_c`, `0 < x_c < 11/12`, and the bound on the first segment, which contains (S5)) are
+checked in `SaddleDataZ7.lean`.
 -/
 import ZetaIrrational.Z7.Interval.DirectionZ7
 import ZetaIrrational.Z7.Interval.OmegaZ7
@@ -93,45 +92,11 @@ theorem S2_le_ReOmega {z : ℂ} (h : (f z).re ≤ T0) : (f z).re ≤ Ω.re - ηf
 
 /-! ## (S1′) upper half plane, `x_c` -/
 
-lemma chk_im_up : polyImPos upStart upPts = true := by decide +kernel
-lemma chk_im_dn : polyImPos dnStart dnPts = true := by decide +kernel
-
-theorem xtop_im : (0 : ℝ) < (toC xtop).im := by simp [toC, xtop]
-
 lemma upPts_last : upPts.getLast (by simp [upPts, upC2]) = xtop := by decide +kernel
 
 theorem xtop_on_up : onPoly upStart upPts (toC xtop) := by
   have := onPoly_last upStart upPts (by simp [upPts, upC2])
   rwa [upPts_last] at this
-
-theorem S1'_up : ∀ z, onPoly upStart upPts z → z ≠ toC xtop → 0 < z.im := by
-  intro z hz hne
-  refine poly_im_pos upStart upPts chk_im_up (by decide +kernel) z hz ?_
-  intro h; apply hne; rw [h]
-  have e : (upStart :: upPts).getLast (by simp) = xtop := by decide +kernel
-  rw [e]
-
-lemma dnPts_last : dnPts.getLast (by simp [dnPts]) = (xc, 0) := by decide +kernel
-
-theorem S1'_dn : ∀ z, onPoly dnStart dnPts z → z ≠ toC (xc, 0) → 0 < z.im := by
-  intro z hz hne
-  refine poly_im_pos dnStart dnPts chk_im_dn (by decide +kernel) z hz ?_
-  intro h; apply hne; rw [h]
-  have e : (dnStart :: dnPts).getLast (by simp) = (xc, 0) := by decide +kernel
-  rw [e]
-
-theorem xc_mem : 0 < xc ∧ xc < 11 / 12 := by norm_num [xc]
-
-theorem xc_on_dn : onPoly dnStart dnPts (toC (xc, 0)) := by
-  have := onPoly_last dnStart dnPts (by simp [dnPts])
-  rwa [dnPts_last] at this
-
-/-- **(S5)** `h(x_c) ≤ T0 < Re Ω`. -/
-theorem S5 : (f (toC (xc, 0))).re ≤ T0 ∧ (T0 : ℝ) < Ω.re := by
-  refine ⟨S2_dn _ xc_on_dn, ?_⟩
-  have := T0_le_ReOmega
-  have : (0 : ℝ) < ηfar := by norm_num [ηfar]
-  linarith
 
 /-! ## (S4) sector bounds -/
 
@@ -179,15 +144,5 @@ theorem S4_conn_dn : ∀ z ∈ segment ℝ eMinus (toC dnStart),
   exact sector_of_sectorQ 40 16 amin Amax (CB.mem_ofQRad (by simpa [toC] using h)) chk_sec_cdn'
 
 /-! ## (S2) on the top ray -/
-
-/-- **(S2) on the ray.** -/
-theorem S2_ray (y : ℝ) (hy : (xtop.2 : ℝ) ≤ y) : (f ⟨X0, y⟩).re ≤ T0 := by
-  have h0 := S2_up _ xtop_on_up
-  have e : toC xtop = ⟨X0, xtop.2⟩ := rfl
-  rw [e] at h0
-  have := S3_h_decreasing le_rfl hy
-  have hq := q0_sub_three_pi
-  have : 0 ≤ (q0 - 3 * π) * (y - xtop.2) := mul_nonneg (by linarith) (by linarith)
-  linarith
 
 end ZetaIrr.Z7.Interval

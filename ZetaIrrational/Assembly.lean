@@ -1,10 +1,9 @@
 /-
-# Assembly: logarithmic bounds force `D_m L_m → 0` (PROOF_BETA §7)
+# Assembly: logarithmic bounds force `D_m L_m → 0`
 
 If `log D_m + log |L_m| ≤ n_m (Q + ε_m)` whenever `L_m ≠ 0`, with `Q < 0`, `ε_m → 0`, `D_m > 0` and
 `n_m ≥ m`, then `D_m · L_m → 0`. This is the analytic content of the contradiction step: the
 `G log n!` terms of Lemmas 4 and 6 have already cancelled in the hypothesis.
-Status: complete (no `sorry`).
 -/
 import Mathlib
 

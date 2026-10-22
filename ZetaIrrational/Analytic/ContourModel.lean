@@ -1,5 +1,5 @@
 /-
-# Ingredients for the contour formula (PROOF_BETA100 §6.1)
+# Ingredients for the contour formula
 
 * `norm_sin_sq`: `‖sin z‖² = sin²(Re z) + sinh²(Im z)`, and its lower bounds.
 * The *model kernel* `m_{t,s}(z) = (z - t)⁻¹ - (z - s)⁻¹` (real `t, s`), which has a simple pole
@@ -10,8 +10,6 @@
   so `-2π` if `s < c < t`, and `0` if `s, t < c` (`integral_model_line`).
 * `integrable_of_bound_inv_one_add_sq`: a continuous `g : ℝ → ℂ` with `‖g y‖ ≤ C (1 + y²)⁻¹`
   is integrable.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib.Analysis.SpecialFunctions.ImproperIntegrals
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.DerivHyp
@@ -45,16 +43,6 @@ lemma abs_sinh_im_le_norm_sin (z : ℂ) : |Real.sinh z.im| ≤ ‖Complex.sin z�
   have h : Real.sinh z.im ^ 2 ≤ ‖Complex.sin z‖ ^ 2 := by
     rw [norm_sin_sq]; nlinarith [sq_nonneg (Real.sin z.re)]
   exact abs_le.2 (abs_le_of_sq_le_sq' h (norm_nonneg _))
-
-/-- On the line `Re z = N + 1/2`, `‖sin (π z)‖ ≥ 1`. -/
-lemma one_le_norm_sin_pi_half (N : ℕ) (y : ℝ) :
-    1 ≤ ‖Complex.sin (π * (((N : ℝ) + 1 / 2 : ℝ) + y * I))‖ := by
-  have h := abs_sin_re_le_norm_sin (π * (((N : ℝ) + 1 / 2 : ℝ) + y * I))
-  have hre : (π * (((N : ℝ) + 1 / 2 : ℝ) + y * I) : ℂ).re = N * π + π / 2 := by
-    simp; ring
-  rw [hre, Real.sin_add_pi_div_two, Real.cos_nat_mul_pi, abs_pow, abs_neg, abs_one,
-    one_pow] at h
-  exact h
 
 /-- `sin (π z) ≠ 0` when `Re z` is not an integer. -/
 lemma sin_pi_ne_zero_of_re {z : ℂ} (hz : ∀ k : ℤ, z.re ≠ k) : Complex.sin (π * z) ≠ 0 := by

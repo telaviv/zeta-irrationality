@@ -9,8 +9,6 @@
 Then `g` has exactly one zero in the disc. Proof: `T z = z - Y g z` maps the disc into itself and
 is a `κ`-contraction there (mean value inequality on the convex disc); Banach's fixed point theorem
 (`ContractingWith.exists_fixedPoint'`) gives the fixed point, and the contraction gives uniqueness.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib.Analysis.Calculus.MeanValue
 import Mathlib.Analysis.Complex.Basic

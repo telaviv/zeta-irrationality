@@ -1,18 +1,17 @@
 /-
 # Uniform complex Stirling in sectors, with the sharp DLMF constant
 
-Main theorem `stirling_sector`: for `0 < φ ≤ π`, `w ≠ 0`, `|arg w| ≤ π - φ`,
+Main theorem `norm_J_le`: if `‖t + w‖ ≥ s (t + ‖w‖)` for all `t ≥ 0` (`SectorBound s w`; for
+`|arg w| ≤ π - φ` one may take `s = sin(φ/2)`, `sectorBound_of_arg`), then the remainder
+`J w = logGammaS w - ((w - 1/2) log w - w + (1/2) log 2π)` satisfies
 
-    exp (logGammaS w) = Γ(w)   and
-    ‖logGammaS w - ((w - 1/2) log w - w + (1/2) log 2π)‖ ≤ 1 / (12 ‖w‖ sin²(φ/2)).
+    ‖J w‖ ≤ 1 / (12 s² ‖w‖).
 
 This is DLMF §5.11(ii) (remainder bound for 5.11.1 with N = 1, in the form |ϱ| ≤ 1/(12|w| sin²(φ/2))).
 
 Route: `J w = ∫_0^∞ Q(t)/(t+w)^2 dt` with `Q = {t}(1-{t})/2 ≥ 0`; `‖t + w‖ ≥ sin(φ/2)(t + ‖w‖)`;
 and `∫_0^∞ Q(t)/(t+r)^2 dt ≤ 1/(12 r)`, proved period by period from
 `(x + 1/2) log(1 + 1/x) - 1 ≤ 1/(12x) - 1/(12(x+1))` (series for `log(1 + 1/x)`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Stirling.LogGamma
 
@@ -179,29 +178,5 @@ theorem norm_J_le {s : ℝ} (hs : 0 < s) {w : ℂ} (hw : w ≠ 0) (h : SectorBou
     _ = (1 / s ^ 2) * ∫ t in Ioi (0 : ℝ), kerQ t / (t + ‖w‖) ^ 2 := integral_const_mul _ _
     _ ≤ (1 / s ^ 2) * (1 / (12 * ‖w‖)) := mul_le_mul_of_nonneg_left hle (by positivity)
     _ = 1 / (12 * s ^ 2 * ‖w‖) := by field_simp
-
-lemma mem_slitPlane_of_arg {φ : ℝ} (hφ0 : 0 < φ) {w : ℂ} (hw0 : w ≠ 0)
-    (harg : |arg w| ≤ Real.pi - φ) : w ∈ slitPlane := by
-  rw [mem_slitPlane_iff_arg]
-  refine ⟨fun h => ?_, hw0⟩
-  rw [h, abs_of_pos Real.pi_pos] at harg
-  linarith
-
-/-- **Uniform Stirling in sectors (DLMF §5.11(ii), sharp constant).**
-For `0 < φ ≤ π`, `w ≠ 0` and `|arg w| ≤ π - φ`, `Γ(w) = exp (logGammaS w)` and
-`‖logGammaS w - ((w - 1/2) log w - w + (1/2) log 2π)‖ ≤ 1 / (12 ‖w‖ sin²(φ/2))`. -/
-theorem stirling_sector {φ : ℝ} (hφ0 : 0 < φ) (hφ : φ ≤ Real.pi) {w : ℂ} (hw0 : w ≠ 0)
-    (harg : |arg w| ≤ Real.pi - φ) :
-    exp (logGammaS w) = Gamma w ∧
-      ‖logGammaS w - ((w - 1 / 2) * log w - w + (1 / 2 : ℂ) * (Real.log (2 * Real.pi) : ℂ))‖ ≤
-        1 / (12 * ‖w‖ * Real.sin (φ / 2) ^ 2) := by
-  refine ⟨exp_logGammaS (mem_slitPlane_of_arg hφ0 hw0 harg), ?_⟩
-  have hs : 0 < Real.sin (φ / 2) := Real.sin_pos_of_pos_of_lt_pi (by linarith) (by linarith)
-  have hJ := norm_J_le hs hw0 (sectorBound_of_arg hφ0 hφ harg)
-  have : logGammaS w - ((w - 1 / 2) * log w - w + (1 / 2 : ℂ) * (Real.log (2 * Real.pi) : ℂ)) =
-      J w := by unfold logGammaS; ring
-  rw [this]
-  calc ‖J w‖ ≤ 1 / (12 * Real.sin (φ / 2) ^ 2 * ‖w‖) := hJ
-    _ = 1 / (12 * ‖w‖ * Real.sin (φ / 2) ^ 2) := by ring
 
 end ZetaIrr.Stirling

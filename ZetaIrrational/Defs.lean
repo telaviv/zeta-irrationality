@@ -1,11 +1,9 @@
 /-
 # Zeta values at natural arguments
 
-`zetaR s = ∑_{m ≥ 0} 1/(m+1)^s`, the real series of `ζ(s)` (PROOF_ZETA §2 uses it in Lemma 1).
+`zetaR s = ∑_{m ≥ 0} 1/(m+1)^s`, the real series of `ζ(s)` (used in Lemma 1).
 `riemannZeta_re_eq_zetaR` identifies it with the real part of Mathlib's `riemannZeta` for `s ≥ 2`,
 which is how the target statement (`Statement.lean`) is phrased.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib
 

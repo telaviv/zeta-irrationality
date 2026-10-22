@@ -1,24 +1,22 @@
 /-
 # The concrete family Z7: parameters, `R_n`, `L_n`, and the assembly from the inputs
 
-PROOF_ZETA §1 and §9 (parameter set "Z7"):
-* `r = 11/12`, `q = 240`, zero multiplicity `5`, `S = 18`, `G = 547/120`, `N = 21`, `e = 1`;
-* eighteen pole blocks with offsets `δ = k/80`, `k = 1, …, 18`, each of multiplicity 1.
+The parameter set "Z7":
+* `r = 11/12`, `n ∈ 240ℕ`, zero multiplicity `5`, `S = 18` pole blocks, `G = 547/120`;
+* the pole blocks have offsets `δ = k/80`, `k = 1, …, 18`, each of multiplicity 1;
+* the factor `2t + n` makes `deg R_n = -1094(m+1) - 17` odd (needed for Lemma 2).
 
 With `n = 240(m+1)`: `rn = 220(m+1)`, `(1+r)n = 460(m+1)`, `δ n = 3k(m+1)`.
 
 Contents:
 * the concrete `R_n` and `L_n = Σ_{t ≥ 1} R_n⁗(t)`;
-* the parameter facts `S = 18`, `G` from the blocks, (H1) `G > 0`, (H6) `qG` even;
+* `S = 18`, `G > 0`, and the block offsets `0 < δ < 1/2`;
 * `H5_Z7`: `V + A < 0` for `V ≤ Vcert = -10.1167` and `A ≤ Acert` (margin ≈ 0.198);
-* `Hyp`, collecting the conclusions of PROOF_ZETA Lemmas 3–6 for these `R_n`, `L_n`, and
+* `Hyp`, collecting the conclusions of Lemmas 3–6 for these `R_n`, `L_n`, and
   `oneOfZeta7To21_of_hyp : Hyp → OneOfZeta7To21`.
 
-Lemma 6(i) here is the saddle-point bound `log |L_n| ≤ -G log n! + n Re Ω + o(n)`, with the
-certified `Re Ω ≤ -10.1167485` (PROOF_ZETA §9); the real-axis bound of `lean_beta` (`≈ -8.92`
-for Z7) is too weak.
-
-Status: complete (no `sorry`).
+`Vcert` bounds the real part of the saddle value `Ω` of Lemma 6 (certified `Re Ω ≤ -10.1167485`),
+and `Acert` bounds the constant `A` of Lemma 5.
 -/
 import ZetaIrrational.Defs
 import ZetaIrrational.Statement
@@ -28,14 +26,14 @@ namespace ZetaIrr
 
 open Filter Topology
 
-/-- The upper bound of the exact A certificate (PROOF_ZETA §9, `f4_final.log`: X = 400,
-30,971 event intervals). -/
+/-- The upper bound of the exact A certificate of Lemma 5 (X = 400,
+30,137 event intervals). -/
 def Acert : ℚ := 11757994664484187722611840743096153 / 1185451381619680151243401356902400
 
 /-- The saddle-point size constant: `Re Ω ≤ Vcert` (certified `Re Ω ≤ -10.1167485`). -/
 def Vcert : ℚ := -101167 / 10000
 
-/-- **(H5) for instance Z7.** `V + A < 0` for `V ≤ Vcert` and `A ≤ Acert`
+/-- **The final inequality for Z7.** `V + A < 0` for `V ≤ Vcert` and `A ≤ Acert`
 (margin about `0.198`). -/
 theorem H5_Z7 (V A : ℝ) (hV : V ≤ (Vcert : ℝ)) (hA : A ≤ (Acert : ℝ)) : V + A < 0 := by
   have h : (Vcert : ℝ) + (Acert : ℝ) < 0 := by norm_num [Vcert, Acert]
@@ -62,23 +60,14 @@ def G : ℚ := 547 / 120
 /-- `S = Σ_j m_j = 18`, so `N = S + 3 = 21` (S even). -/
 lemma S_eq : (blocks.map Prod.snd).sum = 18 := by decide
 
-/-- `G` agrees with its definition from the parameters (`r = 11/12`, zero multiplicity 5). -/
-lemma G_eq : G = (blocks.map (fun b => (b.2 : ℚ) * (1 - 2 * ((b.1 : ℚ) / 80)))).sum
-    - 10 * (11 / 12) := by
-  norm_num [G, blocks]
-
-/-- **(H1)** `G > 0`. -/
+/-- `G > 0`. -/
 lemma H1 : 0 < G := by norm_num [G]
-
-/-- **(H6)** `q G = 1094` is even, so the parity factor `e` is the same for all `n ∈ 240ℕ`
-(here `e = 1`: `deg R_n = 1 - Gn - S = -1094(m+1) - 17` is odd). -/
-lemma H6 : (240 : ℚ) * G = 2 * 547 := by norm_num [G]
 
 /-- Every block offset satisfies `0 < δ < 1/2` (`1 ≤ k < 40`), so each block
 `[3k(m+1), n - 3k(m+1)]` is nonempty, contains the centre, and avoids `0`. -/
 lemma blocks_bounds : ∀ b ∈ blocks, 1 ≤ b.1 ∧ b.1 < 40 := by decide
 
-/-- The concrete rational function `R_n(t)` of PROOF_ZETA §1 for `n = 240 (m+1)`:
+/-- The concrete rational function `R_n(t)` for `n = 240 (m+1)`:
 `(2t + n) · Π_{l=1}^{rn} (t - l)^5 · Π_{l=n+1}^{(1+r)n} (t + l)^5 /`
 `Π_j Π_{k = δ_j n}^{(1-δ_j) n} (t + k)^{m_j}`,
 with `r n = 220 (m+1)`, `(1+r) n = 460 (m+1)`, `δ_j n = 3 k_j (m+1)`. -/
@@ -92,7 +81,7 @@ noncomputable def R (m : ℕ) (t : ℝ) : ℝ :=
 /-- The linear form `L_n = Σ_{t ≥ 1} R_n⁗(t)`. -/
 noncomputable def L (m : ℕ) : ℝ := ∑' t : ℕ, iteratedDeriv 4 (R m) ((t : ℝ) + 1)
 
-/-- The inputs of the assembly (PROOF_ZETA Lemmas 3–6), stated for the concrete `R_n`, `L_n`
+/-- The inputs of the assembly (Lemmas 3–6), stated for the concrete `R_n`, `L_n`
 above. -/
 structure Hyp where
   /-- Lemma 3: `L_n ∈ ℚ + ℚ ζ(7) + ℚ ζ(9) + … + ℚ ζ(21)`. -/
@@ -104,7 +93,7 @@ structure Hyp where
   D_pos : ∀ m, 0 < D m
   int_ρ : ∀ m, ∃ z : ℤ, (z : ℚ) = D m * ρ m
   int_τ : ∀ m j, ∃ z : ℤ, (z : ℚ) = D m * τ m j
-  /-- (H2): the arithmetic integral, with its certified upper bound. -/
+  /-- Lemma 5: the arithmetic integral `A`, with its certified upper bound. -/
   A : ℝ
   hA : A ≤ (Acert : ℝ)
   /-- Lemmas 4–5: `log D_n ≤ G log n! + n A + o(n)`. -/
@@ -117,7 +106,7 @@ structure Hyp where
   εL_lim : Tendsto εL atTop (𝓝 0)
   size : ∀ᶠ m in atTop, L m ≠ 0 →
     Real.log |L m| ≤ -(G : ℝ) * Real.log ((nOf m).factorial : ℝ) + (nOf m : ℝ) * (Vcert + εL m)
-  /-- Lemma 6(ii): `L_n ≠ 0` for infinitely many `n` (via (H4), (H6)). -/
+  /-- Lemma 6(ii): `L_n ≠ 0` for infinitely many `n`. -/
   nonvan : ∃ᶠ m in atTop, L m ≠ 0
 
 /-- **Main theorem (conditional).** The inputs `Hyp` imply that one of `ζ(7), ζ(9), …, ζ(21)` is

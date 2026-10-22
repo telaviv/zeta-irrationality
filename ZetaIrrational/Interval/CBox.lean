@@ -5,8 +5,6 @@ A complex box `CB` is a pair of real intervals (`re`, `im`); `z ∈ B` means `z.
 `z.im ∈ B.im`. Operations: `add`, `sub`, `neg`, `mul`, `inv`, multiplication by rational scalars,
 rational points, `normSq`. All correctness theorems are unconditional (an operation that cannot
 enclose returns a box with `top` components).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Interval.Basic
 import Mathlib.Analysis.Complex.Norm
@@ -44,14 +42,10 @@ def normSq (B : CB) : IV := B.re.sq.add B.im.sq
 def inv (B : CB) : CB :=
   let n := (normSq B).inv
   ⟨B.re.mul n, B.im.neg.mul n⟩
-/-- Multiplication by `i`. -/
-def mulI (B : CB) : CB := ⟨B.im.neg, B.re⟩
 /-- Embedding of a real interval. -/
 def ofIV (I : IV) : CB := ⟨I, ofRat 0⟩
 /-- Round both components outward. -/
 def round (p : ℕ) (B : CB) : CB := ⟨B.re.round p, B.im.round p⟩
-/-- Hull of two boxes. -/
-def join (B C : CB) : CB := ⟨B.re.join C.re, B.im.join C.im⟩
 
 /-- Check `‖z‖ ≤ q` on the box (requires `0 ≤ q`). -/
 def normLe (B : CB) (q : ℚ) : Bool := decide (0 ≤ q) && (normSq B).hiLe (q ^ 2)
@@ -95,20 +89,11 @@ lemma mem_inv {B : CB} {z : ℂ} (hz : B.mem z) : (inv B).mem z⁻¹ := by
   · rw [Complex.inv_re, div_eq_mul_inv]; exact IV.mem_mul hz.1 hn
   · rw [Complex.inv_im, div_eq_mul_inv]; exact IV.mem_mul (IV.mem_neg hz.2) hn
 
-lemma mem_mulI {B : CB} {z : ℂ} (hz : B.mem z) : (mulI B).mem (z * Complex.I) :=
-  ⟨by simpa [mulI] using IV.mem_neg hz.2, by simpa [mulI] using hz.1⟩
-
 lemma mem_ofIV {I : IV} {x : ℝ} (hx : I.mem x) : (ofIV I).mem (x : ℂ) :=
   ⟨by simpa [ofIV] using hx, by simpa [ofIV] using mem_ofRat 0⟩
 
 lemma mem_round (p : ℕ) {B : CB} {z : ℂ} (hz : B.mem z) : (B.round p).mem z :=
   ⟨IV.mem_round p hz.1, IV.mem_round p hz.2⟩
-
-lemma mem_join_left {B C : CB} {z : ℂ} (hz : B.mem z) : (B.join C).mem z :=
-  ⟨IV.mem_join_left hz.1, IV.mem_join_left hz.2⟩
-
-lemma mem_join_right {B C : CB} {z : ℂ} (hz : C.mem z) : (B.join C).mem z :=
-  ⟨IV.mem_join_right hz.1, IV.mem_join_right hz.2⟩
 
 lemma norm_le_of_normLe {B : CB} {z : ℂ} {q : ℚ} (hz : B.mem z) (h : B.normLe q = true) :
     ‖z‖ ≤ q := by

@@ -1,5 +1,5 @@
 /-
-# Lemma 4 for instance Z7: `D_n ρ_n, D_n τ_i ∈ ℤ` (PROOF_ZETA §4)
+# Lemma 4 for instance Z7: `D_n ρ_n, D_n τ_i ∈ ℤ`
 
 For each prime `p` we show `v_p(τ_i) ≥ -E_p` and `v_p(ρ) ≥ -E_p`, in three regimes:
 * `p > n`: `a_int` (Lemma A(a)) and Lemma B (`H_k^{(j)}` is `p`-integral, `k ≤ n < p`);
@@ -11,8 +11,6 @@ For each prime `p` we show `v_p(τ_i) ≥ -E_p` and `v_p(ρ) ≥ -E_p`, in three
 Main theorems:
 * `int_tau (m i) : ∃ z : ℤ, (z : ℚ) = D m * (pf m).tau i`;
 * `int_rho (m) : ∃ z : ℤ, (z : ℚ) = D m * (pf m).rho`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Arith.Ep
 
@@ -26,7 +24,6 @@ open ZetaIrr.PFData (Hq)
 variable {p : ℕ} [hp : Fact p.Prime]
 
 lemma pf_K (m : ℕ) : (pf m).K = nOf m := rfl
-lemma pf_I (m : ℕ) : (pf m).I = 18 := rfl
 lemma pf_a (m : ℕ) : (pf m).a = a m := rfl
 
 lemma a_eq_zero_of_not {m i k : ℕ} (h : ¬ (1 ≤ i ∧ i ≤ Bk m k)) : a m i k = 0 := by

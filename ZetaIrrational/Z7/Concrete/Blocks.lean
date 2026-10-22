@@ -1,13 +1,11 @@
 /-
 # Instance Z7: block bookkeeping
 
-Facts about the block-membership count `Z7.Bk` (PROOF_ZETA §1):
+Facts about the block-membership count `Z7.Bk`:
 * `prod_blocks`: `Π_j (Π_{k ∈ block j} x_k)^{m_j} = Π_{k ≤ n} x_k^{B_k}` (any commutative monoid);
 * `Bk_le`: `B_k ≤ S = 18`; `Bk_mirror`: `B_{n-k} = B_k`;
-* `sum_Bk`: `Σ_{k ≤ n} B_k = 3294(m+1) + 18` (even);
-* `Bk_zero_of_lt`: no block contains `k < 3(m+1)` (so there is no pole at `0`).
-
-Status: complete (no `sorry`).
+* `sum_Bk`: `Σ_{k ≤ n} B_k = 3294(m+1) + 18`;
+* list-sum helpers `prod_list_blocks`, `sum_list_blocks`, `list_sum_ite_le`.
 -/
 import ZetaIrrational.Z7.Concrete.Data
 
@@ -53,8 +51,6 @@ lemma sum_list_blocks (I : ℕ × ℕ → Finset ℕ) (U : Finset ℕ) (L : List
 
 lemma blocks_fst_le : ∀ b ∈ blocks, b.1 ≤ 18 := by decide
 
-lemma blocks_fst_ge : ∀ b ∈ blocks, 1 ≤ b.1 := by decide
-
 lemma blocks_snd : ∀ b ∈ blocks, b.2 = 1 := by decide
 
 lemma blk_subset (m : ℕ) : ∀ b ∈ blocks, blk m b ⊆ range (nOf m + 1) := by
@@ -84,10 +80,6 @@ lemma Bk_le (m k : ℕ) : Bk m k ≤ 18 := by
   rw [Bk, ← S_eq]
   exact list_sum_ite_le blocks _
 
-lemma mem_blk_iff (m : ℕ) (b : ℕ × ℕ) (k : ℕ) :
-    k ∈ blk m b ↔ 3 * b.1 * (m + 1) ≤ k ∧ k ≤ nOf m - 3 * b.1 * (m + 1) := by
-  simp [blk]
-
 /-- Mirror symmetry of the block counts: `B_{n-k} = B_k`. -/
 lemma Bk_mirror (m k : ℕ) (hk : k ≤ nOf m) : Bk m (nOf m - k) = Bk m k := by
   rw [Bk_eq, Bk_eq]
@@ -101,20 +93,6 @@ lemma Bk_mirror (m k : ℕ) (hk : k ≤ nOf m) : Bk m (nOf m - k) = Bk m k := by
     generalize 3 * b.1 * (m + 1) = q at *
     omega
   simp only [hiff]
-
-/-- No block contains `k < 3(m+1)`. -/
-lemma Bk_zero_of_lt (m k : ℕ) (hk : k < 3 * (m + 1)) : Bk m k = 0 := by
-  rw [Bk_eq]
-  have : ∀ b ∈ blocks, (if k ∈ blk m b then b.2 else 0) = 0 := by
-    intro b hb
-    have h1 := blocks_fst_ge b hb
-    have : k ∉ blk m b := by
-      rw [mem_blk_iff]
-      have : 3 * (m + 1) ≤ 3 * b.1 * (m + 1) := by nlinarith
-      omega
-    simp [this]
-  rw [List.map_congr_left this]
-  simp
 
 /-- `Σ_{k ≤ n} B_k = 3294(m+1) + 18`. -/
 lemma sum_Bk (m : ℕ) : ∑ k ∈ range (nOf m + 1), Bk m k = 3294 * (m + 1) + 18 := by

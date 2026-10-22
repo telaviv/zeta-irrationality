@@ -1,17 +1,14 @@
 /-
-# Polylines, connectors, sector bounds and vertical rays (machinery for (S1′)–(S4))
+# Polylines, connectors and vertical rays (machinery for (S2) and (S3))
 
 * `polyChk` / `poly_bound`: `Re f ≤ T` on every segment of a rational polyline (via `segOK`).
 * `ballOK` / `ball_bound`: `Re f ≤ T` on a closed disc around a rational point (used for the short
   connector between the exact Taylor-disc endpoint `x₀ ± ρ d` and the first rational vertex).
-* `sectorB` / `sector_of_sectorB`: `|α_i| ≥ a` and `|arg α_i| ≤ A` on a box, for every factor.
-* `polyImPos` / `poly_im_pos`: all segments except the last endpoint lie in `Im z > 0`.
-* `rayB`, `im_dpsiL_ge_tail`: lower bounds for `Im Ψ'(X + i y)` (box evaluation, and the analytic
-  tail `Im Ψ' ≥ (π/2) Σ c - Σ |c| |s X + κ| / y` for factors with `s = ±1`).
+* `rayPts` / `ray_pts`, `im_dpsiL_ge_tail`: lower bounds for `Im Ψ'(X + i y)` on a vertical ray
+  (box evaluation on a list of `y`-intervals, and the analytic tail
+  `Im Ψ' ≥ (π/2) Σ c - Σ |c| |s X + κ| / y` for factors with `s = ±1`).
 * `ray_h_decreasing`: if `Im Ψ' ≥ ωπ + η` on the vertical ray, then `y ↦ h(X + i y) + η y` is
   antitone (so `h` decreases at rate `η`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Interval.Segment
 import Mathlib.Analysis.Complex.RealDeriv
@@ -125,101 +122,9 @@ theorem ball_bound (ω p n : ℕ) (l : List Fac) (T : ℚ) (v : ℚ × ℚ) (D :
 
 /-! ## Sector bounds -/
 
-/-- Check `a ≤ |α_i|` and `|arg α_i| ≤ A` on the box, for every factor. -/
-def sectorB (p n : ℕ) (amin A : ℚ) : List Fac → CB → Bool
-  | [], _ => true
-  | f :: l, B => (f.αB B).normGe amin && (argCB p n (f.αB B)).absLe A && sectorB p n amin A l B
-
-theorem sector_of_sectorB (p n : ℕ) (amin A : ℚ) {l : List Fac} {B : CB} {z : ℂ} (hz : B.mem z)
-    (h : sectorB p n amin A l B = true) :
-    ∀ f ∈ l, (amin : ℝ) ≤ ‖f.α z‖ ∧ |arg (f.α z)| ≤ A := by
-  induction l with
-  | nil => intro f hf; simp at hf
-  | cons f0 l ih =>
-    simp only [sectorB, Bool.and_eq_true] at h
-    obtain ⟨⟨h1, h2⟩, h3⟩ := h
-    intro f hf
-    rcases List.mem_cons.1 hf with rfl | hf
-    · have hα := f.mem_αB hz
-      exact ⟨CB.le_norm_of_normGe hα h1, abs_le_of_absLe (mem_argCB p n hα) h2⟩
-    · exact ih h3 f hf
-
-/-- Sector check on every segment box of a polyline, plus `Re(2z+1) > 0` (the e-factor). -/
-def polySector (p n : ℕ) (amin A : ℚ) (l : List Fac) : (ℚ × ℚ) → List (ℚ × ℚ) → Bool
-  | _, [] => true
-  | a, b :: rest => sectorB p n amin A l (segBox a b) && (segBox a b).re.loGt (-1 / 2)
-      && polySector p n amin A l b rest
-
-theorem poly_sector (p n : ℕ) (amin A : ℚ) (l : List Fac) (a : ℚ × ℚ) (pts : List (ℚ × ℚ))
-    (h : polySector p n amin A l a pts = true) :
-    ∀ z, onPoly a pts z → (∀ f ∈ l, (amin : ℝ) ≤ ‖f.α z‖ ∧ |arg (f.α z)| ≤ A) ∧ -1 / 2 < z.re := by
-  induction pts generalizing a with
-  | nil => intro z hz; exact hz.elim
-  | cons b rest ih =>
-    simp only [polySector, Bool.and_eq_true] at h
-    intro z hz
-    rcases hz with hz | hz
-    · have hb := mem_segBox hz
-      refine ⟨sector_of_sectorB p n amin A hb h.1.1, ?_⟩
-      have := gt_of_loGt hb.1 h.1.2
-      push_cast at this; exact this
-    · exact ih b h.2 z hz
-
 /-! ## Upper half plane -/
 
-def polyImPos : (ℚ × ℚ) → List (ℚ × ℚ) → Bool
-  | _, [] => true
-  | a, [_] => decide (0 < a.2)
-  | a, b :: c :: rest => decide (0 < a.2) && polyImPos b (c :: rest)
-
-/-- If all vertices except the last have `Im > 0`, every polyline point other than the last vertex
-has `Im > 0`. -/
-theorem poly_im_pos (a : ℚ × ℚ) (pts : List (ℚ × ℚ)) (h : polyImPos a pts = true)
-    (hlast : ∀ v ∈ pts.getLast?, 0 ≤ v.2) :
-    ∀ z, onPoly a pts z → z ≠ toC ((a :: pts).getLast (by simp)) → 0 < z.im := by
-  induction pts generalizing a with
-  | nil => intro z hz; exact hz.elim
-  | cons b rest ih =>
-    intro z hz hne
-    cases rest with
-    | nil =>
-      simp only [polyImPos, decide_eq_true_eq] at h
-      have hb : (0 : ℚ) ≤ b.2 := hlast b (by simp)
-      rcases hz with hz | hz
-      · obtain ⟨s, t, hs, ht, hst, rfl⟩ := hz
-        have hs0 : s ≠ 0 := by
-          rintro rfl
-          apply hne
-          simp at hst; subst hst
-          simp
-        have hs' : 0 < s := lt_of_le_of_ne hs (Ne.symm hs0)
-        have ha : (0 : ℝ) < a.2 := by exact_mod_cast h
-        have hb' : (0 : ℝ) ≤ b.2 := by exact_mod_cast hb
-        simp [toC]
-        positivity
-      · exact hz.elim
-    | cons c rest' =>
-      simp only [polyImPos, Bool.and_eq_true, decide_eq_true_eq] at h
-      rcases hz with hz | hz
-      · obtain ⟨s, t, hs, ht, hst, rfl⟩ := hz
-        have ha : (0 : ℝ) < a.2 := by exact_mod_cast h.1
-        have hb2 : (0 : ℚ) < b.2 := by
-          cases rest' with
-          | nil => simpa [polyImPos] using h.2
-          | cons _ _ => simp only [polyImPos, Bool.and_eq_true, decide_eq_true_eq] at h; exact h.2.1
-        have hb' : (0 : ℝ) < b.2 := by exact_mod_cast hb2
-        simp only [toC, add_im, smul_im, smul_eq_mul]
-        rcases eq_or_lt_of_le hs with hs0 | hs0
-        · subst hs0; simp at hst; subst hst; simp; exact_mod_cast hb2
-        · positivity
-      · exact ih b h.2 hlast z hz (by simpa using hne)
-
 /-! ## Vertical rays -/
-
-/-- Box evaluation of `Im Ψ'` on `{X} × [y1, y2]` must be `≥ q`. -/
-def rayB (p n : ℕ) (l : List Fac) (X q : ℚ) : List (ℚ × ℚ) → Bool
-  | [] => true
-  | (y1, y2) :: rest => (dpsiB p n l ⟨ofRat X, ival y1 y2⟩).im.loGe q && rayB p n l X q rest
 
 /-- Box checks `Im Ψ' ≥ q` on `{X} × [y_i, y_{i+1}]` for consecutive breakpoints. -/
 def rayPts (p n : ℕ) (l : List Fac) (X q : ℚ) : List ℚ → Bool

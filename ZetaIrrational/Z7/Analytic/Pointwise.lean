@@ -1,12 +1,10 @@
 /-
-# Pointwise integrand bounds (U) and (M) for instance Z7 (PROOF_ZETA §6.5)
+# Pointwise integrand bounds for instance Z7 (Lemma 6)
 
 No certificate is needed:
-* `norm_Gfn_le` (the bound (U)): `|G_n(nx)| ≤ e^{λ_n + n Re f(x)} n · 72 B²`;
-* `Gfn_disc_approx` (the form (M)):
+* `norm_Gfn_le` (upper bound everywhere on the contour): `|G_n(nx)| ≤ e^{λ_n + n Re f(x)} n · 72 B²`;
+* `Gfn_disc_approx` (main-term form on the disc):
   `|G_n(nx) e^{-λ_n - nΩ}/n - e^{n(f(x) - Ω)} A(x)| ≤ |e^{n(f(x)-Ω)}| · 100 B² δ_n`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Analytic.PhaseDeriv
 import ZetaIrrational.Z7.Analytic.SaddleData
@@ -33,7 +31,7 @@ lemma norm_q_le_one (n : ℝ) (hn : 0 ≤ n) {x : ℂ} (hx : 0 ≤ x.im) :
   have : 0 ≤ 2 * π * n * x.im := by positivity
   linarith
 
-/-- **(U)**: `|G_n(nx)| ≤ e^{λ_n + n Re f(x)} n · 72 B²`. -/
+/-- **Upper bound**: `|G_n(nx)| ≤ e^{λ_n + n Re f(x)} n · 72 B²`. -/
 theorem norm_Gfn_le (m : ℕ) {a η : ℝ} (ha : 0 < a) (hη0 : 0 < η) (hη : η ≤ π) {x : ℂ}
     (hxim : 0 < x.im) (hx : SectorAt a η x) {R : ℝ} (hR : ‖x‖ ≤ R)
     (hn : LargeN a η (Z7.nOf m : ℝ)) :
@@ -65,7 +63,7 @@ lemma cE_pos {a η : ℝ} (ha : 0 < a) (hη0 : 0 < η) (hη : η ≤ π) : 0 < c
   have : 0 < Real.sin (η / 2) := Real.sin_pos_of_pos_of_lt_pi (by linarith) (by linarith)
   positivity
 
-/-- **(M)**: on the disc, `G_n(nx) e^{-λ_n - nΩ}/n ≈ e^{n(f(x) - Ω)} A(x)`. -/
+/-- **Main-term form**: on the disc, `G_n(nx) e^{-λ_n - nΩ}/n ≈ e^{n(f(x) - Ω)} A(x)`. -/
 theorem Gfn_disc_approx (m : ℕ) {a η : ℝ} (ha : 0 < a) (hη0 : 0 < η) (hη : η ≤ π) {x : ℂ}
     (hxim : 0 < x.im) (hx : SectorAt a η x) {R y₁ : ℝ} (hR : ‖x‖ ≤ R)
     (hy₁ : y₁ ≤ x.im) (Ω : ℂ) (hn : LargeN a η (Z7.nOf m : ℝ))

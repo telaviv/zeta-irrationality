@@ -1,15 +1,12 @@
 /-
-# Legendre-type bounds for sums of `p`-adic valuations (for PROOF_BETA §4, "Size")
+# Legendre-type bounds for sums of `p`-adic valuations (used for the small primes in Lemma 4)
 
 For a prime `p`, writing `Λ(N) = ⌊log_p N⌋`:
 * `digitSum_le`: the base-`p` digit sum of `N` is `≤ (p-1)(Λ(N)+1)`;
 * `legendre_lower`, `legendre_upper`: `N - (p-1)(Λ(N)+1) ≤ (p-1) v_p(N!) ≤ N`;
 * `sum_Icc_padicValNat`: `Σ_{d=A}^{B} v_p(d) = v_p(B!) - v_p((A-1)!)`, and
-  `sub_one_mul_sum_Icc_le`: `(p-1) Σ_{d=A}^{B} v_p(d) ≤ (B + 1 - A) + (p-1)(Λ(A-1)+1)`;
-* `oddSum_add`: for odd `p`, `Σ_{j<A} v_p(2j+1) + v_p(A!) = v_p((2A)!)`, and
-  `sub_one_mul_oddSum_ge`: `(p-1) Σ_{j<A} v_p(2j+1) ≥ A - (p-1)(Λ(2A)+1)`.
-
-Status: complete (no `sorry`).
+  `sub_one_mul_sum_Icc_le`: `(p-1) Σ_{d=A}^{B} v_p(d) ≤ (B + 1 - A) + (p-1)(Λ(A-1)+1)`
+  (`sub_one_mul_sum_Icc_le'`: the same with `Λ(N)`, `N ≥ A - 1`, and any `A, B`).
 -/
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Mathlib.Data.Nat.Digits.Lemmas
@@ -105,40 +102,5 @@ theorem sub_one_mul_sum_Icc_le' {A B N : ℕ} (hA : 1 ≤ A) (hN : A - 1 ≤ N) 
     positivity
 
 /-! ### Products of odd numbers -/
-
-theorem padicValNat_two_mul_of_ne (hp2 : p ≠ 2) {x : ℕ} (hx : x ≠ 0) :
-    padicValNat p (2 * x) = padicValNat p x := by
-  rw [padicValNat.mul (by norm_num) hx]
-  have : ¬ p ∣ 2 := fun h => hp2 ((Nat.prime_dvd_prime_iff_eq hp.out Nat.prime_two).mp h)
-  simp [padicValNat.eq_zero_of_not_dvd this]
-
-theorem oddSum_add (hp2 : p ≠ 2) (A : ℕ) :
-    (∑ j ∈ range A, padicValNat p (2 * j + 1)) + padicValNat p A.factorial
-      = padicValNat p (2 * A).factorial := by
-  induction A with
-  | zero => simp
-  | succ A ih =>
-    rw [sum_range_succ, Nat.factorial_succ, padicValNat.mul (by omega) (Nat.factorial_ne_zero A)]
-    have h2 : 2 * (A + 1) = (2 * A + 1) + 1 := by ring
-    rw [h2, Nat.factorial_succ, Nat.factorial_succ,
-      padicValNat.mul (by omega) (by positivity), padicValNat.mul (by omega) (Nat.factorial_ne_zero _)]
-    have h3 : 2 * A + 1 + 1 = 2 * (A + 1) := by ring
-    rw [h3, padicValNat_two_mul_of_ne hp2 (by omega)]
-    omega
-
-/-- `(p-1) Σ_{j<A} v_p(2j+1) ≥ A - (p-1)(Λ(2A)+1)` for odd `p`. -/
-theorem sub_one_mul_oddSum_ge (hp2 : p ≠ 2) (A : ℕ) :
-    (A : ℤ) - ((p - 1 : ℕ) : ℤ) * ((Nat.log p (2 * A) : ℤ) + 1)
-      ≤ ((p - 1 : ℕ) : ℤ) * ((∑ j ∈ range A, padicValNat p (2 * j + 1) : ℕ) : ℤ) := by
-  have h := oddSum_add (p := p) hp2 A
-  have hu := legendre_upper (p := p) A
-  have hl := legendre_lower (p := p) (2 * A)
-  have h' : ((∑ j ∈ range A, padicValNat p (2 * j + 1) : ℕ) : ℤ)
-      = (padicValNat p (2 * A).factorial : ℤ) - (padicValNat p A.factorial : ℤ) := by
-    rw [← h]; push_cast; ring
-  rw [h', mul_sub]
-  have hc : ((2 * A : ℕ) : ℤ) = 2 * (A : ℤ) := by push_cast; ring
-  rw [hc] at hl
-  linarith
 
 end ZetaIrr.Arith

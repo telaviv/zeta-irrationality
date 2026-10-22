@@ -9,8 +9,6 @@ integer instead of rational bounds.
 Main facts:
 * closure of `vge` under sums, products, powers, finite sums and products;
 * `int_of_forall_vge`: a rational that is `p`-integral for every prime `p` is an integer.
-
-Status: complete (no `sorry`).
 -/
 import Mathlib.NumberTheory.Padics.PadicVal.Basic
 import Mathlib.Algebra.BigOperators.Ring.Finset
@@ -29,11 +27,6 @@ theorem vge_zero (b : ℤ) : vge p b 0 := fun h => absurd rfl h
 theorem vge_mono {x : ℚ} {b b' : ℤ} (h : vge p b x) (hb : b' ≤ b) : vge p b' x :=
   fun hx => hb.trans (h hx)
 
-theorem vge_max {x : ℚ} {b c : ℤ} (hb : vge p b x) (hc : vge p c x) : vge p (max b c) x :=
-  fun hx => max_le (hb hx) (hc hx)
-
-theorem vge_self {x : ℚ} : vge p (padicValRat p x) x := fun _ => le_rfl
-
 theorem vge_add {x y : ℚ} {b : ℤ} (hx : vge p b x) (hy : vge p b y) : vge p b (x + y) := by
   intro hxy
   by_cases hx0 : x = 0
@@ -46,12 +39,6 @@ theorem vge_neg {x : ℚ} {b : ℤ} (h : vge p b x) : vge p b (-x) := by
   intro hx
   rw [padicValRat.neg]
   exact h (neg_ne_zero.mp hx)
-
-theorem vge_neg_iff {x : ℚ} {b : ℤ} : vge p b (-x) ↔ vge p b x :=
-  ⟨fun h => by simpa using vge_neg h, vge_neg⟩
-
-theorem vge_sub {x y : ℚ} {b : ℤ} (hx : vge p b x) (hy : vge p b y) : vge p b (x - y) := by
-  rw [sub_eq_add_neg]; exact vge_add hx (vge_neg hy)
 
 theorem vge_sum {ι : Type*} (s : Finset ι) (f : ι → ℚ) {b : ℤ} (h : ∀ i ∈ s, vge p b (f i)) :
     vge p b (∑ i ∈ s, f i) := by
@@ -71,15 +58,6 @@ theorem vge_mul {x y : ℚ} {a b : ℤ} (hx : vge p a x) (hy : vge p b y) : vge 
 
 theorem vge_one : vge p 0 1 := by
   intro _; simp
-
-theorem vge_prod {ι : Type*} (s : Finset ι) (f : ι → ℚ) (b : ι → ℤ)
-    (h : ∀ i ∈ s, vge p (b i) (f i)) : vge p (∑ i ∈ s, b i) (∏ i ∈ s, f i) := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simpa using vge_one (p := p)
-  | insert a s ha ih =>
-    rw [prod_insert ha, sum_insert ha]
-    exact vge_mul (h a (mem_insert_self a s)) (ih fun i hi => h i (mem_insert_of_mem hi))
 
 theorem vge_pow {x : ℚ} {b : ℤ} (h : vge p b x) (n : ℕ) : vge p (n * b) (x ^ n) := by
   induction n with

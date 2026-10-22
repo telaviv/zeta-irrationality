@@ -1,5 +1,5 @@
 /-
-# Certified saddle data (S0), (S1), (S1′) for instance Z7 (PROOF_ZETA §6.3)
+# Certified saddle data (S0), (S1), (S1′) for instance Z7
 
 Instance Z7 (`r = 11/12`, `q = 240`, phase `3πi`), factor list `facZ7` (`FacZ7.lean`).
 
@@ -11,16 +11,14 @@ Instance Z7 (`r = 11/12`, `q = 240`, phase `3πi`), factor list `facZ7` (`FacZ7.
   `deriv Ψ x₀ = 3πi`.
 
 Main results:
-* `saddle_mem`, `deriv_Ψ_saddle`, `saddle_unique` — (S0);
+* `saddle_mem`, `x₀_spec` — (S0) (uniqueness in `B0` is `exists_unique_zero_g`);
 * `Z7_K_ge : 28 ≤ ‖Ψ''(x₀)‖`, `Z7_d2_mem` (box for `Ψ''(x₀)`);
 * `Z7_M_bound : ∀ z ∈ closedBall x₀ ρ, ‖Ψ'''(z)‖ ≤ Mcert` with `ρ = 1/20`, `Mcert ≈ 310.2`;
 * `Z7_rho_M : Mcert * ρ ≤ 3 |Ψ''(x₀)| / 2` — (S1) (`Mcert ρ ≈ 15.5 ≤ 42`);
 * `Z7_disc_upper`, `Z7_S1'` — (S1′): the Taylor disc lies in `Im z > 0` (`Im x₀ ≈ 0.1829`).
 
-The value `Ω = f(x₀)` and (H4) are in `OmegaZ7.lean`. All numerical checks are `decide +kernel`
+The value `Ω = f(x₀)` and `sin(240 Im Ω)` are in `OmegaZ7.lean`. All numerical checks are `decide +kernel`
 (no `native_decide`).
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.Interval.FacZ7
 import ZetaIrrational.Z7.Interval.ConstZ7
@@ -50,9 +48,6 @@ def d2B : CB := d2psiB facZ7 B0box
 def KB : CB := (CB.ofQ 1 0).sub (YB.mul d2B)
 
 lemma mem_P0 : P0.mem c0 := CB.mem_ofQ cRe cIm
-
-lemma mem_threePiI : (phIB 3).mem (3 * π * I) := by
-  have := mem_phIB 3; push_cast at this; exact this
 
 lemma mem_YB : YB.mem Y := CB.mem_ofQ Yre Yim
 
@@ -129,20 +124,6 @@ lemma x₀_spec : x₀ ∈ closedBall c0 R0 ∧ g x₀ = 0 := (Classical.choose_
 
 theorem saddle_mem : x₀ ∈ closedBall c0 R0 := x₀_spec.1
 
-lemma x₀_im_pos : 0 < x₀.im := im_pos_of_mem_ball saddle_mem R0_lt
-
-theorem deriv_Ψ_saddle : deriv Ψ x₀ = 3 * π * I := by
-  rw [deriv_Ψ x₀_im_pos.ne']
-  have := x₀_spec.2
-  rw [g_apply] at this
-  exact sub_eq_zero.1 this
-
-theorem saddle_unique {z : ℂ} (hz : z ∈ closedBall c0 R0) (hd : deriv Ψ z = 3 * π * I) :
-    z = x₀ := by
-  have hg : g z = 0 := by
-    rw [g_apply, ← deriv_Ψ (im_ne_of_ball hz), hd, sub_self]
-  exact (exists_unique_zero_g.unique ⟨hz, hg⟩ x₀_spec)
-
 /-- `‖g‖ ≤ 1/10^16 + 30 R0` on the ball. -/
 lemma norm_g_le {z : ℂ} (hz : z ∈ closedBall c0 R0) :
     ‖g z‖ ≤ ((1 / 10 ^ 16 + 30 * R0 : ℚ) : ℝ) := by
@@ -182,8 +163,6 @@ def Mcert : ℚ := d3bnd facM
 lemma chk_M : d3chk P0 (ρ + R0) facM = true := by decide +kernel
 
 lemma chk_Mρ : Mcert * ρ ≤ 3 * 28 / 2 := by decide +kernel
-
-lemma chk_Mval : Mcert ≤ 311 := by decide +kernel
 
 lemma norm_sub_c0_le {z : ℂ} (hz : z ∈ closedBall x₀ (ρ : ℝ)) :
     ‖z - c0‖ ≤ ((ρ + R0 : ℚ) : ℝ) := by

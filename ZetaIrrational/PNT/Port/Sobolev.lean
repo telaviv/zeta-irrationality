@@ -7,9 +7,9 @@ directory). Changes: blueprint annotations removed, declarations wrapped in
 
 Second-hand port: copied from the `Zeta5/Zeta5/PNTPort/` directory of domino14/zeta5 (commit
 3da8eb1b91f9a90a1c0b7959e845c060dbd16256, Lean v4.35.0-rc2), which made the changes listed above.
-Further changes here (2026-10-15): namespace `Zeta5.PNTPort` renamed to `ZetaIrr.PNT.Port`, imports
-re-pointed (no other source changes were needed for Mathlib v4.35.0). The Apache-2.0 `LICENSE` is
-reproduced in this directory.
+Further changes here: namespace `Zeta5.PNTPort` renamed to `ZetaIrr.PNT.Port`, imports re-pointed
+(no other source changes were needed for Mathlib v4.35.0). The Apache-2.0 `LICENSE` is reproduced in
+this directory.
 -/
 import Mathlib.Analysis.Calculus.Deriv.Support
 import Mathlib.Analysis.Distribution.SchwartzSpace.Deriv

@@ -11,8 +11,6 @@
 * `Complex.arg` on a box: `arctan (im / re)` if `re > 0`; `±π/2 - arctan (re / im)` if `im ≷ 0`
   (proved here from `Complex.tan_arg`-type identities). Boxes meeting the cut get `top`.
 * `Complex.log` on a box: `(½ log normSq, arg)`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Interval.CBox
 import Mathlib.Analysis.SpecialFunctions.Log.Deriv

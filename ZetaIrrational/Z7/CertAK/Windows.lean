@@ -15,8 +15,6 @@ into the 133 windows `[bnd j, bnd (j+1))`, `bnd j = 1 + 3j`, and sort each windo
 
 The kernel checks themselves are in the generated files `Z7/CertAK/EvData.lean`, `Z7/CertAK/EvWin*.lean`
 and `Z7/CertAK/EvSum*.lean`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Z7.CertA.Step
 import ZetaIrrational.Z7.CertAK.EvSort

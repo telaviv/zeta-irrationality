@@ -1,5 +1,5 @@
 /-
-# The kernel `k(z) = π cot(πz)` and its first four derivatives (PROOF_ZETA §6.1, PLAN.md)
+# The kernel `k(z) = π cot(πz)` and its first four derivatives
 
 With `C(z) = cos(πz)/sin(πz)` and `S(z) = 1/sin(πz)` (`cotP`, `cscP`), `C' = -πS²`, `S' = -πCS`, and
 
@@ -14,8 +14,6 @@ With `C(z) = cos(πz)/sin(πz)` and `S(z) = 1/sin(πz)` (`cotP`, `cscP`), `C' = 
   `|Im z| ≥ y₀ > 0`;
 * `tendsto_sub_mul_kk0`: `(z - t) k₀(z) → 1` at every `t ∈ ℕ` (residue 1);
 * conjugation symmetry `kk_conj`.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Analytic.ContourModel
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
@@ -141,31 +139,6 @@ theorem T_eq_exp (z : ℂ) :
   rw [hc, hq, h3]
   field_simp
   ring
-
-/-- `‖T(z)‖ ≤ 24 e^{3π Im z}` for `Im z ≥ 0`. -/
-theorem norm_T_le {z : ℂ} (hz : 0 ≤ z.im) : ‖Tfun z‖ ≤ 24 * Real.exp (3 * π * z.im) := by
-  rw [T_eq_exp]
-  have hq : ‖Complex.exp (2 * π * I * z)‖ ≤ 1 := by
-    rw [Complex.norm_exp]
-    apply Real.exp_le_one_iff.2
-    have : (2 * π * I * z).re = -(2 * π * z.im) := by simp
-    rw [this]; have := Real.pi_pos; nlinarith
-  have he : ‖Complex.exp (-(3 * π * I * z))‖ = Real.exp (3 * π * z.im) := by
-    rw [Complex.norm_exp]; congr 1; simp
-  rw [norm_mul, he]
-  set q := Complex.exp (2 * π * I * z)
-  have : ‖1 + 11 * q + 11 * q ^ 2 + q ^ 3‖ ≤ 24 := by
-    calc ‖1 + 11 * q + 11 * q ^ 2 + q ^ 3‖
-        ≤ ‖(1 : ℂ)‖ + ‖11 * q‖ + ‖11 * q ^ 2‖ + ‖q ^ 3‖ := norm_add₄_le
-      _ ≤ 1 + 11 * 1 + 11 * 1 + 1 := by
-          simp only [norm_mul, norm_pow, norm_one]
-          have h2 : ‖q‖ ^ 2 ≤ 1 := pow_le_one₀ (norm_nonneg _) hq
-          have h3 : ‖q‖ ^ 3 ≤ 1 := pow_le_one₀ (norm_nonneg _) hq
-          norm_num
-          linarith
-      _ = 24 := by norm_num
-  have := Real.exp_pos (3 * π * z.im)
-  nlinarith
 
 /-- `‖1 + 11q + 11q² + q³ - 1‖ ≤ 23 ‖q‖` for `‖q‖ ≤ 1`. -/
 lemma norm_Qz_sub_one_le {q : ℂ} (hq : ‖q‖ ≤ 1) :

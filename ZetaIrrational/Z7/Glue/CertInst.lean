@@ -6,12 +6,10 @@
   `LE = #events - 1`, with `xE 0 = 1`, `xE LE = 400`, strictly increasing, `e* ≤ uE i` on each open
   cell (`CertA.eStar_eq_mid`), and `ABody 400 = Σ_i uE i (1/xE i − 1/xE (i+1))`.
 * the tail `e*(y) ≤ 33 + G{y}` for `y ≥ 400` is `CertA.eStar_le_tail` (`Z7/CertA/Tail.lean`;
-  `33 = S + 15`, PROOF_ZETA (5.2)).
+  `33 = S + 15`).
 
 All list facts are proved for an abstract list `l` (strictly increasing, inside `[1, 400]`,
-containing `1` and `400`), so that `events 400` (30,972 entries) is never unfolded.
-
-Status: complete (no `sorry`). Nothing here uses `native_decide`.
+containing `1` and `400`), so that `events 400` (30,138 entries) is never unfolded.
 -/
 import ZetaIrrational.Z7.CertA.Attain
 import ZetaIrrational.Z7.Glue.CertPoint

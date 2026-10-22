@@ -2,7 +2,7 @@
 # Certified bounds for `h = Re f` along polylines (far part (S2) machinery)
 
 For a factor list `l` and a phase multiplier `ω : ℕ`, `fL ω l z = Ψ(z) - ωπi z` and
-`gL ω l z = Ψ'(z) - ωπi` (`ω = 2` for the β family of lean_beta, `ω = 3` for the ζ family).
+`gL ω l z = Ψ'(z) - ωπi` (the proof of the main theorem uses `ω = 3`).
 
 **Segment bound.** For `z = a + t (b - a)`, `t ∈ [0, 1/2]`, the second-order Taylor bound
 (`taylor2_seg`, from the mean value inequality applied twice) gives
@@ -18,8 +18,6 @@ bounding box.
 `polyChk` runs `segOK` along a list of rational vertices; `poly_bound` turns a successful check into
 `∀ z` on the polyline, `Re f z ≤ T`. `ball_bound` handles a short connector near a non-rational
 point.
-
-Status: complete (no `sorry`).
 -/
 import ZetaIrrational.Interval.Psi
 import Mathlib.Analysis.Calculus.MeanValue

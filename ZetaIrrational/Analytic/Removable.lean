@@ -1,17 +1,14 @@
 /-
-# Finitely many removable singularities, and the residue of `π / sin(π z)`
+# Finitely many removable singularities
 
-* `exists_removable`: if `G` is differentiable on a punctured ball around each point `t` of a finite
-  set `S`, and `(z - t) G(z) → 0` as `z → t`, then `G` can be redefined on `S` to be differentiable
-  at every point of `S` (and wherever `G` was already differentiable off `S`). This is
-  Mathlib's `Complex.differentiableOn_update_limUnder_of_isLittleO`, applied pointwise.
-* `tendsto_sub_mul_pi_div_sin`: `(z - t) · π / sin(π z) → (-1)^t` as `z → t ∈ ℕ`.
+`exists_removable`: if `G` is differentiable on a punctured ball around each point `t` of a finite
+set `S`, and `(z - t) G(z) → 0` as `z → t`, then `G` can be redefined on `S` to be differentiable
+at every point of `S` (and wherever `G` was already differentiable off `S`). This is Mathlib's
+`Complex.differentiableOn_update_limUnder_of_isLittleO`, applied pointwise.
 
-These replace the residue theorem in `Contour.lean`: subtracting the principal parts
-`(-1)^t f(t) m_{t,s}(z)` leaves a function with removable singularities only, to which Cauchy's
-theorem for rectangles applies.
-
-Status: complete (no `sorry`).
+It replaces the residue theorem in `ContourCot.lean`: subtracting the principal parts
+`f(t) m_{t,s}(z)` leaves a function with removable singularities only, to which Cauchy's theorem
+for rectangles applies.
 -/
 import Mathlib.Analysis.Complex.RemovableSingularity
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Deriv
@@ -66,36 +63,5 @@ theorem exists_removable {G : ℂ → ℂ} (S : Finset ℂ)
       have hw' : w ∉ S := by simpa using hw
       simp only [G', hw', ↓reduceIte]
     exact hd.congr_of_eventuallyEq heq
-
-/-- `(z - t) · π / sin(π z) → (-1)^t` as `z → t`, for `t ∈ ℕ`. -/
-lemma tendsto_sub_mul_pi_div_sin (t : ℕ) :
-    Tendsto (fun z : ℂ => (z - t) * (π / Complex.sin (π * z))) (𝓝[≠] (t : ℂ))
-      (𝓝 ((-1 : ℂ) ^ t)) := by
-  have hcast : (π : ℂ) * t = ((t * π : ℝ) : ℂ) := by push_cast; ring
-  have hcos : Complex.cos (π * t) = (-1 : ℂ) ^ t := by
-    rw [hcast, ← Complex.ofReal_cos, Real.cos_nat_mul_pi]; push_cast; rfl
-  have hsin : Complex.sin (π * t) = 0 := by
-    rw [hcast, ← Complex.ofReal_sin, Real.sin_nat_mul_pi]; simp
-  have hd : HasDerivAt (fun z : ℂ => Complex.sin (π * z)) (Complex.cos (π * t) * π) t := by
-    have := ((hasDerivAt_id (t : ℂ)).const_mul (π : ℂ)).csin
-    simpa using this
-  rw [hcos] at hd
-  have hslope := hd.tendsto_slope
-  have hne : (-1 : ℂ) ^ t * π ≠ 0 :=
-    mul_ne_zero (pow_ne_zero _ (by norm_num)) (by exact_mod_cast Real.pi_ne_zero)
-  have hinv := hslope.inv₀ hne
-  have hlim : Tendsto (fun z => (π : ℂ) * (slope (fun z : ℂ => Complex.sin (π * z)) t z)⁻¹)
-      (𝓝[≠] (t : ℂ)) (𝓝 ((π : ℂ) * ((-1 : ℂ) ^ t * π)⁻¹)) := hinv.const_mul _
-  have hval : (π : ℂ) * ((-1 : ℂ) ^ t * π)⁻¹ = (-1 : ℂ) ^ t := by
-    have hπ : (π : ℂ) ≠ 0 := by exact_mod_cast Real.pi_ne_zero
-    rw [mul_inv, ← mul_assoc, mul_comm (π : ℂ), mul_assoc, mul_inv_cancel₀ hπ, mul_one]
-    rw [← inv_pow, inv_neg, inv_one]
-  rw [hval] at hlim
-  refine hlim.congr' ?_
-  filter_upwards [self_mem_nhdsWithin] with z hz
-  rw [slope_def_field, hsin, sub_zero]
-  have : z - t ≠ 0 := sub_ne_zero.2 hz
-  rw [inv_div]
-  ring
 
 end ZetaIrr.Analytic

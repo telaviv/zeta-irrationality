@@ -1,5 +1,5 @@
 /-
-# Size of `D_n` at the small primes (PROOF_ZETA §4, "Size of the small-prime part", instance Z7)
+# Size of `D_n` at the small primes (Lemma 4, instance Z7)
 
 With `n = 240(m+1)`, `𝒩 = 700(m+1)+1`, `Λ_p = ⌊log_p 𝒩⌋`, `G = 547/120`:
 
@@ -9,10 +9,7 @@ With `n = 240(m+1)`, `𝒩 = 700(m+1)+1`, `Λ_p = ⌊log_p 𝒩⌋`, `G = 547/12
   contribute `Σ_k B_k = 3294(m+1) + 18`, and `3294 - 5·440 = 1094 = 240 G`);
 * `Esmall_sub_le`: `(p-1)(E_p - G v_p(n!)) ≤ 18 + 73(p-1)(Λ_p+1)`;
 * `small_primes_sum_le`: `Σ_{p ≤ √𝒩, p prime} (E_p - G v_p(n!)) log p ≤ 182 ⌊√𝒩⌋ log 𝒩`, so this
-  part is `O(√n log n) = o(n)` (PROOF_ZETA (4.1)). There is no exceptional prime: `p = 2, 3` are
-  covered by the same count.
-
-Status: complete (no `sorry`).
+  part is `O(√n log n) = o(n)`. The count covers every prime `p ≤ √𝒩`, including `p = 2, 3`.
 -/
 import ZetaIrrational.Z7.Arith.Integrality
 import Mathlib.Analysis.SpecialFunctions.Log.Basic
