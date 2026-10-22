@@ -1,0 +1,1629 @@
+\documentclass[11pt]{amsart}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+
+% ---------------------------------------------------------------------------
+% Theorem environments
+% ---------------------------------------------------------------------------
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\numberwithin{equation}{section}
+\setlength{\emergencystretch}{2em}
+
+% ---------------------------------------------------------------------------
+% Macros
+% ---------------------------------------------------------------------------
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\cN}{\mathcal{N}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\Acert}{A_{\mathrm{cert}}}
+\newcommand{\Abody}{A_{\mathrm{body}}}
+\newcommand{\Vcert}{V_{\mathrm{cert}}}
+\newcommand{\etafar}{\eta_{\mathrm{far}}}
+\newcommand{\xtop}{x_{\mathrm{top}}}
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ind}[1]{[\,#1\,]}
+\newcommand{\lean}[1]{{\def\_{\textunderscore\allowbreak}\texttt{#1}}}
+
+\begin{document}
+
+\title{One of $\zeta(7),\zeta(9),\dots,\zeta(21)$ is irrational}
+
+\author{Shawn Krisman}
+
+\subjclass[2020]{Primary 11J72; Secondary 11M06, 41A60, 68V20}
+\keywords{Riemann zeta function, odd zeta values, irrationality, hypergeometric linear forms,
+saddle-point method, formal verification, Lean}
+
+\date{\today}
+
+\begin{abstract}
+We prove that at least one of the eight numbers $\zeta(7),\allowbreak\zeta(9),\allowbreak\dots,\allowbreak\zeta(21)$
+is irrational. The best previous result of this form that does not involve $\zeta(5)$ was ``one of
+$\zeta(7),\dots,\zeta(35)$'', a consequence of the theorem of Lai and Zhou that at least two of
+$\zeta(5),\dots,\zeta(35)$ are irrational; Zudilin had earlier proved ``one of $\zeta(7),\dots,\zeta(37)$''. The
+proof uses the linear forms $L_n=\sum_{t\ge1}R_n''''(t)$ attached to very-well-poised rational functions $R_n$
+of Zudilin's type with quintuple zeros. The fourth derivative and a symmetry keep $\zeta(3)$, $\zeta(5)$ and the
+even zeta values out of the forms. The new ingredients are a near-continuous profile of eighteen pole blocks, a
+sharper $p$-adic bound at the poles $-k$ with $k<p$, and a saddle-point analysis for the kernel $\pi\cot\pi z$:
+four integrations by parts turn the integrand into $R_n(z)$ times an entire trigonometric factor, which fixes the
+phase $3\pi$. The common denominators are controlled by an arithmetic integral that we bound with an exact
+rational certificate, and the size and nonvanishing of $L_n$ by a certified steepest-descent contour. The whole
+proof, including every numerical certificate, has been formalised in Lean~4 with Mathlib and checked by the Lean
+kernel, using only Lean's three standard axioms.
+\end{abstract}
+
+\maketitle
+
+\tableofcontents
+
+% ===========================================================================
+\section{Introduction}\label{sec:intro}
+% ===========================================================================
+
+Let $\zeta(s)=\sum_{m\ge1}m^{-s}$ be the Riemann zeta function.
+
+\begin{theorem}\label{thm:main}
+At least one of the eight numbers $\zeta(7),\allowbreak \zeta(9),\allowbreak \zeta(11),\allowbreak \dots,\allowbreak \zeta(21)$ is irrational.
+\end{theorem}
+
+\subsection{Context}
+The even values $\zeta(2k)$ are nonzero rational multiples of $\pi^{2k}$, hence transcendental. Among the odd
+values, $\zeta(3)$ is irrational by Ap\'ery's theorem \cite{Apery1979}. Rivoal \cite{Rivoal2000} and Ball and
+Rivoal \cite{BallRivoal2001} proved that infinitely many odd values are irrational, and
+Fischler, Sprang and Zudilin \cite{FSZ2019} sharpened the count. For short windows, Zudilin
+\cite{Zudilin2001} proved that one of $\zeta(5),\zeta(7),\zeta(9),\zeta(11)$ is irrational (see also
+\cite[Thm.~3]{Zudilin2004}); Rivoal \cite{Rivoal2002} and Zudilin \cite[Thm.~1]{Zudilin2002} proved it for
+the nine numbers $\zeta(5),\dots,\zeta(21)$; and Zudilin gave an elementary proof for
+$\zeta(5),\dots,\zeta(25)$ \cite{Zudilin2018}.
+
+A statement ``one of $\zeta(5),\dots,\zeta(N)$ is irrational'' holds as soon as $\zeta(5)$ is irrational, and
+then it says nothing about $\zeta(7),\zeta(9),\dots$. The known explicit results about windows that start at
+$\zeta(7)$ are the following.
+\begin{itemize}
+\item Zudilin \cite[Thm.~1]{Zudilin2002} proved that one of $\zeta(7),\zeta(9),\dots,\zeta(37)$ is irrational,
+  and more generally \cite[Thm.~2]{Zudilin2002} that for every odd $b\ge1$ one of
+  $\zeta(b+2),\zeta(b+4),\dots,\zeta(8b-1)$ is irrational.
+\item Lai and Zhou \cite{LaiZhou2022} proved that at least two of $\zeta(5),\zeta(7),\dots,\zeta(35)$ are
+  irrational. This implies, with no hypothesis on $\zeta(5)$, that one of $\zeta(7),\dots,\zeta(35)$ is
+  irrational: if $\zeta(7),\dots,\zeta(35)$ were all rational, at most one number in the list
+  $\zeta(5),\dots,\zeta(35)$ could be irrational.
+\item Rivoal and Zudilin \cite{RivoalZudilin2020} proved that at least two of $\zeta(5),\dots,\zeta(69)$ are
+  irrational, which gives the same conclusion for $\zeta(7),\dots,\zeta(69)$.
+\end{itemize}
+So the window $\zeta(7),\dots,\zeta(35)$ was the shortest of this kind that we know of. Theorem~\ref{thm:main}
+shortens it to $\zeta(7),\dots,\zeta(21)$, which is Rivoal's window of nine numbers with $\zeta(5)$ removed.
+
+A proof that $\zeta(5)$ is irrational has recently been announced in an unrefereed preprint by A.~Fauzan, with
+Lean formalisations (for instance \cite{zeta5}). Theorem~\ref{thm:main} does not use the arithmetic nature of
+$\zeta(5)$ or $\zeta(3)$ in any way: neither number occurs in our linear forms (Corollary~\ref{cor:form}).
+Theorem~\ref{thm:main} neither implies nor is implied by the result of Lai and Zhou. To our knowledge it is new.
+Our literature search covered arXiv and the web, but not MathSciNet or zbMATH; we would be grateful to hear of
+prior work.
+
+\subsection{The method}
+We follow the approach of Ball and Rivoal \cite{BallRivoal2001} and Zudilin \cite{Zudilin2002,Zudilin2004}
+through linear forms with rational coefficients, and the construction is not new: it is the derivative form of
+Zudilin's very-well-poised hypergeometric construction \cite[\S8, (8.2)--(8.4)]{Zudilin2004}, with derivative
+order $4$. For $n$ in an arithmetic progression we put
+\[
+  R_n(t)=\frac{(2t+n)\prod_{l=1}^{rn}(t-l)^5\prod_{l=n+1}^{(1+r)n}(t+l)^5}{\prod_{j}\prod_{k=\delta_jn}^{(1-\delta_j)n}(t+k)^{m_j}},
+  \qquad L_n=\sum_{t\ge1}R_n''''(t).
+\]
+Differentiating four times raises every pole order by $4$, so $\zeta(3)$ cannot occur; $\zeta(5)$ drops out
+because the residues of $R_n$ add up to $0$; and the symmetry $R_n(-n-t)=-R_n(t)$ removes the even zeta values
+(Section~\ref{sec:algebra}). Since all zeros and poles are integers there is no $2$-adic or $3$-adic cost of the
+kind that half-integer or third-integer shifts produce. As far as we can tell, Zudilin's theorem for
+$\zeta(7),\dots,\zeta(37)$ is of the same type, with all poles in a single block; our single-block instance Z1 of
+Section~\ref{sec:general} reaches the same window. The analytic method, a saddle point of the Ball--Rivoal--Zudilin type, is also standard.
+
+What is new is the following.
+\begin{enumerate}
+\item \emph{A near-continuous pole profile.} The denominator of $R_n$ is a product of eighteen blocks, one at
+  each offset $\delta_j=j/80$, $1\le j\le18$, with $r=11/12$. Zudilin's parametrisation allows such profiles; the
+  profile used here was found by a numerical search (Section~\ref{sec:search}). Even $S=18$ is useful: the top
+  index is then $S+3=21$, so the window $\zeta(7),\dots,\zeta(21)$ gets one block more than an odd $S$ would.
+\item \emph{An arithmetic refinement.} If $k<p$, the harmonic sums $H_k^{(j)}$ are $p$-integral, and the
+  Taylor coefficients of $R_n$ at the pole $-k$ are $p$-integral unless another pole lies at a distance
+  $\equiv0\pmod p$ (Corollary~\ref{cor:A}(b$'$)). So such poles cost nothing at $p$, and the others cost less
+  than in the standard estimate (Definition~\ref{def:Ep}). This lowers the arithmetic integral by an amount of
+  order $1$ per unit of $n$.
+\item \emph{The saddle point for the $\cot$ kernel.} $L_n$ is a contour integral of $R_n''''(z)\pi\cot\pi z$.
+  Four integrations by parts move the derivatives onto the kernel, and
+  $\sin^5u\cdot\cot''''u=2\cos3u+22\cos u$ (Lemma~\ref{lem:trig}) turns the integrand into $R_n(z)$ times an
+  entire function whose leading exponential is $e^{-3\pi iz}$. The resulting phase $\Psi(x)-3\pi ix$ has a
+  saddle $x_0$ with $\Re\Omega\le-10.1167485$, which gives both the size of $L_n$ and its nonvanishing for
+  infinitely many $n$ (Section~\ref{sec:nonvan}). The elementary bound on the real axis would not suffice here.
+\item \emph{Certified numerics.} The arithmetic integral is a sum over $30{,}137$ intervals, evaluated exactly in
+  rational arithmetic (Section~\ref{sec:A}). The saddle point, the steepest-descent contour and all bounds along it
+  are certified by interval arithmetic.
+\item \emph{Formalisation.} Every step, including all computations, has been formalised in Lean~4
+  \cite{LeanFour} with Mathlib \cite{Mathlib} (Section~\ref{sec:lean}).
+\end{enumerate}
+The exponent that must be negative is $Q=\Re\Omega+\Acert<-0.1981$, see \eqref{eq:Q}. Here $\Re\Omega$
+controls the size of $L_n$ (Proposition~\ref{prop:size}) and $\Acert$ is the arithmetic integral
+(Proposition~\ref{prop:certA}). There is no $2$-adic term.
+
+The same machine gives, with larger margins, the windows $\zeta(7),\dots,\zeta(N)$ for $N=23,25,29,31,33,37$
+(Section~\ref{sec:general}); those instances rest on certificates computed in Python and Arb and are not
+formalised. It does not reach $N=19$ (Section~\ref{sec:N19}).
+
+\subsection{The formalisation}
+The statement of Theorem~\ref{thm:main} and its complete proof, including the prime number theorem, complex
+Stirling bounds, the contour-integral representation, the arithmetic certificate and the interval-arithmetic
+saddle-point certificate, are formalised in Lean~4 with Mathlib and checked by the Lean kernel. The proof
+depends only on Lean's three standard axioms (\lean{propext}, \lean{Classical.choice}, \lean{Quot.sound}). It
+contains no \lean{sorry} and no \lean{native\_decide}: every proof, including every computation, is checked by
+the kernel. The formal statement uses Mathlib's \lean{riemannZeta} and is described in Section~\ref{sec:lean}.
+
+The prose proof below is self-contained, except that certain finite computations are only described: the exact
+value of a rational sum with $30{,}137$ terms (Proposition~\ref{prop:certA}) and the interval-arithmetic checks of
+the saddle-point data (Theorem~\ref{thm:saddle}). Both are decidable statements about rational data, proved by
+\lean{decide +kernel}. The formalisation differs from the informal write-up from which it was ported in a few
+places; the paper follows the formalisation, and the differences are listed in Section~\ref{sec:lean-diff}.
+
+\subsection{Organisation and notation}
+Section~\ref{sec:construction} defines the class of rational functions and the instance used for
+Theorem~\ref{thm:main}. Section~\ref{sec:algebra} shows that $L_n\in\QQ+\QQ\zeta(7)+\dots+\QQ\zeta(21)$.
+Section~\ref{sec:arith} constructs a common denominator $D_n$, and Section~\ref{sec:A} bounds its size through
+the arithmetic integral. Section~\ref{sec:nonvan} bounds $|L_n|$ and proves that $L_n\ne0$ for infinitely many
+$n$. Section~\ref{sec:proof} combines these results. Section~\ref{sec:general} states the general theorem and the
+other instances, Section~\ref{sec:lean} describes the formalisation, and Section~\ref{sec:remarks} contains
+remarks on the parameter search, the limits of the method and effectivity.
+
+Throughout, $p$ denotes a prime and $v_p$ the $p$-adic valuation on $\QQ$, with $v_p(0)=+\infty$;
+$\ZZ_{(p)}$ is the ring of rationals with $v_p\ge0$. $\lfloor\cdot\rfloor$, $\lceil\cdot\rceil$ and $\{\cdot\}$
+are the floor, ceiling and fractional part; $\ind{P}$ is $1$ if $P$ holds and $0$ otherwise; $\#$ denotes
+cardinality; intervals $[a,b]$ of integers are written like real intervals. $\theta(y)=\sum_{p\le y}\log p$ is
+Chebyshev's function. For a power series $g$ in $\eps$, $[\eps^M]g$ is the coefficient of $\eps^M$. We write
+$(i)_4:=i(i+1)(i+2)(i+3)$ and $H_k^{(j)}:=\sum_{m=1}^{k}m^{-j}$ (so $H_0^{(j)}=0$).
+
+% ===========================================================================
+\section{The construction}\label{sec:construction}
+% ===========================================================================
+
+\subsection{The class of rational functions}
+\begin{definition}\label{def:param}
+A \emph{parameter set} $\cP=(r,(\delta_j,m_j)_{j=1}^J,q)$ consists of $r\in\QQ_{>0}$, offsets
+$\delta_j\in\QQ\cap[0,\frac12)$ with multiplicities $m_j\in\NN_{\ge1}$, and $q\in\NN_{\ge1}$ with $rq\in\ZZ$ and
+$\delta_jq\in\ZZ$ for all $j$. We assume $S:=\sum_jm_j\ge2$. The integer $n$ always runs through
+$q\NN=\{q,2q,3q,\dots\}$. Put
+\begin{gather*}
+  a_j:=\delta_jn,\quad b_j:=n-a_j,\quad I_j:=[a_j,b_j]\cap\ZZ,\\
+  B_k:=\sum_jm_j\ind{k\in I_j}\ (0\le k\le n),\\
+  G:=\sum_jm_j(1-2\delta_j)-10r,\qquad \cN:=(2+r)n+1,
+\end{gather*}
+and let $N_\cP$ be the largest odd integer $\le S+4$ (so $N_\cP=S+4$ for odd $S$ and $S+3$ for even $S$).
+\end{definition}
+
+Each $I_j$ is a nonempty integer interval, symmetric under $k\mapsto n-k$, with $\#I_j=(1-2\delta_j)n+1$; so
+$B_{n-k}=B_k$ and $0\le B_k\le S$. The \emph{zero set} is
+\[
+  \mathcal Z_n:=[1,rn]\cup[-(1+r)n,\,-n-1]\subset\ZZ,
+\]
+two runs of $rn$ consecutive integers on either side of the pole region $[-n,0]$; each zero will have
+multiplicity $5$. For $e\in\{0,1\}$ define
+\begin{equation}\label{eq:R}
+  R_n(t):=\frac{(2t+n)^e\prod_{l=1}^{rn}(t-l)^5\prod_{l=n+1}^{(1+r)n}(t+l)^5}{\prod_{j}\prod_{k\in I_j}(t+k)^{m_j}}
+  =\frac{(2t+n)^e\prod_{z\in\mathcal Z_n}(t-z)^5}{\prod_{k=0}^{n}(t+k)^{B_k}},
+\end{equation}
+and
+\begin{equation}\label{eq:L}
+  L_n:=\sum_{t=1}^{\infty}R_n''''(t).
+\end{equation}
+
+\begin{lemma}\label{lem:counts}
+$\sum_{k=0}^nB_k=\sum_jm_j\#I_j=(G+10r)n+S$ and $\deg R_n=e-Gn-S$. In particular $Gn\in\ZZ$. If $G>0$, then
+$\deg R_n\le-2$, so $R_n(t)=O(t^{-2})$, $R_n''''(t)=O(t^{-6})$ as $t\to\infty$, and the series \eqref{eq:L}
+converges absolutely.
+\end{lemma}
+
+\begin{proof}
+$\sum_jm_j((1-2\delta_j)n+1)=(G+10r)n+S$, and the numerator has degree $e+10rn$. Hence
+$Gn=e+10rn-S-\deg R_n\in\ZZ$. If $G>0$ then $Gn\ge1$ and $\deg R_n\le1-1-S\le-2$.
+\end{proof}
+
+\begin{lemma}[Symmetry]\label{lem:sym}
+If $e\equiv1+S+Gn\pmod2$, then $\deg R_n$ is odd and $R_n(-n-t)=-R_n(t)$.
+\end{lemma}
+
+\begin{proof}
+The first claim is Lemma~\ref{lem:counts}. The map $z\mapsto-n-z$ sends $[1,rn]$ onto $[-n-rn,-n-1]$ and back,
+and $-n-t-z=-(t-(-n-z))$; the $e$-factor becomes $2(-n-t)+n=-(2t+n)$; and $-n-t+k=-(t+(n-k))$ with
+$B_{n-k}=B_k$. So every linear factor changes sign and the multisets of zeros and poles are preserved, whence
+$R_n(-n-t)=(-1)^{\deg R_n}R_n(t)=-R_n(t)$.
+\end{proof}
+
+If $qG$ is even, then $Gn$ is even for every $n\in q\NN$, and the condition of Lemma~\ref{lem:sym} fixes
+$e\equiv1+S\pmod2$ independently of $n$. This is hypothesis (H6) of Section~\ref{sec:general}. Following
+\cite{Zudilin2004}, the symmetry makes $R_n$ \emph{very-well-poised}.
+
+\subsection{The instance Z7}
+Theorem~\ref{thm:main} uses the following parameter set, called Z7 (the last column of
+Table~\ref{tab:instances}).
+\begin{itemize}
+\item $r=11/12$ and $q=240$: $n=240N_0$ with $N_0\in\NN_{\ge1}$, so $rn=220N_0$ and $(1+r)n=460N_0$.
+\item Eighteen blocks $(\delta_j,m_j)=(j/80,1)$, $1\le j\le18$, so $a_j=3jN_0$.
+\item $e=1$.
+\end{itemize}
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{@{}p{0.36\textwidth}p{0.58\textwidth}@{}}
+\toprule
+quantity & value\\
+\midrule
+$r$, $q$, $e$ & $11/12$, $240$, $1$\\
+blocks $(\delta_j,m_j)$ & $(j/80,1)$ for $j=1,\dots,18$\\
+$S=\sum_jm_j$, $N_\cP$ & $18$, $21$\\
+$\sum_jm_j(1-2\delta_j)$ & $18-\frac{171}{40}=\frac{549}{40}$\\
+$G=\sum_jm_j(1-2\delta_j)-10r$ & $\frac{549}{40}-\frac{55}{6}=\frac{547}{120}$; $qG=1094$\\
+zero set $\mathcal Z_n$ & $[1,220N_0]\cup[-460N_0,-240N_0-1]$, each of order $5$\\
+$\sum_kB_k$ & $3294N_0+18$\\
+$\deg R_n$ & $-1094N_0-17$ (odd)\\
+$\cN=(2+r)n+1$ & $700N_0+1$\\
+\bottomrule
+\end{tabular}
+\caption{The parameters of Z7.}\label{tab:blocks}
+\end{table}
+
+All blocks have $\delta_j\ge\frac1{80}$, so $B_k=0$ for $k<3N_0$: there is no pole at $0$, and every pole of
+$R_n$ lies in $[-n+3N_0,-3N_0]$. The $e$-factor vanishes at $t=-n/2$, which is the central pole ($B_{n/2}=18$);
+so that pole has order $17$, and the Taylor data below absorb this automatically ($u_e=0$ in
+Lemma~\ref{lem:A}). By Lemma~\ref{lem:sym} and $qG=1094\equiv0$, $S=18$, the choice $e=1$ gives
+$R_n(-n-t)=-R_n(t)$ for every $n\in240\NN$.
+
+% ===========================================================================
+\section{\texorpdfstring{The linear form lies in $\QQ+\QQ\zeta(7)+\dots+\QQ\zeta(21)$}{The linear form lies in Q + Q zeta(7) + ... + Q zeta(21)}}\label{sec:algebra}
+% ===========================================================================
+
+In this section $\cP$ is any parameter set with $G>0$ and $e$ as in Lemma~\ref{lem:sym}.
+
+For $0\le k\le n$ define the power series in $\QQ[[\eps]]$
+\begin{equation}\label{eq:fk}
+  f_k(\eps):=(n-2k+2\eps)^e\prod_{z\in\mathcal Z_n}(-k-z+\eps)^5\prod_{\substack{0\le k'\le n\\k'\ne k}}(k'-k+\eps)^{-B_{k'}},
+\end{equation}
+with $(d+\eps)^{-1}=\sum_{M\ge0}(-1)^Md^{-M-1}\eps^M$ for $d\ne0$. Note $-k-z\ne0$, because no zero lies in
+the pole region $[-n,0]$. If $t_0:=-k$, then $f_k(\eps)$ is the Taylor expansion of $R_n(t_0+\eps)(t_0+\eps+k)^{B_k}$
+at $\eps=0$. We write $u_z:=-k-z$, $u_e:=n-2k$ and $d_{k'}:=k'-k$ when $k$ is fixed.
+
+\begin{lemma}[Partial fractions]\label{lem:pf}
+Put $a_{i,k}:=[\eps^{B_k-i}]f_k$ for $0\le k\le n$, $1\le i\le B_k$, and $a_{i,k}:=0$ otherwise. Then
+$a_{i,k}\in\QQ$ and, for every $t\in\CC\setminus\{-k:B_k\ge1\}$,
+\[
+  R_n(t)=\sum_{k=0}^{n}\sum_{i=1}^{S}\frac{a_{i,k}}{(t+k)^i}.
+\]
+\end{lemma}
+
+\begin{proof}
+By Lemma~\ref{lem:counts} the numerator of \eqref{eq:R} has smaller degree than the denominator, so $R_n$ is the
+sum of its principal parts at the distinct poles $-k$. The principal part at $t_0=-k$ is
+$\sum_{i=1}^{B_k}a_{i,k}(t-t_0)^{-i}$, where $a_{i,k}$ is the coefficient of $(t-t_0)^{B_k-i}$ in the Taylor
+expansion of $R_n(t)(t-t_0)^{B_k}$, which is $f_k$. Since $B_k\le S$, all $i\le S$ are covered.
+\end{proof}
+
+\begin{lemma}\label{lem:shift}
+For integers $j\ge2$ and $k\ge0$, $\sum_{t\ge1}(t+k)^{-j}=\zeta(j)-H_k^{(j)}$.
+\end{lemma}
+
+\begin{proof}
+Substitute $m=t+k$.
+\end{proof}
+
+\begin{proposition}[Expansion]\label{prop:expansion}
+Define
+\[
+  \tau_i:=(i)_4\sum_{k=0}^{n}a_{i,k},\qquad
+  \rho_n:=-\sum_{k=0}^{n}\sum_{i=1}^{S}(i)_4\,a_{i,k}\,H_k^{(i+4)} .
+\]
+Then $\rho_n,\tau_i\in\QQ$ and $L_n=\rho_n+\sum_{i=1}^{S}\tau_i\,\zeta(i+4)$.
+\end{proposition}
+
+\begin{proof}
+All poles are $\le0$, so for real $t>0$ Lemma~\ref{lem:pf} may be differentiated termwise:
+$R_n''''(t)=\sum_{k,i}a_{i,k}(i)_4(t+k)^{-i-4}$. Sum over $t\ge1$; this is a finite sum of absolutely convergent
+series, and Lemma~\ref{lem:shift} with $j=i+4\ge5$ gives the claim.
+\end{proof}
+
+\begin{lemma}[Symmetry of the coefficients]\label{lem:tau-even}
+$a_{i,n-k}=(-1)^{i+1}a_{i,k}$ for all $i,k$. Consequently $\tau_i=0$ for every even $i$.
+\end{lemma}
+
+\begin{proof}
+By Lemmas~\ref{lem:sym} and~\ref{lem:pf},
+\[
+  R_n(t)=-R_n(-n-t)=-\sum_{k,i}\frac{a_{i,k}}{(-n-t+k)^i}=\sum_{k,i}\frac{(-1)^{i+1}a_{i,k}}{(t+(n-k))^i},
+\]
+and uniqueness of the partial-fraction decomposition gives $a_{i,n-k}=(-1)^{i+1}a_{i,k}$. Summing over $k$ gives
+$\tau_i=(-1)^{i+1}\tau_i$.
+\end{proof}
+
+\begin{lemma}[The residues add up to zero]\label{lem:tau1}
+$\sum_ka_{1,k}=0$; hence $\tau_1=0$.
+\end{lemma}
+
+\begin{proof}
+As $t\to+\infty$, $tR_n(t)\to0$ because $\deg R_n\le-2$, while $t\sum_{k,i}a_{i,k}(t+k)^{-i}\to\sum_ka_{1,k}$.
+\end{proof}
+
+\begin{corollary}\label{cor:form}
+$L_n=\rho_n+\sum_{i}\tau_i\,\zeta(i+4)$, where $i$ runs over the odd integers with $3\le i\le S$. Hence
+$L_n\in\QQ+\QQ\zeta(7)+\QQ\zeta(9)+\dots+\QQ\zeta(N_\cP)$; for Z7,
+\[
+  L_n=\rho_n+\sum_{j=3}^{10}\tau_{2j-3}\,\zeta(2j+1)\in\QQ+\QQ\zeta(7)+\QQ\zeta(9)+\dots+\QQ\zeta(21).
+\]
+In particular $\zeta(3)$ and $\zeta(5)$ do not occur.
+\end{corollary}
+
+\begin{proof}
+In Proposition~\ref{prop:expansion} only $\zeta(i+4)$ with $1\le i\le S$ occurs. Lemma~\ref{lem:tau-even} removes
+the even $i$ and Lemma~\ref{lem:tau1} removes $i=1$. For Z7, $i=2j-3$ with $3\le j\le10$.
+\end{proof}
+
+% ===========================================================================
+\section{Denominators}\label{sec:arith}
+% ===========================================================================
+
+In this section $\cP$ is any parameter set with $G>0$, $e$ is as in Lemma~\ref{lem:sym}, and $n\in q\NN$ with
+$n>r$. For $0\le k\le n$ we have $0<|u_z|<\cN$ for $z\in\mathcal Z_n$ (indeed $|u_z|\le(1+r)n$),
+$|u_e|\le n<\cN$, and $|d_{k'}|\le n<\cN$.
+
+\subsection{Valuations of the Taylor coefficients}
+
+\begin{definition}
+Let $p$ be a prime and $\nu,\lambda\in\ZZ$. A power series $g\in\QQ[[\eps]]$ is
+\emph{$(\nu,\lambda)$-bounded at $p$} if $v_p([\eps^M]g)\ge \nu-\lambda M$ for all $M\ge0$.
+\end{definition}
+
+\begin{lemma}\label{lem:psge}
+Let $p$ be a prime and $\lambda\in\ZZ$.
+\begin{enumerate}
+\item If $g_1$ is $(\nu_1,\lambda)$-bounded and $g_2$ is $(\nu_2,\lambda)$-bounded at $p$, then $g_1g_2$ is
+  $(\nu_1+\nu_2,\lambda)$-bounded at $p$.
+\item If $u,c\in\QQ$ with $v_p(u)\ge \nu$ and $v_p(c)\ge \nu-\lambda$, then $u+c\eps$ is
+  $(\nu,\lambda)$-bounded at $p$.
+\item If $d\in\QQ\setminus\{0\}$ with $v_p(d)\le\lambda$ and $\nu\le -v_p(d)$, then $(d+\eps)^{-1}$
+  is $(\nu,\lambda)$-bounded at $p$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(1) $[\eps^M](g_1g_2)=\sum_{a+b=M}[\eps^a]g_1\,[\eps^b]g_2$, and each term has valuation
+$\ge \nu_1-\lambda a+\nu_2-\lambda b$. (2) is immediate (also when $u=0$). (3) The coefficient of $\eps^M$ is
+$(-1)^Md^{-M-1}$, of valuation $-v_p(d)-Mv_p(d)\ge \nu-\lambda M$.
+\end{proof}
+
+\begin{lemma}[Lemma A]\label{lem:A}
+Let $p$ be a prime, $\lambda\ge0$ an integer and $0\le k\le n$. Let $\nu_E\in\ZZ$, $\nu_z\in\ZZ$
+$(z\in\mathcal Z_n)$ and $\nu_{k'}\in\ZZ$ $(k'\ne k,\ B_{k'}\ge1)$ satisfy
+\begin{itemize}
+\item $v_p(u_e)\ge \nu_E$ and $v_p(2)\ge \nu_E-\lambda$ (only if $e=1$; put $\nu_E:=0$ if $e=0$);
+\item $v_p(u_z)\ge \nu_z$ and $\nu_z\le\lambda$ for every $z\in\mathcal Z_n$;
+\item $v_p(d_{k'})\le\lambda$ and $\nu_{k'}\le -v_p(d_{k'})$ for every $k'\ne k$ with $B_{k'}\ge1$.
+\end{itemize}
+Put $\nu:=\nu_E+5\sum_{z}\nu_z+\sum_{k'\ne k}B_{k'}\nu_{k'}$. Then $f_k$ is $(\nu,\lambda)$-bounded at $p$, and
+$v_p(a_{i,k})\ge \nu-\lambda(B_k-i)$ for $1\le i\le B_k$.
+\end{lemma}
+
+\begin{proof}
+Apply Lemma~\ref{lem:psge}(2) to $u_e+2\eps$ and to each $u_z+\eps$ (here $v_p(1)=0\ge\nu_z-\lambda$),
+Lemma~\ref{lem:psge}(3) to each $(d_{k'}+\eps)^{-1}$, and Lemma~\ref{lem:psge}(1) to the product \eqref{eq:fk}.
+\end{proof}
+
+For a prime $p$ and $0\le k\le n$ define
+\begin{gather*}
+  c_p(k):=5\,\#\{z\in\mathcal Z_n:p\mid k+z\}+e\,\ind{p\mid n-2k},\\
+  P_{p,j}(k):=\#\{k'\in I_j\setminus\{k\}:p\mid k'-k\},\qquad P_p(k):=\sum_jm_jP_{p,j}(k),\\
+  \nu_p(k):=5\sum_{z\in\mathcal Z_n}v_p(k+z)-\sum_jm_j\sum_{k'\in I_j\setminus\{k\}}v_p(k'-k),
+\end{gather*}
+and $\lambda_p:=\lfloor\log_p\cN\rfloor$. Note $\sum_{k'\ne k}B_{k'}g(k')=\sum_jm_j\sum_{k'\in I_j\setminus\{k\}}g(k')$
+for any $g$.
+
+\begin{corollary}\label{cor:A}
+Let $0\le k\le n$ and $1\le i\le B_k$.
+\begin{enumerate}
+\item[(b$'$)] If $P_p(k)=0$, i.e.\ no pole $-k'\ne-k$ of $R_n$ has $p\mid k'-k$, then $a_{i,k}\in\ZZ_{(p)}$.
+\item[(a)] If $p>n$, then $a_{i,k}\in\ZZ_{(p)}$.
+\item[(b)] If $p^2>\cN$, then $v_p(a_{i,k})\ge c_p(k)-P_p(k)-(B_k-i)$.
+\item[(c)] $v_p(a_{i,k})\ge \nu_p(k)-\lambda_p(B_k-i)$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+We apply Lemma~\ref{lem:A}; $v_p(u_z)=v_p(k+z)$.
+\begin{enumerate}
+\item[(b$'$)] Take $\lambda=0$ and all exponents $0$. The hypotheses hold because all $u$'s are integers and
+  $v_p(d_{k'})=0$ for every pole $-k'\ne-k$.
+\item[(a)] For $k'\ne k$, $0<|k'-k|\le n<p$, so $P_p(k)=0$; apply (b$'$).
+\item[(b)] Take $\lambda=1$, $\nu_E=\ind{p\mid u_e}$, $\nu_z=\ind{p\mid u_z}$ and $\nu_{k'}=-\ind{p\mid d_{k'}}$.
+  Since $0<|d_{k'}|<\cN<p^2$, $v_p(d_{k'})=\ind{p\mid d_{k'}}\le1$; and $v_p(u_e)\ge\nu_E$ also when $u_e=0$.
+  Here $\nu=c_p(k)-P_p(k)$.
+\item[(c)] Take $\lambda=\lambda_p$, $\nu_E=0$, $\nu_z=v_p(u_z)$ and $\nu_{k'}=-v_p(d_{k'})$. Since
+  $0<|u_z|,|d_{k'}|<\cN<p^{\lambda_p+1}$, both valuations are $\le\lambda_p$. Here $\nu=\nu_p(k)$.\qedhere
+\end{enumerate}
+\end{proof}
+
+Part (b$'$) is the new ingredient. It needs no condition on $p$, and it is used for $k<p$, where also the
+harmonic sums are $p$-integral (Lemma~\ref{lem:B}): the pole $-k$ then costs nothing at $p$ unless another pole
+lies at a distance divisible by $p$. (The $e$-factor term $v_p(n-2k)$ is dropped from $\nu_p(k)$ in (c); this only
+weakens the bound.)
+
+\begin{lemma}[Lemma B]\label{lem:B}
+Let $p$ be a prime, $\lambda\ge0$, $j\ge1$ and $k\ge0$, and suppose $v_p(m)\le\lambda$ for all $1\le m\le k$. Then
+$v_p(H_k^{(j)})\ge -j\lambda$. In particular, for $0\le k\le n$: $H_k^{(j)}\in\ZZ_{(p)}$ if $k<p$;
+$v_p(H_k^{(j)})\ge -j$ if $p^2>\cN$; and $v_p(H_k^{(j)})\ge-j\lambda_p$ always.
+\end{lemma}
+
+\begin{proof}
+Each term $m^{-j}$ has valuation $\ge-j\lambda$. For the special cases use $\lambda=0$ (if $k<p$), $\lambda=1$
+(as $k\le n<\cN<p^2$) and $\lambda=\lambda_p$ (as $k<\cN$).
+\end{proof}
+
+\subsection{The common denominator}
+
+\begin{definition}\label{def:Ep}
+For $0\le k\le n$ with $B_k\ge1$ and a prime $p$ put
+\[
+  e_p(k):=\begin{cases}
+  B_k+4-c_p(k)+P_p(k), & k\ge p,\\
+  B_k-1-c_p(k)+P_p(k), & k<p \text{ and } P_p(k)\ge1,\\
+  0, & k<p \text{ and } P_p(k)=0,
+  \end{cases}
+\]
+and define the integer $E_p$ by
+\[
+  E_p:=\begin{cases}
+  0, & p>n,\\
+  \max\bigl(0,\ \max_{k:\,B_k\ge1}e_p(k)\bigr), & p\le n,\ p^2>\cN,\\
+  \max_{0\le k\le n}\bigl(-\nu_p(k)\bigr)+(S+4)\lambda_p, & p^2\le \cN
+  \end{cases}
+\]
+(the cases are applied in this order). Put $D_n:=\prod_{p\le n}p^{E_p}\in\QQ_{>0}$.
+\end{definition}
+
+Thus $v_p(D_n)=E_p$ for every prime $p$. We do not need $E_p\ge0$ in the third range, so we only assert
+$D_n\in\QQ_{>0}$.
+
+\begin{proposition}[Integrality]\label{prop:integral}
+$D_n\rho_n\in\ZZ$ and $D_n\tau_i\in\ZZ$ for all $i$.
+\end{proposition}
+
+\begin{proof}
+It suffices to show $v_p(\tau_i)\ge -E_p$ and $v_p(\rho_n)\ge-E_p$ for every prime $p$. Since $(i)_4\in\ZZ$, it
+suffices to bound $v_p(a_{i,k})$ and $v_p(a_{i,k}H_k^{(i+4)})$ from below by $-E_p$, for $0\le k\le n$ and
+$1\le i\le B_k$ (the other $a_{i,k}$ vanish).
+\begin{itemize}
+\item $p>n$: $a_{i,k}\in\ZZ_{(p)}$ by Corollary~\ref{cor:A}(a), and $H_k^{(i+4)}\in\ZZ_{(p)}$ by
+  Lemma~\ref{lem:B} since $k\le n<p$.
+\item $p\le n$, $p^2>\cN$, $k\ge p$: by Corollary~\ref{cor:A}(b) and Lemma~\ref{lem:B},
+  \[
+    v_p\bigl(a_{i,k}H_k^{(i+4)}\bigr)\ge c_p(k)-P_p(k)-(B_k-i)-(i+4)=-e_p(k)\ge-E_p,
+  \]
+  and $v_p(a_{i,k})\ge c_p(k)-P_p(k)-B_k+1\ge-e_p(k)$.
+\item $p\le n$, $p^2>\cN$, $k<p$: $H_k^{(i+4)}\in\ZZ_{(p)}$ by Lemma~\ref{lem:B}. If $P_p(k)\ge1$,
+  Corollary~\ref{cor:A}(b) gives $v_p(a_{i,k})\ge c_p(k)-P_p(k)-B_k+1=-e_p(k)$. If $P_p(k)=0$,
+  Corollary~\ref{cor:A}(b$'$) gives $v_p(a_{i,k})\ge0=-e_p(k)$.
+\item $p^2\le\cN$: by Corollary~\ref{cor:A}(c) and Lemma~\ref{lem:B}, since $B_k\le S$,
+  \[
+    v_p\bigl(a_{i,k}H_k^{(i+4)}\bigr)\ge\nu_p(k)-\lambda_p(B_k-i)-\lambda_p(i+4)\ge\nu_p(k)-(S+4)\lambda_p\ge-E_p,
+  \]
+  and the same bound holds without the factor $H_k^{(i+4)}$.\qedhere
+\end{itemize}
+\end{proof}
+
+\begin{corollary}\label{cor:intform}
+$D_nL_n=D_n\rho_n+\sum_{i}(D_n\tau_i)\,\zeta(i+4)$ ($i$ odd, $3\le i\le S$) is a linear form in
+$1,\zeta(7),\dots,\zeta(N_\cP)$ with integer coefficients.
+\end{corollary}
+
+\subsection{The small primes}
+
+Let $s_p(N)$ denote the sum of the base-$p$ digits of $N\ge0$, and $\ell_p(N):=\lfloor\log_pN\rfloor$ for
+$N\ge1$, $\ell_p(0):=0$.
+
+\begin{lemma}[Legendre-type bounds]\label{lem:legendre}
+Let $p$ be a prime.
+\begin{enumerate}
+\item For $N\ge0$: $(p-1)v_p(N!)=N-s_p(N)$ and $0\le s_p(N)\le(p-1)(\ell_p(N)+1)$.
+\item For integers $1\le A\le B+1$:
+  \begin{align*}
+    (p-1)\sum_{d=A}^{B}v_p(d)&\ge(B-A+1)-(p-1)(\ell_p(B)+1),\\
+    (p-1)\sum_{d=A}^{B}v_p(d)&\le(B-A+1)+(p-1)(\ell_p(A-1)+1).
+  \end{align*}
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(1) is Legendre's formula, and each of the at most $\ell_p(N)+1$ digits is $\le p-1$. (2) The sum equals
+$v_p(B!)-v_p((A-1)!)$, so $(p-1)$ times it is $(B-A+1)-s_p(B)+s_p(A-1)$; use (1).
+\end{proof}
+
+\begin{lemma}\label{lem:polesum}
+Let $p$ be a prime, $0\le k\le n$ and $1\le j\le J$. Then
+$(p-1)\sum_{k'\in I_j\setminus\{k\}}v_p(k'-k)\le \#I_j+2(p-1)(\lambda_p+1)$.
+\end{lemma}
+
+\begin{proof}
+The numbers $|k'-k|$ with $k'\in I_j$, $k'>k$, form an interval $[A_1,B_1]$ of positive integers, and those with
+$k'<k$ form another interval $[A_2,B_2]$; their total length is at most $\#I_j$, and $A_i-1\le n<\cN$. Apply the
+upper bound of Lemma~\ref{lem:legendre}(2) to each (an empty interval contributes $0$).
+\end{proof}
+
+\begin{proposition}\label{prop:smallprimes}
+Let $p$ be a prime with $p^2\le\cN$. Then $p\le n$ and
+\begin{equation}\label{eq:smallp}
+  E_p-G\,v_p(n!)\le(4S+14+G)(\lambda_p+1).
+\end{equation}
+Consequently
+\[
+  \sum_{p^2\le\cN}\bigl(E_p-G\,v_p(n!)\bigr)\log p\le2(4S+14+G)\lfloor\sqrt\cN\rfloor\log\cN .
+\]
+For Z7 the constants are $4S+14+G\le91$ and $2(4S+14+G)\le182$.
+\end{proposition}
+
+\begin{proof}
+Since $n>r$, $\cN=(2+r)n+1<(n+1)^2$, so $p\le n$. Fix $k$. As $z$ runs through $\mathcal Z_n$, $k+z$ runs
+through the two intervals $[k+1,k+rn]$ and $[k-(1+r)n,k-n-1]$, each consisting of $rn$ consecutive nonzero
+integers of absolute value $<\cN$. By the lower bound of Lemma~\ref{lem:legendre}(2), applied to the absolute
+values,
+\[
+  (p-1)\cdot5\sum_{z\in\mathcal Z_n}v_p(k+z)\ge10rn-10(p-1)(\lambda_p+1).
+\]
+By Lemma~\ref{lem:polesum} and Lemma~\ref{lem:counts},
+\[
+  (p-1)\sum_jm_j\sum_{k'\in I_j\setminus\{k\}}v_p(k'-k)\le(G+10r)n+S+2S(p-1)(\lambda_p+1).
+\]
+Hence $(p-1)(-\nu_p(k))\le Gn+S+(2S+10)(p-1)(\lambda_p+1)$. By Lemma~\ref{lem:legendre}(1) and
+$\ell_p(n)\le\lambda_p$, $(p-1)v_p(n!)\ge n-(p-1)(\lambda_p+1)$. Therefore
+\begin{multline*}
+  (p-1)\bigl(E_p-Gv_p(n!)\bigr)\le S+(2S+10)(p-1)(\lambda_p+1)\\+(S+4)(p-1)\lambda_p+G(p-1)(\lambda_p+1),
+\end{multline*}
+and dividing by $p-1\ge1$ gives \eqref{eq:smallp}. For the sum, each term is at most
+$(4S+14+G)(\lambda_p\log p+\log p)\le2(4S+14+G)\log\cN$, since $p^{\lambda_p}\le\cN$ and $p\le\cN$, and there are at
+most $\lfloor\sqrt\cN\rfloor$ primes in the range. For Z7, $4\cdot18+14+\frac{547}{120}<91$.
+\end{proof}
+
+There is no exceptional prime here: $p=2$ and $p=3$ are covered by the same count, because all zeros and poles
+of $R_n$ are integers. (For the $\beta$-analogue \cite{BetaPaper}, with half-integer poles, the prime $2$ costs
+a term proportional to $n$.)
+
+\begin{proposition}\label{prop:decomp}
+For every $n\in q\NN$ with $n>r$,
+\[
+  \log D_n-G\log n!\le2(4S+14+G)\lfloor\sqrt\cN\rfloor\log\cN
+  +\sum_{\substack{p\le n\\p^2>\cN}}\bigl(E_p-G\lfloor n/p\rfloor\bigr)\log p .
+\]
+\end{proposition}
+
+\begin{proof}
+By definition and Legendre's formula, $\log D_n-G\log n!=\sum_{p\le n}(E_p-Gv_p(n!))\log p$. Split the sum into the
+primes with $p^2\le\cN$ (Proposition~\ref{prop:smallprimes}) and those with $p^2>\cN$, for which $p^2>\cN>n$ and so
+$v_p(n!)=\lfloor n/p\rfloor$.
+\end{proof}
+
+% ===========================================================================
+\section{The arithmetic integral}\label{sec:A}
+% ===========================================================================
+
+In this section we bound the last sum in Proposition~\ref{prop:decomp} by $n(\Acert+o(1))$. The definitions
+are for a general parameter set; the certificate is for Z7, where
+\begin{equation}\label{eq:Acert}
+  \Acert:=\frac{11757994664484187722611840743096153}{1185451381619680151243401356902400}
+  =9.9185802528\ldots
+\end{equation}
+
+\subsection{The step function}
+\begin{definition}\label{def:f}
+For real $x\ge1$ and $0\le y\le x$ put
+\begin{align*}
+  \cS(x,y)&:=\sum_jm_j\,\ind{\delta_jx\le y\le(1-\delta_j)x},\\
+  P(x,y)&:=\sum_jm_j\,\#\{m\in\ZZ\setminus\{0\}:\ \delta_jx\le y+m\le(1-\delta_j)x\},\\
+  c(x,y)&:=5\bigl(\lfloor y+rx\rfloor-\lfloor y\rfloor\bigr)+5\bigl(\lceil y-x\rceil-\lceil y-(1+r)x\rceil\bigr),
+\end{align*}
+\[
+  b(x,y):=\begin{cases}
+  \cS+4-c+P, & y\ge1,\\
+  \cS-1-c+P, & y<1\text{ and }P\ge1,\\
+  0, & y<1\text{ and }P=0,
+  \end{cases}
+\]
+\[
+  g(x,y):=\begin{cases}b(x,y),&\cS(x,y)>0,\\0,&\cS(x,y)=0,\end{cases}
+\]
+(arguments $(x,y)$ omitted on the right), and
+\[
+  e^*(x):=\max\Bigl(0,\max_{0\le y\le x}g(x,y)\Bigr)-G\lfloor x\rfloor .
+\]
+\end{definition}
+The maximum exists because $g(x,\cdot)$ takes finitely many values on $[0,x]$. For Z7 no block contains $y=0$,
+so $g(x,0)=0$ and the outer $\max(0,\cdot)$ is redundant; the formalisation defines $e^*$ without it. The
+formalisation also writes the pole count of block $j$ by cases: $\lfloor y-\delta_jx\rfloor+\lfloor(1-\delta_j)x-y\rfloor$
+in the block, and $\lfloor(1-\delta_j)x-y\rfloor-\lfloor\delta_jx-y\rfloor+\ind{\delta_jx-y\in\ZZ}$ (resp.\ the mirror
+expression) to the left (resp.\ right) of it; by $\lceil a\rceil=\lfloor a\rfloor+1-\ind{a\in\ZZ}$ this is the
+count above.
+
+\begin{proposition}[Pointwise bound]\label{prop:pointwise}
+Let $p\le n$ be a prime. Then $\max\bigl(0,\max_{k:B_k\ge1}e_p(k)\bigr)-G\lfloor n/p\rfloor\le e^*(n/p)$. In
+particular $E_p-G\lfloor n/p\rfloor\le e^*(n/p)$ whenever $p^2>\cN$.
+\end{proposition}
+
+\begin{proof}
+Let $0\le k\le n$ with $B_k\ge1$, and put $x:=n/p\ge1$ and $y:=k/p\in[0,x]$. Since $a_j/p=\delta_jx$ and
+$b_j/p=(1-\delta_j)x$, we have $B_k=\cS(x,y)$, and, writing $k'=k+mp$,
+$P_{p,j}(k)=\#\{m\ne0:\delta_jx\le y+m\le(1-\delta_j)x\}$, so $P_p(k)=P(x,y)$. The zeros $z\in[1,rn]$ with
+$p\mid k+z$ correspond to the multiples of $p$ in $[k+1,k+rn]$, of which there are
+$\lfloor(k+rn)/p\rfloor-\lfloor k/p\rfloor=\lfloor y+rx\rfloor-\lfloor y\rfloor$. The zeros $z=-l$,
+$l\in[n+1,(1+r)n]$, with $p\mid l-k$ correspond to the multiples of $p$ in $[n+1-k,(1+r)n-k]$, of which there are
+$\lfloor(1+r)x-y\rfloor-\lfloor x-y\rfloor=\lceil y-x\rceil-\lceil y-(1+r)x\rceil$. Hence
+$c_p(k)=c(x,y)+e\ind{p\mid n-2k}\ge c(x,y)$. Finally $k\ge p$ if and only if $y\ge1$. Comparing the three cases
+of Definition~\ref{def:Ep} with those of $b$, we get $e_p(k)\le b(x,y)=g(x,y)$. Take the maximum over $k$ and
+subtract $G\lfloor x\rfloor$.
+\end{proof}
+
+\begin{lemma}[Uniform bound]\label{lem:tail}
+For $x\ge1$, $e^*(x)\le S+14+G\{x\}$.
+\end{lemma}
+
+\begin{proof}
+For each block, $\ind{\delta_jx\le y\le(1-\delta_j)x}+\#\{m\ne0:\dots\}=\#\{m\in\ZZ:\delta_jx\le y+m\le(1-\delta_j)x\}
+\le(1-2\delta_j)x+1$. Each of the two zero counts in $c$ is at least $rx-1$, so $c\ge10rx-10$. Hence, if $y\ge1$,
+$b=\sum_jm_j(\ind{\cdot}+\#\{\cdot\})+4-c\le S+(G+10r)x+4-10rx+10=S+14+Gx$, and the other two cases of $b$
+are smaller or $0$. So $\max(0,\max_yg)\le S+14+Gx$, and $e^*(x)\le S+14+Gx-G\lfloor x\rfloor$.
+\end{proof}
+
+For Z7 this reads $e^*(x)\le32+G\{x\}$.
+
+\subsection{Step structure}
+Writing $\#\{m\in\ZZ:\delta x\le y+m\le(1-\delta)x\}=1+\lfloor y-\delta x\rfloor-\lceil y-(1-\delta)x\rceil$,
+$\ind{\delta x\le y\le(1-\delta)x}=\ind{\lfloor y-\delta x\rfloor\ge0}\cdot\ind{\lceil y-(1-\delta)x\rceil\le0}$
+and $\ind{y\ge1}=\ind{\lfloor y\rfloor\ge1}$, we see that $g(x,y)$ depends on $y$ only through the numbers
+$\lfloor y-s x\rfloor$ and $\lceil y-sx\rceil$ for the slopes
+\[
+  s\in\mathcal T:=\{0,\,-r,\,1,\,1+r\}\cup\{\delta_j,\,1-\delta_j:1\le j\le J\}.
+\]
+(The slopes $0$ and $1$ also carry the constraint $0\le y\le x$.) For Z7, $\mathcal T=\{\sigma/240\}$ with
+$\sigma\in\{0,-220,240,460\}\cup\{3j,240-3j:1\le j\le18\}$. Let $X:=400$. The \emph{event set} $\cE\subset[1,X]$
+is the union of
+\begin{itemize}
+\item the points $1+j/20$ $(0\le j<40)$ and $3+j/2$ $(0\le j\le 2(X-3))$, which include every integer in
+  $[1,X]$;
+\item all $x\in(1,X)$ of the form $x=m/(s_1-s_2)$ with $s_1,s_2\in\mathcal T$, $s_1>s_2$, and $m\in\ZZ$.
+\end{itemize}
+This is a finite set of rationals, $1=x_0<x_1<\dots<x_L=X$. For Z7 it has $30{,}138$ elements, so
+$L=30{,}137$.
+
+\begin{lemma}\label{lem:step}
+$e^*$ is constant on each open interval $(x_{\ell-1},x_\ell)$.
+\end{lemma}
+
+\begin{proof}
+Let $J=(x_{\ell-1},x_\ell)$ and $x,x'\in J$. Consider the discrete set $C(x):=\{sx+m:s\in\mathcal T,\ m\in\ZZ\}$. For
+two of its elements the difference $(s-s')x+(m-m')$ is an affine function of $x$; if it is not identically zero,
+its only zero is an event point or lies outside $(1,X)$, so it does not vanish on $J$. Hence $sx+m\mapsto sx'+m$
+is a well-defined, strictly increasing bijection $C(x)\to C(x')$, which extends to an increasing bijection
+$\pi:\RR\to\RR$. For every $s\in\mathcal T$ and every $y$, $sx+m\le y\iff sx'+m\le\pi(y)$, so
+$\lfloor\pi(y)-sx'\rfloor=\lfloor y-sx\rfloor$, and likewise for ceilings. Moreover $\pi(0)=0$ and $\pi(x)=x'$
+(slopes $0$ and $1$), so $\pi$ maps $[0,x]$ onto $[0,x']$, and $\lfloor x\rfloor=\lfloor x'\rfloor$ because $\cE$
+contains every integer of $[1,X]$. Therefore $g(x',\pi(y))=g(x,y)$ for all $y$, and $e^*(x')=e^*(x)$.
+\end{proof}
+
+The proof also shows how $e^*$ is computed exactly at a rational point $\xi$: $g(\xi,\cdot)$ is constant between
+consecutive points of $C(\xi)$, so the maximum over $[0,\xi]$ is attained at a point of $C(\xi)$ or as a right
+limit there. In the formalisation, with $\xi=P/Q$ and $M=240Q$, all points of $C(\xi)$ lie in $\frac1M\ZZ$, and
+$e^*(\xi)$ is a maximum over the residues modulo $M$ of the scaled offsets of one closed-form candidate each; that
+this maximum equals $\max_{0\le y\le\xi}g(\xi,y)$, and is attained, is proved in general.
+
+\subsection{The certificate}
+
+\begin{proposition}[Certified computation, Z7]\label{prop:certA}
+Let $\xi_\ell:=(x_{\ell-1}+x_\ell)/2$ and $\Abody:=\sum_{\ell=1}^{L}e^*(\xi_\ell)\bigl(\frac1{x_{\ell-1}}-\frac1{x_\ell}\bigr)$.
+Then
+\[
+  \sum_{\ell=1}^{L}\Bigl\lceil 2^{96}e^*(\xi_\ell)\Bigl(\frac1{x_{\ell-1}}-\frac1{x_\ell}\Bigr)\Bigr\rceil
+  =U:=778841997893779320302794447562 .
+\]
+Consequently $\Abody\le U/2^{96}=9.8303680\ldots$ and
+\[
+  \frac{U}{2^{96}}+\frac{33}{400}+\frac{G}{2\cdot 399}=\Acert ,
+\]
+with $\Acert$ as in \eqref{eq:Acert}. (Note $33/400+G/798=10559/119700$, and $33=S+15$.)
+\end{proposition}
+
+\begin{proof}
+This is a finite computation with explicit rationals: enumerate $\cE$, evaluate $e^*(\xi_\ell)$ exactly, round each
+term up to a multiple of $2^{-96}$, and add. The last identity is exact rational arithmetic. The computation has
+been carried out by an exact-rational Python implementation and by the Lean kernel, with the same result; see
+Section~\ref{sec:lean-cert}.
+\end{proof}
+
+\subsection{From primes to the integral}
+
+\begin{lemma}[Tail]\label{lem:pnt-tail}
+Let $X\ge2$ be an integer, $C,G'\ge0$, and $h:[X,\infty)\to\RR$ with $h(y)\le C+G'\{y\}$. For every
+$\eps>0$, for all sufficiently large $n$,
+\[
+  \sum_{p\le n/X}h(n/p)\log p\le n\Bigl(\frac CX+\frac{G'}{2(X-1)}\Bigr)+\eps n .
+\]
+\end{lemma}
+
+\begin{proof}
+Choose an integer $K_0\ge1$ with $G'/(2K_0(X-1))\le\eps/4$ and an integer $M>X$ with
+$(C+G')\log4/M\le\eps/4$. The primes $p\le n/M$ contribute at most $(C+G')\theta(n/M)\le(C+G')(\log4)\,n/M\le\eps n/4$,
+by Chebyshev's bound $\theta(y)\le y\log4$. Cut $[X,M)$ into the $K_0(M-X)$ cells
+$[\,m+\frac{i-1}{K_0},\,m+\frac i{K_0})$, $X\le m<M$, $1\le i\le K_0$. On such a cell $h\le C+G'i/K_0$. The primes
+with $n/p$ in the cell $[a,b)$ are those in $(n/b,n/a]$, and by the prime number theorem
+$\theta(n/a)-\theta(n/b)=n(1/a-1/b)+o(n)$. Since there are finitely many cells, for large $n$ the primes
+$n/M<p\le n/X$ contribute at most
+\[
+  n\sum_{m=X}^{M-1}\sum_{i=1}^{K_0}\Bigl(C+\frac{G'i}{K_0}\Bigr)
+  \Bigl(\frac1{m+\frac{i-1}{K_0}}-\frac1{m+\frac i{K_0}}\Bigr)+\frac{\eps n}4 .
+\]
+The $C$-part telescopes to $C(1/X-1/M)\le C/X$. In the $G'$-part each bracket is at most $1/(K_0m^2)$, so the inner
+sum is at most $G'(K_0+1)/(2K_0m^2)$; since $\sum_{m\ge X}m^{-2}\le1/(X-1)$, the $G'$-part is at most
+$\frac{G'}{2(X-1)}+\frac\eps4$.
+\end{proof}
+
+\begin{proposition}\label{prop:lemma5}
+For Z7 there are $\eps_n\to0$ such that, for all large $n\in240\NN$,
+\[
+  \sum_{\substack{p\le n\\p^2>\cN}}\bigl(E_p-G\lfloor n/p\rfloor\bigr)\log p\le n(\Acert+\eps_n).
+\]
+\end{proposition}
+
+\begin{proof}
+Fix $\eps>0$ and define $h$ on $[1,\infty)$ by $h(x):=e^*(x)$ for $x<400$ and $h(x):=\max(e^*(x),0)$ for
+$x\ge400$. Let $n$ be large; in particular $n/\sqrt\cN\ge400$, which holds as soon as $N_0\ge400^2$.
+\begin{enumerate}
+\item By Proposition~\ref{prop:pointwise}, each term of the sum is at most $h(n/p)\log p$. Every prime $p\le n$
+  not in the sum has $p^2\le\cN$, hence $n/p\ge400$ and $h(n/p)\ge0$. So the sum is at most
+  $\sum_{p\le n}h(n/p)\log p$.
+\item \emph{Primes $n/400<p\le n$}, i.e.\ $n/p\in[1,400)$. Let $v_\ell:=e^*(\xi_\ell)$. By Lemma~\ref{lem:step},
+  $h(n/p)=v_\ell$ when $n/p\in(x_{\ell-1},x_\ell)$, and by the prime number theorem
+  $\sum_{x_{\ell-1}<n/p<x_\ell}\log p=n(1/x_{\ell-1}-1/x_\ell)+o(n)$ for each of the finitely many $\ell$. At most
+  $L+1$ primes have $n/p\in\cE$, and each contributes $O(\log n)$, since $|e^*|\le S+14+400G$ on $[1,400]$ by
+  Lemma~\ref{lem:tail}. Hence this part is at most $n\Abody+\eps n/2$ for large $n$.
+\item \emph{Primes $p\le n/400$.} By Lemma~\ref{lem:tail}, $h(x)\le32+G\{x\}\le33+G\{x\}$ for $x\ge400$ (the
+  certificate uses $33=S+15$). Lemma~\ref{lem:pnt-tail} with $X=400$, $C=33$, $G'=G$ bounds this part by
+  $n(33/400+G/798)+\eps n/2$.
+\end{enumerate}
+Adding up and using Proposition~\ref{prop:certA}, the sum is at most $n(\Acert+\eps)$ for large $n$.
+\end{proof}
+
+The same argument works for any parameter set, with $C=S+15$ and with $\Acert$ the certified bound for that set.
+
+\begin{corollary}\label{cor:logD}
+For Z7 there are $\eps'_n\to0$ with $\log D_n\le G\log n!+n(\Acert+\eps'_n)$ for all large $n\in240\NN$.
+\end{corollary}
+
+\begin{proof}
+Combine Propositions~\ref{prop:decomp} and~\ref{prop:lemma5}; the term $182\lfloor\sqrt\cN\rfloor\log\cN$ is
+$O(\sqrt n\log n)=o(n)$.
+\end{proof}
+
+% ===========================================================================
+\section{\texorpdfstring{Size and nonvanishing of $L_n$}{Size and nonvanishing of L\_n}}\label{sec:nonvan}
+% ===========================================================================
+
+We extend $R_n$ to the rational function of $z\in\CC$ given by \eqref{eq:R}. It has real coefficients, and its
+poles are the points $-k$ with $B_k\ge1$, all $\le0$ (for Z7, all $\le-3N_0$). Put $k(z):=\pi\cot(\pi z)$ and
+$k_j:=k^{(j)}$.
+
+\subsection{An integral representation}
+
+\begin{lemma}\label{lem:vanish}
+$R_n''''(t)=0$ for every integer $t\in[1,rn]$.
+\end{lemma}
+
+\begin{proof}
+Near such $t$, $R_n(s)=(s-t)^5g(s)$ with $g$ holomorphic at $t$, so all derivatives of order $\le4$ vanish at $t$.
+\end{proof}
+
+\begin{lemma}\label{lem:decay}
+Let $c>\max\{-k:B_k\ge1\}$ and $j\ge0$. There is $C=C(n,c,j)$ with $|R_n^{(j)}(z)|\le C(1+|z|^2)^{-1}$ whenever
+$\Re z\ge c$. Moreover $R_n^{(j)}(\bar z)=\overline{R_n^{(j)}(z)}$.
+\end{lemma}
+
+\begin{proof}
+By Lemma~\ref{lem:counts}, $|R_n(w)|\le C_1|w|^{-2}$ for $|w|\ge R_1$. Cauchy's estimate on circles of radius
+$\frac12$ gives $|R_n^{(j)}(z)|\le C_1'|z|^{-2}$ for $|z|\ge2R_1+2$, and on the compact set
+$\{\Re z\ge c,\ |z|\le2R_1+2\}$, which contains no pole, $R_n^{(j)}$ is bounded. The symmetry holds because $R_n$ has
+real coefficients.
+\end{proof}
+
+\begin{lemma}[The kernel]\label{lem:trig}
+With $\mathsf C:=\cot(\pi z)$ and $\mathsf S:=1/\sin(\pi z)$,
+\begin{gather*}
+  k_1=-\pi^2\mathsf S^2,\quad k_2=2\pi^3\mathsf C\mathsf S^2,\\
+  k_3=-2\pi^4(\mathsf S^4+2\mathsf C^2\mathsf S^2),\quad k_4=8\pi^5(\mathsf C^3\mathsf S^2+2\mathsf C\mathsf S^4).
+\end{gather*}
+Consequently $\sin^5(\pi z)\,k_4(z)=\pi^5T(z)$ with the entire function
+\begin{align*}
+  T(z)&:=8\cos(\pi z)\bigl(\cos^2(\pi z)+2\bigr)=2\cos3\pi z+22\cos\pi z\\
+  &=e^{-3\pi iz}\bigl(1+11\mathbf q+11\mathbf q^2+\mathbf q^3\bigr),\qquad \mathbf q:=e^{2\pi iz},
+\end{align*}
+and $|T(z)|\le24e^{3\pi\Im z}$ for $\Im z\ge0$. The kernel $k$ has a simple pole with residue $1$ at every
+integer; $k_0,\dots,k_4$ are bounded on every vertical line $\Re z=c\notin\ZZ$ and on $\{|\Im z|\ge1\}$.
+\end{lemma}
+
+\begin{proof}
+Use $\mathsf C'=-\pi\mathsf S^2$ and $\mathsf S'=-\pi\mathsf C\mathsf S$ and differentiate. Then
+$\sin^5(\pi z)k_4=8\pi^5\cos(\pi z)(\cos^2(\pi z)+2)$, and $8\cos^3u+16\cos u=2\cos3u+22\cos u$. Expanding the
+cosines in exponentials gives the $\mathbf q$-form, and $|\mathbf q|\le1$ for $\Im z\ge0$. The last statements
+are standard.
+\end{proof}
+
+\begin{proposition}\label{prop:contour}
+Put $G_n(z):=R_n(z)k_4(z)$. For every real $c\in(0,rn+1)\setminus\ZZ$,
+\begin{align*}
+  L_n&=-\frac1{2\pi i}\int_{c-i\infty}^{c+i\infty}R_n''''(z)\,k(z)\,dz
+     =-\frac1{2\pi i}\int_{c-i\infty}^{c+i\infty}G_n(z)\,dz\\
+     &=-\frac1\pi\,\Re\int_0^\infty G_n(c+iy)\,dy .
+\end{align*}
+\end{proposition}
+
+\begin{proof}
+\emph{First equality.} Let $N>c$ be an integer and $Y>1$, and integrate $R_n''''k$ counterclockwise around the
+rectangle with vertices $c\pm iY$, $N+\frac12\pm iY$. Inside, the integrand is meromorphic with simple poles at
+the integers $t\in(c,N]$, with residue $R_n''''(t)$. On the horizontal sides $k$ is bounded and
+$|R_n''''(z)|\le C(1+|z|^2)^{-1}\le CY^{-2}$, so these sides contribute $O(N/Y^2)$, which tends to $0$ as
+$Y\to\infty$. On $\Re z=N+\frac12$, $|k|\le\pi$ and $|R_n''''|\le C(1+|z|^2)^{-1}$, so that side tends to $0$ as
+$N\to\infty$. On $\Re z=c$ the integral converges absolutely. Hence
+$-\int_{c-i\infty}^{c+i\infty}R_n''''k\,dz=2\pi i\sum_{t>c}R_n''''(t)=2\pi i\,L_n$, where the last equality
+uses Lemma~\ref{lem:vanish}: every integer $1\le t<c$ satisfies $t\le rn$.
+
+\emph{Second equality.} On the line $\Re z=c$ put
+$W:=R_n'''k_0-R_n''k_1+R_n'k_2-R_nk_3$. Then $W'=R_n''''k_0-R_nk_4$ (the other terms cancel in pairs). The $k_j$
+are bounded on the line and $R_n^{(j)}(c+iy)\to0$ as $|y|\to\infty$ (Lemma~\ref{lem:decay}), so $W\to0$ at both
+ends, and both $R_n''''k_0$ and $R_nk_4$ are integrable on the line. By the fundamental theorem of calculus,
+$\int_{\Re z=c}(R_n''''k_0-R_nk_4)\,dz=0$.
+
+\emph{Third equality.} $G_n(c-iy)=\overline{G_n(c+iy)}$, because $R_n$ and $k_4$ commute with complex conjugation.
+Hence $\int_{c-i\infty}^{c+i\infty}G_n\,dz=i\int_\RR G_n(c+iy)\,dy=2i\Re\int_0^\infty G_n(c+iy)\,dy$.
+\end{proof}
+
+\begin{remark}\label{rem:split}
+The informal write-up from which the formalisation was ported argued differently: on the upper half of the line
+it split $\pi\cot\pi z=-\pi i+K_+(z)$ with $K_+(z)=-2\pi i\mathbf q/(1-\mathbf q)$, integrated the constant part
+exactly, and obtained $L_n=-R_n'''(c)-\frac1\pi\Im\bigl(\int R_n''''K_+\bigr)$, with a boundary term $-R_n'''(c)$
+(an Euler--Maclaurin term) that had to be bounded separately. The phase is the same: $\sin^5(\pi z)\,e^{2\pi iz}$
+has leading exponential $e^{-3\pi iz}$, which is the origin of the phase $3\pi$ in both routes. Moving the four
+derivatives onto the kernel, as above, removes the boundary term, the Fa\`a di Bruno expression for $R_n''''$ and
+all asymptotics of the digamma function and its derivatives; only Stirling's formula for $\log\Gamma$ is needed.
+\end{remark}
+
+\subsection{Gamma factorisation}
+
+We use the following factors $(c_i,s_i,u_i,\beta_i)$:
+\begin{gather*}
+  (5,+1,0,0),\quad(5,-1,r,1),\quad(5,+1,1+r,1),\quad(-5,+1,1,1),\\
+  \text{and for each block } j:\quad(m_j,+1,\delta_j,0),\quad(-m_j,+1,1-\delta_j,1).
+\end{gather*}
+Put $\alpha_i(x):=s_ix+u_i$. One checks directly that
+\begin{equation}\label{eq:factorid}
+  \sum_ic_is_i=0,\qquad\sum_ic_iu_i=-G,\qquad\sum_ic_i\bigl(\beta_i-\tfrac12\bigr)=-S,\qquad\sum_ic_i=10,
+\end{equation}
+so that $\sum_ic_i\alpha_i(x)=-G$ for all $x$. For Z7 there are $40$ factors, with $\sum_i|c_i|=56$ and
+$\sum_i|c_i(\beta_i-\frac12)|=28$.
+
+\begin{lemma}\label{lem:gamma}
+For $z\in\CC\setminus\ZZ$,
+\[
+  R_n(z)=(-1)^{rn}(2z+n)^e\,E_n(z)\,\frac{\sin^5\pi z}{\pi^5},\qquad
+  E_n(z):=\prod_i\Gamma(s_iz+nu_i+\beta_i)^{c_i}.
+\]
+Hence, for $\Im z>0$, $G_n(z)=(-1)^{rn}(2z+n)^eE_n(z)\,T(z)$. For Z7, $(-1)^{rn}=1$ and $e=1$.
+\end{lemma}
+
+\begin{proof}
+$\prod_{l=1}^{rn}(z-l)=(-1)^{rn}\Gamma(rn+1-z)/\Gamma(1-z)=(-1)^{rn}\Gamma(z)\Gamma(rn+1-z)\sin(\pi z)/\pi$ by the
+reflection formula, $\prod_{l=n+1}^{(1+r)n}(z+l)=\Gamma(z+(1+r)n+1)/\Gamma(z+n+1)$, and
+$\prod_{k=a_j}^{b_j}(z+k)=\Gamma(z+b_j+1)/\Gamma(z+a_j)$. Raise to the appropriate powers and use
+$(-1)^{5rn}=(-1)^{rn}$. The second statement follows from Lemma~\ref{lem:trig}.
+\end{proof}
+
+For $\Im z>0$ every argument $s_iz+nu_i+\beta_i$ has nonzero imaginary part, so $E_n$ is holomorphic and zero-free
+there, and $G_n$ involves no singular kernel.
+
+\subsection{Stirling's formula in sectors}
+
+Let $\log\Gamma$ denote the branch of the logarithm of $\Gamma$ on $\CC\setminus(-\infty,0]$ that is real on
+$(0,\infty)$.
+
+\begin{theorem}[{cf.~\cite[\S5.11(ii)]{DLMF}}]\label{thm:stirling}
+Let $0<\varphi\le\pi$ and $\varsigma:=\sin(\varphi/2)$. For $w\ne0$ with $|\arg w|\le\pi-\varphi$,
+\[
+  \Bigl|\log\Gamma(w)-\bigl((w-\tfrac12)\log w-w+\tfrac12\log2\pi\bigr)\Bigr|\le\frac1{12\varsigma^2|w|}.
+\]
+\end{theorem}
+
+\begin{proof}
+This is \cite[\S5.11(ii)]{DLMF} with $K=1$. We recall the argument, which is the one formalised. With
+$Q_1(t):=\frac12\{t\}(1-\{t\})\in[0,\frac18]$ one has
+$\log\Gamma(w)=(w-\frac12)\log w-w+\frac12\log2\pi+\int_0^\infty Q_1(t)(t+w)^{-2}\,dt$. If $|\arg w|\le\pi-\varphi$
+and $t\ge0$, then $|t+w|\ge\varsigma(t+|w|)$. For $\varrho>0$, the identity
+$\int_0^1\frac{u(1-u)/2}{(u+x)^2}du=(x+\frac12)\log(1+\frac1x)-1\le\frac1{12x}-\frac1{12(x+1)}$, summed over the unit
+intervals, gives $\int_0^\infty Q_1(t)(t+\varrho)^{-2}dt\le1/(12\varrho)$. Take $\varrho=|w|$.
+\end{proof}
+
+\begin{corollary}\label{cor:stirling}
+Let $0<\varphi\le\pi$, $\varsigma=\sin(\varphi/2)$, $a>0$, and let $\alpha\in\CC$ with $|\alpha|\ge a$ and
+$|\arg\alpha|\le\pi-\varphi$. Let $\beta\in[0,2]$ and $n\ge4/a$. Then
+\begin{multline*}
+  \Bigl|\log\Gamma(n\alpha+\beta)-\bigl[n\alpha\log n+n(\alpha\log\alpha-\alpha)
+   +(\beta-\tfrac12)(\log n+\log\alpha)+\tfrac12\log2\pi\bigr]\Bigr|\\
+   \le\frac{9+1/(6\varsigma^2)}{an}.
+\end{multline*}
+\end{corollary}
+
+\begin{proof}
+Put $w=n\alpha+\beta$ and $u=\beta/(n\alpha)$, so $|u|\le2/(an)\le\frac12$ and $|w|\ge an/2$. Adding $\beta\ge0$ moves
+the argument towards $0$, so $|\arg w|\le|\arg\alpha|$, and $\log w=\log n+\log\alpha+\log(1+u)$ with principal
+logarithms. Insert this into Theorem~\ref{thm:stirling} and use $|\log(1+u)-u|\le|u|^2$ and
+$|\log(1+u)|\le\frac32|u|$ for $|u|\le\frac12$.
+\end{proof}
+
+\subsection{The phase and the integrand}
+
+On the set of $x\in\CC$ with $\alpha_i(x)\notin(-\infty,0]$ for all $i$ (it contains the open upper half-plane
+and the real interval $(\max_j(-\delta_j),r)$) define, with principal logarithms,
+\begin{gather*}
+  \Psi(x):=\sum_ic_i\,\alpha_i(x)\log\alpha_i(x),\qquad f(x):=\Psi(x)-3\pi ix,\\
+  \psi_0(x):=\sum_ic_i(\beta_i-\tfrac12)\log\alpha_i(x),\qquad A(x):=(2x+1)^e\,e^{\psi_0(x)} .
+\end{gather*}
+By \eqref{eq:factorid}, $\Psi'(x)=\sum_ic_is_i\log\alpha_i(x)$, $\Psi''(x)=\sum_ic_i/\alpha_i(x)$ and
+$\Psi'''(x)=-\sum_ic_is_i/\alpha_i(x)^2$. We say that the \emph{sector condition $(a,\eta)$ holds at $x$} if
+$|\alpha_i(x)|\ge a$ and $|\arg\alpha_i(x)|\le\pi-\eta$ for every $i$. Put
+\[
+  \lambda_n:=-Gn\log n+Gn-S\log n+5\log2\pi .
+\]
+
+\begin{proposition}\label{prop:integrand}
+Let $a>0$ and $0<\eta\le\pi$. There are $n_1$ and a function $B(\varrho)$, depending only on $\cP$, $a$ and $\eta$,
+with the following property. Let $n\ge n_1$, and let $x$ satisfy $\Im x>0$, $\Re x\ge0$ and the sector condition
+$(a,\eta)$. Then
+\[
+  G_n(nx)=(-1)^{rn}\,n^e\,e^{\lambda_n+nf(x)}A_n(x)
+\]
+for a number $A_n(x)$ with
+\begin{enumerate}
+\item[(U)] $|A_n(x)|\le B(|x|)$;
+\item[(M)] $|A_n(x)-A(x)|\le B(|x|)\bigl(n^{-1}+e^{-2\pi n\Im x}\bigr)$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+Let $\varsigma=\sin(\eta/2)$ and apply Corollary~\ref{cor:stirling} to each factor, with $\alpha=\alpha_i(x)$ and
+$\beta=\beta_i$; note $s_i(nx)+nu_i+\beta_i=n\alpha_i(x)+\beta_i$. Summing with weights $c_i$ and using
+\eqref{eq:factorid}, the main terms add up to
+$-Gn\log n+n\Psi(x)+Gn-S\log n+\psi_0(x)+5\log2\pi=\lambda_n+n\Psi(x)+\psi_0(x)$. Hence
+$E_n(nx)=\exp(\lambda_n+n\Psi(x)+\psi_0(x)+e_n)$ with $|e_n|\le\sum_i|c_i|\,(9+1/(6\varsigma^2))/(an)$. By
+Lemmas~\ref{lem:gamma} and~\ref{lem:trig}, $(2nx+n)^e=n^e(2x+1)^e$ and
+$T(nx)=e^{-3\pi inx}Q(\mathbf q)$ with $Q(\mathbf q)=1+11\mathbf q+11\mathbf q^2+\mathbf q^3$ and
+$|\mathbf q|=e^{-2\pi n\Im x}$. So the formula holds with
+\[
+  A_n(x):=(2x+1)^e\,e^{\psi_0(x)+e_n}\,Q(\mathbf q).
+\]
+Since $a\le|\alpha_i(x)|\le|x|+|u_i|+2$, $|\psi_0(x)|$ and $|2x+1|$ are bounded in terms of $a$ and $|x|$. With
+$|Q|\le24$, $|Q-1|\le23|\mathbf q|$ and $|e^{e_n}-1|\le2|e_n|$ for large $n$, (U) and (M) follow.
+\end{proof}
+
+(For Z7 the formalisation proves (U) and (M) in the explicit forms $|A_n|\le72B^2$ and
+$|A_n-A|\le100B^2\delta_n$, where $B\ge1$ bounds $|2x+1|$ and $|e^{\psi_0(x)}|$, and $\delta_n\le1$ bounds $|e_n|$
+and $|\mathbf q|$.)
+
+\subsection{The certified saddle data}
+
+\begin{theorem}[Certified saddle data, Z7]\label{thm:saddle}
+For Z7 put $a:=1/100$, $\eta:=\pi-2.76$, $\rho:=1/20$, $\delta_0:=10^{-7}$, $\etafar:=0.0199414$ and
+\[
+  c_0:=0.8921643007941758286102076+0.1829120718451090538924822\,i .
+\]
+There are $x_0\in\CC$, $d\in\CC$ with $|d|=1$, and $v_0,\dots,v_{23}\in\CC$ such that the following hold, where
+$\Omega:=f(x_0)$ and $K:=|\Psi''(x_0)|$.
+\begin{enumerate}
+\item[(S0)] $|x_0-c_0|\le10^{-12}$, and $x_0$ is the unique zero of $\Psi'-3\pi i$ in this disc. Moreover
+  \begin{gather*}
+    -10.1167486\le\Re\Omega\le-10.1167485,\\
+    -7.704987202\le\Im\Omega\le-7.704987200,\qquad
+    \sin(240\,\Im\Omega)<-0.9 .
+  \end{gather*}
+\item[(S1)] $K\ge28$, $\Psi''(x_0)d^2=-K$, and there is $M\le311$ with $|\Psi'''(x)|\le M$ for $|x-x_0|\le\rho$ and
+  $M\rho\le\frac32K$.
+\item[(S1$'$)] $\rho<\Im x_0$; in particular the closed disc $|x-x_0|\le\rho$ lies in $\Im x>0$.
+\item[(P)] $v_0=x_c:=0.817411103201$, so $\delta_0\le x_c<r=\frac{11}{12}$; $v_5=x_0-\rho d$, $v_6=x_0+\rho d$;
+  $v_{23}=\xtop:=2.051154018351+12.001186644670\,i$; $\Re v_k\ge0$ for all $k$; and
+  $\Im(v_k+t(v_{k+1}-v_k))>0$ for $0\le k<23$ and $0<t\le1$.
+\item[(S2)] For $1\le k<23$, $k\ne5$, and every $x\in[v_k,v_{k+1}]$: $\Re f(x)\le\Re\Omega-\etafar$ and the sector
+  condition $(a,\eta)$ holds at $x$. The same holds for every $x\ne v_0+\epsilon$ on the segment
+  $[v_0+\epsilon,v_1]$, for every real $\epsilon$ with $|\epsilon|\le\delta_0$.
+\item[(S3)] For every $y\ge0$: $\Re f(\xtop+iy)\le\Re\Omega-\etafar-(12-3\pi)y$, and the sector condition
+  $(a,\eta)$ holds at $\xtop+iy$.
+\item[(S4)] The sector condition $(a,\eta)$ holds at $x_0+sd$ for $|s|\le\rho$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Method of proof]
+All statements are verified by exact rational interval arithmetic, with verified enclosures of $\pi$, $\log$,
+$\arctan$ and $\arg$ (series with explicit tail bounds after argument reduction) and complex boxes. The verification
+is carried out by the Lean kernel; see Section~\ref{sec:lean-cert}.
+\begin{itemize}
+\item (S0): with $Y\approx1/\Psi''(c_0)$, box evaluations show that $z\mapsto z-Y(\Psi'(z)-3\pi i)$ is a contraction
+  of the disc $|z-c_0|\le10^{-12}$ into itself, and the Banach fixed-point theorem gives existence and uniqueness.
+  $\Omega$ is enclosed by a box evaluation of $f(c_0)$ (precision $2^{-80}$, $40$ series terms) widened by the
+  mean-value bound $|f(x_0)-f(c_0)|\le(10^{-16}+30\cdot10^{-12})\cdot10^{-12}$. For the sine, one checks
+  $240\,\Im\Omega=(u-\frac\pi2)-294\cdot2\pi$ with $|u|\le0.38$, so $\sin(240\Im\Omega)=-\cos u\le-(1-u^2/2)<-0.9$.
+\item (S1), (S1$'$): $\Psi''(x_0)$ is enclosed in a box; $d:=v/|v|$ with $v:=1-\overline{\Psi''(x_0)}/K$ satisfies
+  $\Psi''(x_0)d^2=-K$; and $M$ bounds $\sum_i|c_i|/|\alpha_i|^2$ on the disc, via lower bounds for $|\alpha_i|$
+  there. Numerically $K\approx28.31$ and $M\approx310.2$, so $M\rho\approx15.5\le42$; and $\Im x_0\approx0.1829$.
+\item (P), (S2): the vertices $v_1,\dots,v_4$ and $v_7,\dots,v_{23}$ are rational points with $12$ decimals, obtained
+  from a Runge--Kutta trace of the steepest-descent curves of $\Re f$ from $x_0\pm\rho d$ and a greedy
+  simplification ($4$ segments on the lower curve down to $x_c$, $16$ on the upper curve up to $\xtop$). On each
+  segment, Taylor bounds on boxes show $\Re f\le T_0:=-10.1367$; since $\Re\Omega\ge-10.1167486$, this gives
+  $\Re f\le\Re\Omega-0.0199514$. The connectors $[v_4,v_5]$ and $[v_6,v_7]$ lie in discs of radius $10^{-9}$ around
+  $v_4$ and $v_7$, on which $\Re f\le T_0$ is checked directly. Moving the start point by $|\epsilon|\le\delta_0$
+  changes $f$ by at most $\delta_0\sup|f'|\le10^{-5}$ on a box containing the widened first segment, which costs
+  $10^{-5}$ of the margin; hence $\etafar=0.0199414$. The sector condition is checked on boxes covering all
+  segments.
+\item (S3): $\partial_y\Re f(\xtop+iy)=3\pi-\Im\Psi'(\xtop+iy)$. Box evaluations give $\Im\Psi'\ge12$ for
+  $12.0012\le\Im\le40$, and for $Y:=\Im\xtop+y\ge40$,
+  \[
+    \Im\Psi'(X+iY)\ge\frac\pi2\sum_ic_i-\sum_i\frac{|c_i||s_iX+u_i|}{Y}=5\pi-\frac{142.86\ldots}{Y}\ge12,
+  \]
+  with $X:=\Re\xtop$. Since $\Re f(\xtop)\le T_0$, (S3) follows. On the ray $|\alpha_i|\ge12$ and
+  $|\arg\alpha_i|\le\frac\pi2+\frac13\le2.76$.\qedhere
+\end{itemize}
+\end{proof}
+
+At the saddle, $A(x_0)=(2x_0+1)e^{\psi_0(x_0)}\ne0$, since $\Re x_0>0$. The numerical values are
+$x_0\approx0.8921643+0.1829121i$, $\Re\Omega\approx-10.11674855$ and $\sin(240\Im\Omega)\approx-0.932453$.
+
+\subsection{Deformation of the contour}
+
+\begin{lemma}\label{lem:deform}
+Let $c\in(0,rn+1)\setminus\ZZ$, and let $w_0=c,w_1,\dots,w_{K'}\in\CC$ be such that every point of every segment
+$[w_k,w_{k+1}]$ other than $w_0$ has positive imaginary part, and $\Re w_k\ge0$ for all $k$. Then
+\[
+  i\int_0^\infty G_n(c+iy)\,dy=\sum_{k=0}^{K'-1}\int_{[w_k,w_{k+1}]}G_n(z)\,dz+i\int_0^\infty G_n(w_{K'}+iy)\,dy .
+\]
+\end{lemma}
+
+\begin{proof}
+Let $\delta:=\min_{m\in\ZZ}|c-m|\in(0,\frac12]$; note $\delta\le c$. On $U:=\{\Im z>0\}\cup\{|z-c|<\delta\}$, $G_n$ is
+holomorphic: $U$ contains no integer and no pole of $R_n$. $U$ is star-shaped with respect to $c+i\delta/2$, so
+$G_n$ has a primitive on $U$. For $Y>\Im w_{K'}$ consider the closed polygon
+$c\to c+iY\to\Re w_{K'}+iY\to w_{K'}\to w_{K'-1}\to\dots\to w_0=c$, which lies in $U$; the integral of $G_n$ around it
+is $0$. On the horizontal side, which lies in $\Re z\ge0$, $k_4$ is bounded and $|R_n|\le C(1+|z|^2)^{-1}$ by
+Lemma~\ref{lem:decay}, so its contribution tends to $0$ as $Y\to\infty$. The vertical integrals converge absolutely.
+\end{proof}
+
+\subsection{Laplace's method}
+
+\begin{lemma}\label{lem:laplace}
+Let $K_1,\rho_1>0$, $M_1\ge0$ with $M_1\rho_1\le\frac32K_1$. Let $\phi,g:[-\rho_1,\rho_1]\to\CC$ be continuous,
+with $|\phi(s)+K_1s^2/2|\le M_1|s|^3/6$, $|g|\le A_0$ and $|g(s)-g(0)|\le A_1|s|$. Then for $n>0$
+\[
+  \Bigl|\int_{-\rho_1}^{\rho_1}e^{n\phi(s)}g(s)\,ds-g(0)\sqrt{\frac{2\pi}{nK_1}}\Bigr|
+  \le\frac1n\Bigl(\frac{8A_0M_1}{3K_1^2}+\frac{2A_1}{K_1}\Bigr)+A_0e^{-nK_1\rho_1^2/4}\sqrt{\frac{4\pi}{nK_1}} .
+\]
+Moreover $\Re\phi(s)\le0$.
+\end{lemma}
+
+(The formalisation proves the same estimate with the larger constants $(16\sqrt{2\pi}/3)\,A_0M_1/K_1^2$ and
+$2\sqrt{2\pi}\,A_1/K_1$; only the order $O(1/n)$ is used.)
+
+\begin{proof}
+Write $\phi(s)=-K_1s^2/2+\tau(s)$. Then $|\tau(s)|\le M_1|s|^3/6\le M_1\rho_1s^2/6\le K_1s^2/4$, so
+$\Re\phi\le-K_1s^2/4\le0$ and
+$|e^{n\phi}-e^{-nK_1s^2/2}|\le e^{-nK_1s^2/2}n|\tau|e^{n|\tau|}\le\frac{nM_1|s|^3}6e^{-nK_1s^2/4}$. Split
+$\int e^{n\phi}g=g(0)\int e^{-nK_1s^2/2}+\int e^{-nK_1s^2/2}(g(s)-g(0))+\int(e^{n\phi}-e^{-nK_1s^2/2})g$. The second
+integral is at most $A_1\int_\RR|s|e^{-nK_1s^2/2}ds=2A_1/(nK_1)$, and the third at most
+$\frac{nM_1A_0}6\int_\RR|s|^3e^{-nK_1s^2/4}ds=\frac{8A_0M_1}{3nK_1^2}$. Finally
+$\int_{|s|>\rho_1}e^{-nK_1s^2/2}ds\le e^{-nK_1\rho_1^2/4}\int_\RR e^{-nK_1s^2/4}ds$.
+\end{proof}
+
+\subsection{The asymptotic formula, nonvanishing and size}
+
+\begin{proposition}\label{prop:asymp}
+For Z7 let $\theta:=\Im\Omega$ and $C_0:=d\,A(x_0)\sqrt{2\pi/K}$, so $C_0\ne0$; write $C_0=|C_0|e^{i\phi_0}$. Then,
+as $n\to\infty$ in $240\NN$,
+\[
+  L_n=-\frac1\pi\,n^{3/2}e^{\lambda_n+n\Re\Omega}\bigl(|C_0|\sin(n\theta+\phi_0)+o(1)\bigr).
+\]
+\end{proposition}
+
+\begin{proof}
+Let $c_n:=\lfloor nx_c\rfloor+\frac12$. Since $0<x_c<r$, we have $0<c_n<rn+1$ and $c_n\notin\ZZ$, and
+$\chi_n:=c_n/n-x_c$ satisfies $|\chi_n|\le\frac1{2n}\le\delta_0$ for large $n$. Let
+$J_n:=i\int_0^\infty G_n(c_n+iy)\,dy$. By Proposition~\ref{prop:contour}, $L_n=-\frac1\pi\Im J_n$. Apply
+Lemma~\ref{lem:deform} with $w_0=c_n$ and $w_k=nv_k$ $(1\le k\le23)$; the hypotheses hold by (P), since
+$\Im(c_n+t(nv_1-c_n))=tn\Im v_1>0$ for $t>0$. Thus $J_n$ is the sum of the $23$ segment integrals and the integral
+over the vertical ray from $n\xtop$.
+
+\emph{The Taylor segment.} Parametrising $[nv_5,nv_6]$ by $z=n(x_0+sd)$, $|s|\le\rho$, and using
+Proposition~\ref{prop:integrand} (applicable by (S1$'$), (S4) and $\Re(x_0+sd)\ge0$, which holds since
+$\Re v_5,\Re v_6\ge0$),
+\[
+  \int_{[nv_5,nv_6]}G_n(z)\,dz=n^2d\,e^{\lambda_n+n\Omega}\mathcal D_n,\qquad
+  \mathcal D_n:=\int_{-\rho}^{\rho}e^{n\phi(s)}A_n(x_0+sd)\,ds,
+\]
+where $\phi(s):=f(x_0+sd)-\Omega$. Since $f'(x_0)=\Psi'(x_0)-3\pi i=0$, $f''(x_0)d^2=\Psi''(x_0)d^2=-K$ and
+$|f'''|=|\Psi'''|\le M$ on the disc, Taylor's formula gives $|\phi(s)+Ks^2/2|\le M|s|^3/6$; by
+Lemma~\ref{lem:laplace}, $\Re\phi\le0$. By (M) with $\Im(x_0+sd)\ge\Im x_0-\rho>0$,
+$|\mathcal D_n-\int_{-\rho}^{\rho}e^{n\phi(s)}A(x_0+sd)\,ds|=O(n^{-1})$. The function $A$ is holomorphic on $\Im x>0$,
+hence bounded and Lipschitz on the disc, and Lemma~\ref{lem:laplace} gives
+$\mathcal D_n=A(x_0)\sqrt{2\pi/(nK)}+O(n^{-1})$.
+
+\emph{The far part.} Let $\mathcal E_n$ be the sum of the other $22$ segment integrals and the ray integral. On each
+of these segments, (S2) and (U) give $|G_n(z)|\le Cn\,e^{\lambda_n+n(\Re\Omega-\etafar)}$, and the segments have
+length $O(n)$. (For the first segment, $z=n((x_c+\chi_n)+t(v_1-x_c-\chi_n))$ with $|\chi_n|\le\delta_0$.) On the ray,
+$z=n(\xtop+iu)$ with $u\ge0$, and (S3), (U) give
+$|G_n(z)|\le n\,e^{\lambda_n+n(\Re\Omega-\etafar)}e^{-n(12-3\pi)u}B(|\xtop|+u)$; since $12-3\pi>2.5$, its integral over
+$dz=in\,du$ is $O(n^2e^{\lambda_n+n(\Re\Omega-\etafar)})$ for large $n$. Hence
+$|\mathcal E_n|=O(n^2e^{\lambda_n+n\Re\Omega-n\etafar})$.
+
+\emph{Conclusion.} Combining,
+\[
+\begin{split}
+  n^{-3/2}e^{-\lambda_n}J_n&=e^{n\Omega}\bigl(C_0+O(n^{-1/2})\bigr)+O\bigl(n^{1/2}e^{-n\etafar}\bigr)e^{n\Re\Omega}\\
+  &=C_0e^{n\Omega}+o\bigl(e^{n\Re\Omega}\bigr),
+\end{split}
+\]
+and $\Im(C_0e^{n\Omega})=|C_0|e^{n\Re\Omega}\sin(n\theta+\phi_0)$.
+\end{proof}
+
+\begin{lemma}\label{lem:sines}
+For real $u,v$: $|\sin u|+|\sin(u+v)|\ge|\sin v|$.
+\end{lemma}
+
+\begin{proof}
+$\sin v=\sin(u+v)\cos u-\cos(u+v)\sin u$.
+\end{proof}
+
+\begin{corollary}\label{cor:nonvan}
+For Z7 and all sufficiently large $n\in240\NN$, $L_n\ne0$ or $L_{n+240}\ne0$. In particular $L_n\ne0$ for
+infinitely many $n\in240\NN$.
+\end{corollary}
+
+\begin{proof}
+By Lemma~\ref{lem:sines} with $v=240\theta$ and (S0),
+$\max(|\sin(n\theta+\phi_0)|,|\sin((n+240)\theta+\phi_0)|)\ge\frac12|\sin(240\theta)|>0.45$ for every $n$. By
+Proposition~\ref{prop:asymp}, once the $o(1)$ terms are below $0.45|C_0|$, the corresponding $L$ is nonzero.
+\end{proof}
+
+\begin{proposition}[Size]\label{prop:size}
+For Z7 put $\Vcert:=-10.1167$. There are $\eps''_n\to0$ such that, for all large $n\in240\NN$ with $L_n\ne0$,
+\[
+  \log|L_n|\le-G\log n!+n\bigl(\Vcert+\eps''_n\bigr).
+\]
+\end{proposition}
+
+\begin{proof}
+By Proposition~\ref{prop:contour} and the proof of Proposition~\ref{prop:asymp},
+$|L_n|\le|J_n|/\pi\le Cn^{3/2}e^{\lambda_n+n\Re\Omega}$ for large $n$. By Stirling's upper bound
+$\log n!\le n\log n-n+\frac12\log n+1$,
+$\lambda_n\le-G\log n!+G(\frac12\log n+1)-18\log n+5\log2\pi$. Finally $\Re\Omega\le\Vcert$ by (S0).
+\end{proof}
+
+\begin{remark}\label{rem:realaxis}
+In the $\beta$-analogue \cite{BetaPaper} the size of $L_n$ was bounded by an elementary estimate on the real axis.
+Here that route is too weak: on the real axis the integrand of $L_n$ only gives the exponent
+$V_{\mathrm{up}}\approx-8.92$ for Z7 [numerical], against $\Acert\approx9.92$, so that $V_{\mathrm{up}}+\Acert\approx+1.0$.
+The saddle point gains about $1.19$ per unit of $n$, through the cancellation in the sum $\sum_tR_n''''(t)$, and this
+gain is essential for Z7. (For Z6 the real-axis exponent would leave a margin of only about $0.07$; see
+Table~\ref{tab:certs}.)
+\end{remark}
+
+% ===========================================================================
+\section{Proof of Theorem~\ref{thm:main}}\label{sec:proof}
+% ===========================================================================
+
+Put
+\begin{equation}\label{eq:Q}
+\begin{split}
+  Q:=\Vcert+\Acert&=-10.1167+9.9185802528\ldots\\
+  &=-0.1981197\ldots<0 .
+\end{split}
+\end{equation}
+(With the certified upper end $-10.1167485$ of $\Re\Omega$ in place of $\Vcert$ one gets $Q\le-0.1981682$.) Let
+$\ell_n:=D_nL_n$, $n\in240\NN$. By Corollary~\ref{cor:intform}, $\ell_n=a_n+\sum_{j=3}^{10}c_{n,j}\zeta(2j+1)$ with
+$a_n,c_{n,j}\in\ZZ$. If $L_n\ne0$, Corollary~\ref{cor:logD} and Proposition~\ref{prop:size} give, for large $n$,
+\[
+  \log|\ell_n|=\log D_n+\log|L_n|\le n\bigl(Q+\eps'_n+\eps''_n\bigr),
+\]
+the terms $\pm G\log n!$ cancelling. Since $Q<0$ and $\eps'_n,\eps''_n\to0$, it follows that $|\ell_n|\le e^{nQ/2}$ for
+all large $n$ (trivially when $L_n=0$), so $\ell_n\to0$. On the other hand $D_n>0$, so by Corollary~\ref{cor:nonvan},
+$\ell_n\ne0$ for infinitely many $n$.
+
+Suppose now that $\zeta(7),\zeta(9),\dots,\zeta(21)$ are all rational, and let $\Delta\ge1$ be a common denominator.
+Then $\Delta\ell_n\in\ZZ$ for every $n$. For the infinitely many $n$ with $\ell_n\ne0$ this gives $|\Delta\ell_n|\ge1$,
+which contradicts $\ell_n\to0$. Hence at least one of $\zeta(7),\dots,\zeta(21)$ is irrational. \qed
+
+% ===========================================================================
+\section{The general theorem and other instances}\label{sec:general}
+% ===========================================================================
+
+The proofs of Sections~\ref{sec:construction}--\ref{sec:proof} use the specific parameters of Z7 only through the
+following hypotheses.
+
+\begin{theorem}\label{thm:general}
+Let $\cP$ be a parameter set (Definition~\ref{def:param}), and suppose:
+\begin{enumerate}
+\item[(H1)] $G>0$;
+\item[(H2)] $\Acert$ is a rational number with
+  $\sum_{\ell}e^*(\xi_\ell)(\frac1{x_{\ell-1}}-\frac1{x_\ell})+\frac{S+15}{X}+\frac{G}{2(X-1)}\le\Acert$, for the event
+  set of Section~\ref{sec:A} with $X=400$;
+\item[(H3)] there are saddle data $(x_0,d,K,M,\rho,v_0,\dots,v_{K_{\mathrm{top}}})$ and constants
+  $a,\eta,\etafar,\delta_0>0$ satisfying (S0)--(S4) of Theorem~\ref{thm:saddle}, with $x_c=v_0<r$, a disc segment
+  $[v_{K_d},v_{K_d+1}]=[x_0-\rho d,x_0+\rho d]$, and some positive decay rate on the top ray in (S3);
+\item[(H4)] $\sin(q\Im\Omega)\ne0$;
+\item[(H5)] $Q:=\Re\Omega+\Acert<0$;
+\item[(H6)] $qG\in2\ZZ$, and $e\equiv1+S\pmod2$.
+\end{enumerate}
+Then at least one of $\zeta(7),\zeta(9),\dots,\zeta(N_\cP)$ is irrational.
+\end{theorem}
+
+\begin{proof}
+Sections~\ref{sec:algebra}--\ref{sec:A} are written for a general parameter set; (H1) and (H6) are what they use
+(Lemma~\ref{lem:sym} and the remark after it), and (H2) replaces Proposition~\ref{prop:certA}, the tail constant
+being $S+15$ by Lemma~\ref{lem:tail}. Section~\ref{sec:nonvan} uses only (H3), with $\lambda_n$ and the amplitude
+$A(x)=(2x+1)^ee^{\psi_0(x)}$ as defined there, and the factor $(-1)^{rn}$ of Lemma~\ref{lem:gamma} does not affect
+the argument, which uses only $|\sin(n\theta+\phi_0)|$; (H4) replaces the sine bound of (S0). The asymptotic
+formula becomes $L_n=\mp\frac1\pi n^{e+1/2}e^{\lambda_n+n\Re\Omega}(|C_0|\sin(n\theta+\phi_0)+o(1))$. Section~\ref{sec:proof}
+then needs (H5).
+\end{proof}
+
+Theorem~\ref{thm:main} is Theorem~\ref{thm:general} for Z7, and this is the case that is formalised. Seven
+instances have been certified; Tables~\ref{tab:instances} and~\ref{tab:certs} list them, with all bounds rounded in
+the safe direction. Z1 has a single block and reaches Zudilin's window $\zeta(7),\dots,\zeta(37)$; Z4--Z7 have
+near-continuous profiles.
+
+\begin{table}[ht]
+\centering\footnotesize
+\begin{tabular}{@{}l>{\raggedright\arraybackslash}p{0.07\textwidth}l>{\raggedright\arraybackslash}p{0.43\textwidth}llll@{}}
+\toprule
+ & $r$ & $q$ & blocks $\delta{:}\,m$ & $S$ & $N_\cP$ & $G$; $qG$ & $e$\\
+\midrule
+Z1 & $5/4$ & $4$ & $0{:}\,33$ & $33$ & $37$ & $41/2$; $82$ & $0$\\
+Z2 & $1$ & $8$ & $0{:}\,21$, $\frac18{:}\,4$, $\frac14{:}\,4$ & $29$ & $33$ & $16$; $128$ & $0$\\
+Z3 & $1$ & $8$ & $0{:}\,19$, $\frac18{:}\,4$, $\frac14{:}\,4$ & $27$ & $31$ & $14$; $112$ & $0$\\
+Z4 & $1$ & $80$ & $0{:}\,2$, $\frac1{80}{:}\,1$, $\frac1{40}{:}\,2$, $\frac3{80}{:}\,1$, $\frac1{20}{:}\,1$,
+  $\frac1{16}{:}\,1$, $\frac3{40}{:}\,1$, $\frac7{80}{:}\,1$, $\frac1{10}{:}\,1$, $\frac18{:}\,2$, $\frac{11}{80}{:}\,1$,
+  $\frac{13}{80}{:}\,2$, $\frac7{40}{:}\,1$, $\frac3{16}{:}\,1$, $\frac15{:}\,1$, $\frac{17}{80}{:}\,1$,
+  $\frac9{40}{:}\,1$, $\frac14{:}\,2$, $\frac{23}{80}{:}\,2$ & $25$ & $29$ & $339/40$; $678$ & $0$\\
+Z5 & $1$ & $80$ & $0{:}\,2$; $\frac k{80}{:}\,1$, $k=1,\dots,19$ & $21$ & $25$ & $25/4$; $500$ & $0$\\
+Z6 & $19/24$ & $240$ & $\frac k{80}{:}\,1$, $k=1,\dots,19$ & $19$ & $23$ & $19/3$; $1520$ & $0$\\
+Z7 & $11/12$ & $240$ & $\frac k{80}{:}\,1$, $k=1,\dots,18$ & $18$ & $21$ & $547/120$; $1094$ & $1$\\
+\bottomrule
+\end{tabular}
+\caption{The certified instances: parameters. Each gives ``one of $\zeta(7),\zeta(9),\dots,\zeta(N_\cP)$''.}\label{tab:instances}
+\end{table}
+
+\begin{table}[ht]
+\centering\footnotesize\setlength{\tabcolsep}{2pt}
+\begin{tabular}{@{}lllllll@{}}
+\toprule
+ & $\Acert\le$ & $\Re\Omega\le$ & $Q\le$ & $\sin(q\Im\Omega)$ & $x_0$ & $V_{\mathrm{up}}$\\
+\midrule
+Z1 & $35.7955767$ & $-36.7604812$ & $-0.9649$ & $-0.709656$ & $1.2579692+0.0404800i$ & $-36.597$\\
+Z2 & $25.3852394$ & $-26.4996942$ & $-1.1144$ & $0.997966$ & $1.0073349+0.0420146i$ & $-26.327$\\
+Z3 & $23.3827332$ & $-23.7154311$ & $-0.3326$ & $0.825398$ & $1.0077298+0.0558821i$ & $-23.476$\\
+Z4 & $11.4875113$ & $-16.0979480$ & $-4.6104$ & $-0.968332$ & $0.9994996+0.1230432i$ & $-15.461$\\
+Z5 & $10.8538930$ & $-12.9889571$ & $-2.1350$ & $0.283577$ & $0.9869778+0.1636877i$ & $-12.027$\\
+Z6 & $10.7587916$ & $-11.4775814$ & $-0.7187$ & $-0.272087$ & $0.7869951+0.1190009i$ & $-10.826$\\
+Z7 & $9.9185803$ & $-10.1167485$ & $-0.1981$ & $-0.932453$ & $0.8921643+0.1829121i$ & $-8.923$\\
+\bottomrule
+\end{tabular}
+
+\medskip
+\begin{tabular}{@{}lllllll@{}}
+\toprule
+ & (S1) $\kappa$, $M$, $\rho$ & (S1$'$) & (S2) $\etafar$ & (S3) $\Im\Psi'$ & (S4) $a$, $\eta$ & (S5) $\eta_5$; $x_c$\\
+\midrule
+Z1 & $118.54$, $5527$, $0.01031$ & $0.0302$ & $5.65\cdot10^{-3}$ & $15.47$ & $1.92\cdot10^{-2}$, $0.672$ & $0.2211$; $1.2290$\\
+Z2 & $114.57$, $5128$, $0.01066$ & $0.0314$ & $5.82\cdot10^{-3}$ & $15.53$ & $1.99\cdot10^{-2}$, $0.718$ & $0.2256$; $0.9783$\\
+Z3 & $86.68$, $2904$, $0.01410$ & $0.0418$ & $7.68\cdot10^{-3}$ & $15.55$ & $2.66\cdot10^{-2}$, $0.788$ & $0.2923$; $0.9712$\\
+Z4 & $40.68$, $622.6$, $0.03076$ & $0.0923$ & $1.69\cdot10^{-2}$ & $15.59$ & $6.06\cdot10^{-2}$, $1.029$ & $0.5898$; $0.9357$\\
+Z5 & $31.19$, $364.8$, $0.04105$ & $0.1226$ & $2.30\cdot10^{-2}$ & $15.62$ & $8.29\cdot10^{-2}$, $1.138$ & $0.7565$; $0.9128$\\
+Z6 & $42.43$, $670.7$, $0.02977$ & $0.0892$ & $1.65\cdot10^{-2}$ & $15.63$ & $5.93\cdot10^{-2}$, $1.077$ & $0.5602$; $0.7290$\\
+Z7 & $28.31$, $301.4$, $0.04614$ & $0.1368$ & $2.63\cdot10^{-2}$ & $15.64$ & $9.48\cdot10^{-2}$, $1.210$ & $0.8265$; $0.8174$\\
+\bottomrule
+\end{tabular}
+\caption{The certified instances: certificates of the Python/Arb implementation. $\Acert$ is the exact rational
+of (H2), rounded up; $\Re\Omega$ is the upper end of the Arb enclosure (radius $\le2\cdot10^{-7}$), rounded up;
+$Q=\Re\Omega+\Acert$, rounded up. Second part: the Taylor-disc data $\kappa=-\Re(\Psi''(x_0)d^2)$, $M$, $\rho$; the margin
+$\Im x_0-\rho$ of (S1$'$); the far margin; the tail value of $\Im\Psi'$ on the top ray (it must exceed $3\pi$); the
+sector constants; and the crossing gap $\eta_5=\Re\Omega-\Psi(x_c)$ with the start point $x_c$. $V_{\mathrm{up}}$ is
+the real-axis exponent of the numerical model [numerical].}\label{tab:certs}
+\end{table}
+
+The exact values of $\Acert$ are
+\begin{align*}
+\text{Z1}&:\ \tfrac{28289277235925350790655713667586667}{790300921079786767495600904601600},\\
+\text{Z2}&:\ \tfrac{20061978064991101891984267756512101}{790300921079786767495600904601600},\\
+\text{Z3}&:\ \tfrac{1319956822769190839182373382010337}{56450065791413340535400064614400},\\
+\text{Z4}&:\ \tfrac{75654922793088526827628553510069}{6585841008998223062463340871680},\\
+\text{Z5}&:\ \tfrac{4288920793391182192917685241907847}{395150460539893383747800452300800},\\
+\text{Z6}&:\ \tfrac{671264435316850956055216565463991}{62392177979983165854915860889600},
+\end{align*}
+and, for Z7, \eqref{eq:Acert}.
+
+\emph{Status of the instances.} For Z7 everything is kernel-checked (Section~\ref{sec:lean}); the Lean saddle
+certificate of Theorem~\ref{thm:saddle} uses its own contour (with $\rho=1/20$ and $23$ segments) and agrees with the
+Arb value of $\Re\Omega$ in Table~\ref{tab:certs}, and the Lean value of $\Acert$ is the same exact rational. For
+Z1--Z6 the certificates are those of one Python implementation each: \texttt{f4\_certA\_exact.py} (exact rational
+arithmetic with python-flint) for (H2), and \texttt{f5\_saddle\_cert.py} (ball arithmetic with Arb) for (H3), (H4).
+These verify the conditions in the form of the informal write-up, which differs from (S0)--(S4) in two harmless
+ways: the Taylor radius is chosen with $\rho\le\kappa/M$, which is stronger than $M\rho\le\frac32\kappa$, and (S2) is
+checked on the polyline starting at $x_c$, with the crossing condition (S5) $\Psi(x_c)\le\Re\Omega-\eta_5$ in addition;
+the perturbation of the start point by $\le1/(2n)$ is not part of that certificate. It changes $\Re f$ on the first
+segment by $O(1/n)$, because the sector condition holds on a neighbourhood of that segment, so it costs nothing in the
+limit [proof sketch]. So Z1--Z6 rest on these certificates and
+are not formalised. The corresponding windows $\zeta(7),\dots,\zeta(N)$ for $N=23,\dots,37$ are weaker than
+Theorem~\ref{thm:main} in any case; their only interest is the larger margins.
+
+As an independent check of the arithmetic part, for every profile type of Table~\ref{tab:instances} and for Z7
+itself at $n=240$, the exact content of the vector $(\rho_n,\tau_i)$ was computed with python-flint and compared with
+the exponents $E_p$ for $\sqrt\cN<p\le n$: the bound was never violated, it was attained at most primes (at $30$ of
+the $39$ primes $41\le p\le233$ for Z7 at $n=240$), and $E_p=0$ for $p>n$ [numerical]. At the same time the window
+was confirmed to be exactly $\zeta(7),\dots,\zeta(N_\cP)$, and $L_n$ was compared with the direct sum
+$\sum_tR_n''''(t)$ to $30$ digits.
+
+% ===========================================================================
+\section{The formalisation}\label{sec:lean}
+% ===========================================================================
+
+\subsection{What is formalised}
+The repository \lean{lean\_zeta7} \cite{ZetaRepo}, at commit \lean{1efbed2}, contains a proof of
+Theorem~\ref{thm:main} in Lean~4 \cite{LeanFour} (version v4.35.0) with Mathlib \cite{Mathlib} (version v4.35.0
+\cite{Mathlib4}). The repository is not yet public. All declaration names and file paths in this section refer
+to that commit; paths are relative to the repository root. The formalisation covers every step of the proof of
+Theorem~\ref{thm:main}, including the parts that a written proof would cite: the prime number theorem, Stirling's
+formula with explicit remainder in sectors, the contour-integral representation, the deformation of contours, and all
+numerical certificates. Much of the instance-independent infrastructure (prime number theorem, Stirling, interval
+arithmetic, contour and Laplace lemmas, partial fractions, valuations) is adapted from the formalisation of the
+$\beta$-analogue \cite{BetaPaper}.
+
+\subsection{The statement}
+The definition that the reader has to check is, in \lean{ZetaIrrational\slash{}Statement.lean} (namespace
+\lean{ZetaIrr}):
+\begin{quote}\ttfamily\footnotesize
+def OneOfZeta7To21 : Prop :=\\
+\hspace*{2em}$\exists$ j $\in$ (\char123 7,~9,~11,~13,~15,~17,~19,~21\char125~:~Finset~$\mathbb{N}$),\\
+\hspace*{4em}Irrational (riemannZeta j).re\\[2pt]
+theorem ZetaIrr.Z7.oneOfZeta7To21 : OneOfZeta7To21
+\end{quote}
+The theorem is in \lean{ZetaIrrational\slash{}Z7\slash{}MainUnconditional.lean}. Here \lean{riemannZeta : $\mathbb C\to\mathbb C$} is
+Mathlib's Riemann zeta function, the natural number \lean{j} is cast to $\CC$, and \lean{Irrational x} is Mathlib's
+predicate $x\notin\QQ$. Nothing defined in the project occurs in the statement. Mathlib's
+\lean{zeta\_nat\_eq\_tsum\_of\_gt\_one} identifies \lean{riemannZeta j} with $\sum_{m\ge1}m^{-j}$ for $j\ge2$; the
+file \lean{ZetaIrrational\slash{}Defs.lean} uses it to pass to the real series used internally
+(\lean{riemannZeta\_re\_eq\_zetaR}). The statement assumes nothing about $\zeta(3)$ or $\zeta(5)$.
+
+The command \lean{lake env lean Axioms.lean} prints
+\begin{quote}\ttfamily\small
+'ZetaIrr.Z7.oneOfZeta7To21' depends on axioms:\\
+\hspace*{2em}[propext, Classical.choice, Quot.sound]
+\end{quote}
+and the same axiom list for each of the main ingredients listed in \lean{Axioms.lean}. These are Lean's three
+standard axioms, which Mathlib also uses. The development contains no \lean{sorry}, no added axiom, no
+\lean{native\_decide} and no \lean{implemented\_by}, so no step relies on compiled code.
+
+\subsection{Correspondence with the paper}
+Table~\ref{tab:lean} lists the main formal counterparts. The theorem is \lean{oneOfZeta7To21\_of\_certUnits}
+applied to the kernel-checked sum \lean{CertA.bodyUnits\_400}. It goes through \lean{oneOfZeta7To21\_of\_parts},
+whose inputs are the certificate inequality, Proposition~\ref{prop:size} and Corollary~\ref{cor:nonvan}, and through
+the criterion \lean{exists\_irrational\_of\_small\_forms}, which formalises Section~\ref{sec:proof}.
+
+\begin{table}[ht]
+\centering\small
+\begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.27\textwidth}>{\raggedright\arraybackslash}p{0.69\textwidth}@{}}
+\toprule
+paper & Lean declaration (namespace \lean{ZetaIrr}) \\
+\midrule
+Lemma~\ref{lem:pf}, Prop.~\ref{prop:expansion} & \lean{Z7.R\_eq\_pfR}, \lean{PF.pf\_eval}, \lean{PFData.tsum\_R4}\\
+Lemmas~\ref{lem:tau-even}, \ref{lem:tau1}, Cor.~\ref{cor:form} & \lean{Z7.pf\_symmetric}, \lean{PFData.tau\_eq\_zero\_of\_even}, \lean{PF.pf\_top\_coeff}, \lean{Z7.pf\_tau\_one}, \lean{PFData.tsum\_R4\_odd}, \lean{Z7.expansion\_Z7}\\
+Lemmas~\ref{lem:psge}, \ref{lem:A}, Cor.~\ref{cor:A} & \lean{Arith.psge\_mul}, \lean{Arith.psge\_inv}, \lean{Z7.Arith.vge\_a}, \lean{Z7.Arith.a\_int\_of\_nodvd}, \lean{Z7.Arith.a\_int}, \lean{Z7.Arith.a\_bound\_sharp}, \lean{Z7.Arith.a\_bound\_small}\\
+Lemma~\ref{lem:B} & \lean{Arith.vge\_Hq}, \lean{Arith.vge\_Hq\_of\_lt}\\
+Def.~\ref{def:Ep}, Prop.~\ref{prop:integral} & \lean{Z7.Arith.Ep}, \lean{Z7.Arith.D}, \lean{Z7.Arith.int\_rho}, \lean{Z7.Arith.int\_tau}\\
+Props.~\ref{prop:smallprimes}, \ref{prop:decomp} & \lean{Z7.Arith.Ep\_sub\_le\_small}, \lean{Z7.Arith.small\_primes\_sum\_le}, \lean{Z7.Arith.log\_D\_sub\_le}\\
+Prop.~\ref{prop:pointwise}, Lemma~\ref{lem:tail} & \lean{Z7.CertA.pointwise\_le\_eStar\_prime}, \lean{Z7.Esharp\_sub\_le\_eStar}, \lean{Z7.CertA.eStar\_le\_tail}\\
+Lemma~\ref{lem:step} & \lean{Z7.CertA.eStar\_eq\_mid}, \lean{Z7.CertA.eStar\_isGreatest}\\
+Prop.~\ref{prop:certA} & \lean{Z7.CertA.bodyUnits\_400}, \lean{Z7.CertA.certFact\_of\_units}\\
+Lemma~\ref{lem:pnt-tail}, Prop.~\ref{prop:lemma5} & \lean{PNT.eventually\_primeSum\_lemma5\_le}, \lean{Z7.sharp\_of\_pointwise}, \lean{Z7.arith\_Z7}\\
+prime number theorem & \lean{PNT.theta\_div\_tendsto}\\
+Lemma~\ref{lem:trig} & \lean{Analytic.hasDerivAt\_kk}, \lean{Analytic.sin\_pow\_five\_mul\_kk4}, \lean{Analytic.T\_eq\_exp}\\
+Prop.~\ref{prop:contour} & \lean{Analytic.hasSum\_cot\_eq\_line\_integral}, \lean{Analytic.integral\_line\_by\_parts4}, \lean{Z7.Analytic.L\_eq\_half\_line}\\
+Lemma~\ref{lem:gamma}, Prop.~\ref{prop:integrand} & \lean{Z7.Analytic.RC\_eq\_En}, \lean{Z7.Analytic.Gfn\_eq\_PT}, \lean{Z7.Analytic.Pfun\_asymp}, \lean{Z7.Analytic.Gfn\_path}, \lean{Z7.Analytic.norm\_Gfn\_le}, \lean{Z7.Analytic.Gfn\_disc\_approx}\\
+Thm.~\ref{thm:stirling}, Cor.~\ref{cor:stirling} & \lean{Stirling.norm\_J\_le}, \lean{Stirling.stirling\_scaled}\\
+Thm.~\ref{thm:saddle} & \lean{Z7.Interval.Z7\_saddleData} (a term of the structure \lean{Z7.Analytic.SaddleData})\\
+Lemmas~\ref{lem:deform}, \ref{lem:laplace} & \lean{Z7.Analytic.contour\_eq\_polyline\_Gfn}, \lean{Analytic.laplace\_bound}\\
+Prop.~\ref{prop:asymp}, Cor.~\ref{cor:nonvan} & \lean{Z7.Analytic.nonvan\_of\_saddleData}, \lean{Z7.nonvan\_Z7}\\
+Prop.~\ref{prop:size} & \lean{Z7.Analytic.size\_of\_saddleData}, \lean{Z7.size\_Z7}\\
+Section~\ref{sec:proof} & \lean{exists\_irrational\_of\_small\_forms}, \lean{oneOfZeta7To21\_of\_forms}, \lean{Z7.oneOfZeta7To21\_of\_hyp}, \lean{Z7.oneOfZeta7To21\_of\_parts}, \lean{Z7.oneOfZeta7To21\_of\_certUnits}, \lean{Z7.oneOfZeta7To21}\\
+\bottomrule
+\end{tabular}
+\caption{Formal counterparts of the main steps.}\label{tab:lean}
+\end{table}
+
+\subsection{Differences from the informal write-up}\label{sec:lean-diff}
+The formalisation was ported from an informal write-up of the general theorem. Where the two differ, this paper
+follows the formalisation.
+\begin{itemize}
+\item \emph{The analytic part} uses the four integrations by parts of Proposition~\ref{prop:contour}, not the kernel
+  split of Remark~\ref{rem:split}. There is no boundary term, and only Stirling's formula for $\log\Gamma$ is needed
+  (generalised from $\beta\in(0,2]$ to $\beta\in[0,2]$, since the factor list contains $\Gamma(z)$ and
+  $\Gamma(z+\delta_jn)$). The near-real-axis piece of the contour is covered by (S2) on the first segment, so the
+  crossing condition (S5) of the informal write-up is not used.
+\item \emph{The size of $L_n$} comes from the saddle point (Proposition~\ref{prop:size}), with
+  $\Vcert=-10.1167$; see Remark~\ref{rem:realaxis}.
+\item \emph{Corollary~\ref{cor:A}(b$'$)} is used only in its integrality form, without the condition $p^2>\cN$ that the
+  informal write-up attached to it. The informal write-up also stated the stronger bound
+  $v_p(a_{i,k})\ge\max(0,c_p(k)-(B_k-i))$ in this case; it is not needed.
+\item \emph{The pointwise bound} (Proposition~\ref{prop:pointwise}) holds for every prime $p\le n$, without
+  $p^2>\cN$.
+\item \emph{Small primes.} Definition~\ref{def:Ep} uses $(S+4)\lambda_p$ (for Z7, $22\lambda_p$) and drops the
+  $e$-factor from $\nu_p(k)$; Proposition~\ref{prop:smallprimes} has the explicit constant $182$.
+\item \emph{The tail} is $e^*(x)\le S+14+G\{x\}$ at real points (Lemma~\ref{lem:tail}); the certificate keeps the
+  constant $S+15=33$ of the informal write-up, which bounded the out-of-block counts with an extra $S/p$.
+\item \emph{The event set} for Z7 has $30{,}138$ points ($30{,}137$ intervals). The Python certificate reports
+  $30{,}971$ ``events'' because it counts the endpoints of its chunks twice; its value of $\Acert$ is the same exact
+  rational.
+\item \emph{The saddle certificate} uses its own steepest-descent contour (Theorem~\ref{thm:saddle}: $\rho=1/20$,
+  $23$ segments, $\etafar=0.0199414$, $a=1/100$, top ray from $\xtop\approx2.0512+12.0012i$), generated independently
+  of the Arb certificate of Table~\ref{tab:certs}; the two enclosures of $\Re\Omega$ agree.
+\end{itemize}
+Further, as for the $\beta$-analogue, a few standard tools are organised differently because Mathlib (at the
+version used) lacks them. Mathlib has no residue theorem, so the first equality of Proposition~\ref{prop:contour}
+is proved by subtracting model principal parts at the integers $c<t\le N$, removing the resulting removable
+singularities, applying Cauchy's theorem for rectangles and evaluating the model integrals explicitly. The deformation
+(Lemma~\ref{lem:deform}) uses primitives of holomorphic functions on unions of discs. Stirling's formula is proved
+from Euler's limit formula for $\Gamma$, an exact Euler--Maclaurin identity and Mathlib's Stirling formula for
+$n!$. The prime number theorem in the form $\theta(y)/y\to1$ is ported from the PrimeNumberTheoremAnd project
+\cite{PNTplus}, through the port in the \lean{zeta5} repository of C\'esar Del Solar \cite{zeta5}; the ported files
+keep their Apache License~2.0. All error terms are explicit, except those coming from the prime number theorem and
+from the compactness arguments in Section~\ref{sec:nonvan} (the decay constants of Lemma~\ref{lem:decay} and the
+amplitude bounds $A_0,A_1$ of Lemma~\ref{lem:laplace}).
+
+\subsection{How the certificates are checked}\label{sec:lean-cert}
+The arithmetic certificate and the saddle certificate are decidable statements about rational data, proved by
+\lean{decide +kernel}, i.e.\ by evaluation in the Lean kernel. The data (event lists, polyline vertices, rational
+enclosures) were produced by scripts that are not trusted: a wrong value would make the build fail, but could not
+make a false statement provable. The generators are in the repository (\lean{scripts\slash{}certA\slash{}},
+\lean{scripts\slash{}saddle\slash{}}).
+
+\emph{The arithmetic certificate} (Proposition~\ref{prop:certA}). The specification of $e^*$ and of the event list
+(built with \lean{List.mergeSort}) is what the soundness proofs use, but the kernel cannot evaluate it efficiently.
+The proof therefore passes through equivalent forms, each with a general proof of equivalence: a closed form of $e^*$
+that uses only natural-number arithmetic per block (the kernel has fast \lean{Nat} primitives but none for
+\lean{Int}); a decomposition of the event list into $133$ windows $[1+3j,4+3j)$, each sorted in the kernel and
+compared with literal data, together with a check that their concatenation is strictly increasing; and a
+decomposition of the rounded sum into $1{,}029$ chunks, each checked by a separate \lean{decide +kernel}. The resulting
+value $U$ agrees exactly with the exact-rational Python implementation.
+
+\emph{The saddle certificate} (Theorem~\ref{thm:saddle}). This uses a verified interval arithmetic with rational
+endpoints (rounded outwards to dyadic grids), complex boxes, verified enclosures of $\log$, $\arctan$, $\pi$ and
+$\arg$, the contraction lemma for (S0), and segment, disc and ray checks as described in the proof of
+Theorem~\ref{thm:saddle}. The phase multiplier ($2\pi$ for the $\beta$-analogue, $3\pi$ here) is a parameter of the
+interval code.
+
+\subsection{Cost}
+With Mathlib cached, a full build takes about $50$ minutes on a $32$-core desktop computer with $32$\,GB of RAM at
+\lean{LEAN\_NUM\_THREADS=12}. The arithmetic certificate dominates (about $30$ minutes wall time, $3.3$ CPU-hours for
+the chunk sums); the saddle certificate takes about $5$ minutes and the rest about $15$ minutes. On Windows the number
+of parallel Lean processes must be limited ($8$--$12$); with one process per core the build fails for lack of
+resources, not because of a proof error.
+
+\subsection{What has to be trusted}
+Beyond the Lean kernel and the three axioms, the reader has to trust that the definition displayed above expresses
+Theorem~\ref{thm:main}, and the Mathlib definitions it uses (\lean{riemannZeta}, real and complex numbers,
+\lean{Complex.re}, \lean{Irrational}, \lean{Finset}). Nothing else, in particular no numerical data and no generating
+script, needs to be trusted. Apart from the check by the Lean kernel, all verification of the formalisation so far
+was carried out by AI systems; no human expert has yet reviewed the Lean code.
+
+% ===========================================================================
+\section{Remarks}\label{sec:remarks}
+% ===========================================================================
+
+\subsection{The margin}
+The proof needs $Q=\Re\Omega+\Acert<0$, and $Q\approx-0.198$. The two terms are of size about $10$, so the margin is
+about $2\%$. Both numbers are certified: $\Acert$ by exact rational arithmetic and $\Re\Omega$ by interval arithmetic.
+There is no third term: the $2$-adic and $3$-adic costs that twisted constructions pay are absent.
+
+\subsection{How the parameters were found}\label{sec:search}
+The parameters were found by a numerical search [numerical, not part of the proof]. A fast model of $Q$ (the
+arithmetic integral on a coarse grid, and the saddle point or the real-axis exponent) was optimised over the block
+profile, with offsets on the grid $\frac1{80}\ZZ\cap[0,\frac38]$, and over $r\in\frac1{24}\ZZ$ (later
+$\frac1{48}\ZZ$), and the best candidates were then certified. In every run the optimum was close to a uniform
+spread: one block at each of $S$ consecutive grid points $k/80$, with $r$ between about $0.8$ and $1$. Compared with
+a single block at $\delta=0$, the spread profile is worth about $6$ per unit of $n$ at $S=27$, and the refinement
+Corollary~\ref{cor:A}(b$'$) together with the exact counts of Section~\ref{sec:A} about $1$--$2$ per unit of $n$
+[numerical].
+
+For $S=17$ (which would also give $\zeta(7),\dots,\zeta(21)$) the best profile found has certified
+$\Re\Omega+\Acert\approx+0.553$, so it does not close; with $S=18$ blocks the uniform profile with $r=11/12$ gives
+Z7.
+
+\subsection{\texorpdfstring{Why not $\zeta(19)$}{Why not zeta(19)}}\label{sec:N19}
+To reach $\zeta(7),\dots,\zeta(19)$ this class needs $S\le16$. With uniform profiles the model gives $Q\approx+1.14$
+for $S=16$ ($r=5/6$) and $Q\approx+1.82$ for $S=15$, including the saddle gain; a finer offset grid $\frac1{160}\ZZ$
+at $S=17$ improved the model by less than $0.1$ [numerical]. So $N=19$ appears out of reach for this class
+[heuristic]; the window $\zeta(7),\zeta(9),\zeta(11),\zeta(13)$ is about $4.5$ per unit of $n$ away.
+
+One idea seemed to close the gap and fails. Replace the outer part of each zero run by zeros of lower multiplicity
+$m_2$ (a \emph{tapered} run): multiplicity $5$ on $[1,r_1n]$ and $m_2$ on $(r_1n,r_2n]$, mirrored. Since only the
+integers up to the crossing point $nx_c$ need quintuple zeros, the model suggested $Q\approx-0.8$ at $S=16$ when the
+sum $\sum_tR_n''''(t)$ over the taper region was assumed to telescope. For $m_2\ge2$ it does not: at the integers of
+the taper region $R_n''''$ equals the real-axis envelope times terms of type $\sin^2(\pi t)=(1-\cos2\pi t)/2$, which
+alias to frequency $0$ under integer sampling, so that sum has the size of the real-axis maximum, not of the saddle.
+The extended certificate confirmed this: the required bound on the taper region fails by $6.32$ and $4.37$ per unit of
+$n$ for the two best candidates. For $m_2=1$ the constraints fail as well ($Q\approx+0.95$ at best) [numerical].
+Ideas not tried include other zero multiplicities on the whole run, blocks of multiplicity $2$ at small $\delta$, and
+genuinely different families.
+
+\subsection{\texorpdfstring{Comparison with Lai--Zhou}{Comparison with Lai-Zhou}}
+No $N$ makes ``one of $\zeta(7),\dots,\zeta(N)$'' imply ``two of $\zeta(5),\dots,\zeta(35)$'': the irrationality of
+$\zeta(7)$ alone would satisfy the former. Conversely, Lai and Zhou's theorem gives only $N=35$ for windows starting at
+$\zeta(7)$. If the irrationality of $\zeta(5)$ is accepted, Theorem~\ref{thm:main} is the stronger of the two
+statements about $\zeta(7),\zeta(9),\dots$. A ``two of'' statement for windows starting at $\zeta(7)$ would need an
+additional elimination, as in \cite{LaiZhou2022,RivoalZudilin2020}, which this family does not do. For the
+construction of Lai and Zhou with simple zeros and twisted sums, the same search gave only $Q\approx-0.68$ at their
+own window ($S=33$) and $Q\approx+0.37$ at $S=31$ in our model [numerical], so the derivative family is the better one
+here.
+
+\subsection{Effectivity}
+The theorem is proved for $n\ge n_0$ with an unspecified $n_0$, because the prime number theorem is used without an
+error term and some constants come from compactness. This does not affect the irrationality statement. The explicit
+error terms are large: for instance the small-prime term $182\sqrt\cN\log\cN$ of Proposition~\ref{prop:decomp} falls
+below $0.198\,n$ only for $n$ of order $2\cdot10^9$ [numerical estimate]. An effective version would need an explicit
+form of the prime number theorem and of the compactness constants.
+
+\subsection{What remains outside Lean}
+Nothing that the proof of Theorem~\ref{thm:main} uses. The Lean statement is exactly the one displayed in
+Section~\ref{sec:lean}, about Mathlib's \lean{riemannZeta}, and it uses no hypothesis on $\zeta(3)$ or $\zeta(5)$.
+Outside Lean are only: the numerical search that found the parameters, the generators of the certificate data (both
+untrusted and not needed for correctness), the exact checks at small $n$ quoted in Section~\ref{sec:general}, and the
+certificates of the instances Z1--Z6, which are not used for Theorem~\ref{thm:main}.
+
+\subsection{Review}
+Before the formalisation, the informal proof of Theorem~\ref{thm:general} was reviewed adversarially by four
+independent AI reviewers (algebra, arithmetic, analysis, certificates and logic), who tested its claims with their
+own code. They found no fatal or major mathematical issue; one presentation error (the values of $Q$ had been rounded
+to nearest instead of up) and about twenty minor points were corrected. Among their checks: Lemma~A and Lemma~B in
+$186$ small instances at every prime in range; the integrality of $p^{E_p}(\rho_n,\tau_i)$ at every prime for $16$
+instances with $n\le32$; an independent evaluation of $e^*$ that reproduces the certified body sums; the identity
+behind Remark~\ref{rem:split} at Z7 for $n=240$ and $480$, to $10^{-16}$; and a re-run of both certificates for
+Z1, Z6 and Z7 [numerical]. The formalisation then found no gap in the informal proof, only the differences listed in
+Section~\ref{sec:lean-diff}.
+
+\section*{Acknowledgements and disclosure}
+The construction, the proofs, the parameter search, the certificate programs, the Lean formalisation and the text of
+this paper were produced largely by AI models (Claude, Anthropic), working under the direction of the author. Apart
+from the check by the Lean kernel, all verification so far, including the reviews mentioned above, was carried out by
+AI systems. No human expert has yet reviewed the mathematics or the Lean code; we would be grateful for corrections.
+The prime number theorem in the formalisation is ported from the PrimeNumberTheoremAnd project of A.~Kontorovich,
+T.~Tao and collaborators, through the \lean{zeta5} repository of C\'esar Del Solar.
+
+\bibliographystyle{amsplain}
+\bibliography{references}
+
+\end{document}
