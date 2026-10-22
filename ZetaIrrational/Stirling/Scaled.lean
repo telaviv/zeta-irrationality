@@ -2,7 +2,7 @@
 # The scaled Stirling expansion used in PROOF_BETA100 §6.4 ("Application")
 
 `stirling_scaled`: for `0 < φ ≤ π`, `a > 0`, `α ∈ ℂ` with `‖α‖ ≥ a` and `|arg α| ≤ π - φ`,
-real `β ∈ (0, 2]`, and real `n ≥ 4/a`:
+real `β ∈ [0, 2]`, and real `n ≥ 4/a`:
 
     Γ(nα + β) = exp (logGammaS (nα + β)),
     ‖logGammaS (nα + β) - [nα log n + n(α log α - α) + (β - 1/2)(log n + log α) + (1/2) log 2π]‖
@@ -24,8 +24,8 @@ lemma SectorBound.mem_slitPlane {s : ℝ} (hs : 0 < s) {w : ℂ} (hw : w ≠ 0) 
   apply hne
   apply Complex.ext <;> simp [hns.2]
 
-/-- The branch splitting `log(α(1+u)) = log α + log(1+u)` for `u = β/(nα)`, `β, n > 0`, `‖u‖ ≤ 1/2`. -/
-lemma log_mul_one_add {α : ℂ} (hα : α ≠ 0) {β n : ℝ} (hβ : 0 < β)
+/-- The branch splitting `log(α(1+u)) = log α + log(1+u)` for `u = β/(nα)`, `β ≥ 0`, `n > 0`, `‖u‖ ≤ 1/2`. -/
+lemma log_mul_one_add {α : ℂ} (hα : α ≠ 0) {β n : ℝ} (hβ : 0 ≤ β)
     (hn : 0 < n) (hu : ‖(β : ℂ) / (n * α)‖ ≤ 1 / 2) :
     log (α * (1 + (β : ℂ) / (n * α))) = log α + log (1 + (β : ℂ) / (n * α)) := by
   set u : ℂ := (β : ℂ) / (n * α) with hudef
@@ -51,7 +51,7 @@ lemma log_mul_one_add {α : ℂ} (hα : α ≠ 0) {β n : ℝ} (hβ : 0 < β)
     have h1 : arg (1 + u) ≤ 0 := by
       have hle : (1 + u).im ≤ 0 := by
         rw [hui]; apply div_nonpos_of_nonpos_of_nonneg _ hns.le
-        have : 0 ≤ β * (n * α.im) := by positivity
+        have : 0 ≤ β * (n * α.im) := mul_nonneg hβ (mul_nonneg hn.le him)
         linarith
       rcases lt_or_eq_of_le hle with hlt | heq
       · exact (arg_neg_iff.mpr hlt).le
@@ -63,14 +63,14 @@ lemma log_mul_one_add {α : ℂ} (hα : α ≠ 0) {β n : ℝ} (hβ : 0 < β)
       apply arg_nonneg_iff.mpr
       rw [hui]
       apply div_nonneg _ hns.le
-      have : β * (n * α.im) < 0 := by
-        apply mul_neg_of_pos_of_neg hβ (mul_neg_of_pos_of_neg hn him)
+      have : β * (n * α.im) ≤ 0 := by
+        apply mul_nonpos_of_nonneg_of_nonpos hβ (mul_neg_of_pos_of_neg hn him).le
       linarith
     exact ⟨by linarith [neg_pi_lt_arg α], by linarith⟩
 
 /-- **Scaled uniform Stirling** (PROOF_BETA100 §6.4, the form used downstream). -/
 theorem stirling_scaled {φ a : ℝ} (hφ0 : 0 < φ) (hφ : φ ≤ Real.pi) (ha : 0 < a) {α : ℂ}
-    (hαa : a ≤ ‖α‖) (harg : |arg α| ≤ Real.pi - φ) {β : ℝ} (hβ0 : 0 < β) (hβ2 : β ≤ 2) {n : ℝ}
+    (hαa : a ≤ ‖α‖) (harg : |arg α| ≤ Real.pi - φ) {β : ℝ} (hβ0 : 0 ≤ β) (hβ2 : β ≤ 2) {n : ℝ}
     (hn : 4 / a ≤ n) :
     Gamma (n * α + β) = exp (logGammaS (n * α + β)) ∧
     ‖logGammaS (n * α + β) -
@@ -85,7 +85,7 @@ theorem stirling_scaled {φ a : ℝ} (hφ0 : 0 < φ) (hφ : φ ≤ Real.pi) (ha 
   set s := Real.sin (φ / 2) with hsdef
   have hsα := sectorBound_of_arg hφ0 hφ harg
   set w : ℂ := n * α + β with hwdef
-  have hsw : SectorBound s w := (hsα.smul_pos hn0).add_pos hs.le hβ0.le
+  have hsw : SectorBound s w := (hsα.smul_pos hn0).add_pos hs.le hβ0
   -- size of w
   have hnα : ‖(n : ℂ) * α‖ = n * ‖α‖ := by rw [norm_mul, Complex.norm_of_nonneg hn0.le]
   have hna : a * n ≤ n * ‖α‖ := by nlinarith
@@ -93,7 +93,7 @@ theorem stirling_scaled {φ a : ℝ} (hφ0 : 0 < φ) (hφ : φ ≤ Real.pi) (ha 
     have h1 : ‖(n : ℂ) * α‖ ≤ ‖w‖ + ‖(β : ℂ)‖ := by
       calc ‖(n : ℂ) * α‖ = ‖w - β‖ := by rw [hwdef]; ring_nf
         _ ≤ ‖w‖ + ‖(β : ℂ)‖ := norm_sub_le _ _
-    rw [hnα, Complex.norm_of_nonneg hβ0.le] at h1
+    rw [hnα, Complex.norm_of_nonneg hβ0] at h1
     linarith
   have hw0 : w ≠ 0 := by
     intro h; rw [h, norm_zero] at hw_big; linarith
@@ -104,7 +104,7 @@ theorem stirling_scaled {φ a : ℝ} (hφ0 : 0 < φ) (hφ : φ ≤ Real.pi) (ha 
   have hnC : (n : ℂ) ≠ 0 := by exact_mod_cast hn0.ne'
   have hnαne : (n : ℂ) * α ≠ 0 := mul_ne_zero hnC hα0
   have hunorm : ‖u‖ = β / (n * ‖α‖) := by
-    rw [hudef, norm_div, hnα, Complex.norm_of_nonneg hβ0.le]
+    rw [hudef, norm_div, hnα, Complex.norm_of_nonneg hβ0]
   have hu2 : ‖u‖ ≤ 2 / (a * n) := by
     rw [hunorm]
     apply div_le_div₀ (by norm_num) hβ2 (by positivity) hna

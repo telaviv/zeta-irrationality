@@ -64,7 +64,7 @@ lemma scaled_setup {φ a : ℝ} (hφ0 : 0 < φ) (hφ : φ ≤ Real.pi) (ha : 0 <
     rw [h, norm_zero] at this; linarith
   have hlogw : log ((n : ℂ) * α + β) = (Real.log n : ℂ) + (log α + log (1 + u)) := by
     rw [hw_eq, log_ofReal_mul hn0 (mul_ne_zero hα0 h1u)]
-    rw [log_mul_one_add hα0 hβ0 hn0 hu12]
+    rw [log_mul_one_add hα0 hβ0.le hn0 hu12]
   exact ⟨hn0, hX, hs, hsw, hw_big, hw0, hsw.mem_slitPlane hs hw0, hu2, hu12, hlogw⟩
 
 /-- **Scaled ψ**: `‖ψ(nα + β) - (log n + log α)‖ ≤ (4 + 1/(8 sin³(φ/2))) / (a n)`. -/
