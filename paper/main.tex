@@ -125,8 +125,8 @@ prior work.
 \subsection{The method}
 We follow the approach of Ball and Rivoal \cite{BallRivoal2001} and Zudilin \cite{Zudilin2002,Zudilin2004}
 through linear forms with rational coefficients, and the construction is not new: it is the derivative form of
-Zudilin's very-well-poised hypergeometric construction \cite[\S8, (8.2)--(8.4)]{Zudilin2004}, with derivative
-order $4$. For $n$ in an arithmetic progression we put
+Zudilin's well-poised hypergeometric construction \cite[\S8, (8.2)--(8.4)]{Zudilin2004}, in which
+$\frac1{(r-1)!}\sum_{t\ge0}R^{(r-1)}(t)$ is summed; here $r=5$, so the derivative has order $4$. For $n$ in an arithmetic progression we put
 \[
   R_n(t)=\frac{(2t+n)\prod_{l=1}^{rn}(t-l)^5\prod_{l=n+1}^{(1+r)n}(t+l)^5}{\prod_{j}\prod_{k=\delta_jn}^{(1-\delta_j)n}(t+k)^{m_j}},
   \qquad L_n=\sum_{t\ge1}R_n''''(t).
@@ -256,8 +256,8 @@ $R_n(-n-t)=(-1)^{\deg R_n}R_n(t)=-R_n(t)$.
 \end{proof}
 
 If $qG$ is even, then $Gn$ is even for every $n\in q\NN$, and the condition of Lemma~\ref{lem:sym} fixes
-$e\equiv1+S\pmod2$ independently of $n$. This is hypothesis (H6) of Section~\ref{sec:general}. Following
-\cite{Zudilin2004}, the symmetry makes $R_n$ \emph{very-well-poised}.
+$e\equiv1+S\pmod2$ independently of $n$. This is hypothesis (H6) of Section~\ref{sec:general}. In the language
+of hypergeometric series, this symmetry together with the factor $2t+n$ makes $R_n$ \emph{very-well-poised}.
 
 \subsection{The instance Z7}
 Theorem~\ref{thm:main} uses the following parameter set, called Z7 (the last column of
@@ -958,7 +958,9 @@ Let $0<\varphi\le\pi$ and $\varsigma:=\sin(\varphi/2)$. For $w\ne0$ with $|\arg 
 \end{theorem}
 
 \begin{proof}
-This is \cite[\S5.11(ii)]{DLMF} with $K=1$. We recall the argument, which is the one formalised. With
+This is the case $n=1$ of the error bound in \cite[\S5.11(ii)]{DLMF}: the remainder of the Stirling series
+\cite[(5.11.1)]{DLMF} after its first term is at most the first neglected term $1/(12|w|)$ times
+$\sec^2(\frac12\arg w)\le1/\varsigma^2$. We recall the argument, which is the one formalised. With
 $Q_1(t):=\frac12\{t\}(1-\{t\})\in[0,\frac18]$ one has
 $\log\Gamma(w)=(w-\frac12)\log w-w+\frac12\log2\pi+\int_0^\infty Q_1(t)(t+w)^{-2}\,dt$. If $|\arg w|\le\pi-\varphi$
 and $t\ge0$, then $|t+w|\ge\varsigma(t+|w|)$. For $\varrho>0$, the identity
