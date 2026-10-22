@@ -25,7 +25,7 @@ Standard axioms only, no `sorry`, no `native_decide`, all certificates `decide +
 | W1: Lemma 3 for Z7, Lemma 4, Lemma 5 glue | `Z7/Concrete/`, `Z7/Arith/`, `Arith/` (new files), `Z7/Glue/` | todo |
 | W2: A-certificate (spec, soundness, kernel computation) | `Z7/CertA/`, `Z7/CertAK/`, `scripts/certA/` | todo |
 | W3: contour, Γ-form, Laplace; Lemma 6(i) and 6(ii) from `SaddleData` | `Analytic/` (new files), `Stirling/`, `Z7/Analytic/` | todo |
-| W4: kernel-checked saddle certificate | `Interval/`, `Fam/Interval/`, `Z7/Interval/`, `scripts/saddle/` | todo |
+| W4: kernel-checked saddle certificate | `Interval/`, `Fam/Interval/`, `Z7/Interval/`, `scripts/saddle/` | **done** (`Z7.Interval.Z7_saddleData`, standard axioms; verified by main) |
 | main assembly + audit | `Z7/MainCond.lean`, `Z7/MainUnconditional.lean`, `Axioms.lean` | todo |
 
 ## Z7 data
@@ -107,3 +107,7 @@ must reproduce A_cert above (or be slightly larger and still give Q < 0).
 - 2026-10-21: project set up (toolchain, Mathlib v4.35.0 copied from lean_beta's `.lake/packages`); generic
   infrastructure copied; `Defs`, `Statement`, `FamilyZ7` (with `Hyp` and `oneOfZeta7To21_of_hyp`), `Expansion`,
   `Z7/Concrete/Data` written; base built, axiom audit standard, committed (77bb872). Workstreams W1–W4 started.
+- 2026-10-22: W4 done (`8582083`, `1d7d722`): `Z7_saddleData : Z7.Analytic.SaddleData`, all `decide +kernel`.
+  Re Ω ∈ [−10.1167486, −10.1167485], sin(240 Im Ω) < −0.9, η_far ≈ 0.0199, ρ = 1/20, K ≥ 28, M ≤ 311, sectors
+  |α| ≥ 1/100, |arg α| ≤ 2.76; top ray Im Ψ′ ≥ 12 from x_top ≈ 2.0512 + 12.0012i. Interval phase is now a parameter
+  ω (`fL ω l z = Ψ(z) − ωπi z`). Build ≈ 4.5 min wall at LEAN_NUM_THREADS=8. Main re-ran the build and audit.
