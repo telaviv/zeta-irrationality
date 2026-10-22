@@ -24,7 +24,8 @@ Standard axioms only, no `sorry`, no `native_decide`, all certificates `decide +
 | copied generic infrastructure (namespace `ZetaIrr`) | `PNT/`, `Stirling/`, `Interval/`, `Analytic/`, `Arith/{Valuation,PSVal,Legendre}`, `Concrete/PartialFrac`, `Fam/`, `Size/`, `Assembly` | copied from lean_beta (docstrings still cite PROOF_BETA) |
 | W1: Lemma 3 for Z7, Lemma 4, Lemma 5 glue | `Z7/Concrete/`, `Z7/Arith/`, `Arith/` (new files), `Z7/Glue/` | todo |
 | W2: A-certificate (spec, soundness, kernel computation) | `Z7/CertA/`, `Z7/CertAK/`, `scripts/certA/` | todo |
-| W3: contour, Γ-form, Laplace; Lemma 6(i) and 6(ii) from `SaddleData` | `Analytic/` (new files), `Stirling/`, `Z7/Analytic/` | todo |
+| W3: contour, Γ-form, Laplace; Lemma 6(i) and 6(ii) from `SaddleData` | `Analytic/` (new files), `Stirling/`, `Z7/Analytic/` | **done** (`size_of_saddleData`, `nonvan_of_saddleData`) |
+| Lemma 6 for Z7, unconditional | `Z7/Lemma6.lean` (`size_Z7`, `nonvan_Z7`) | **done** |
 | W4: kernel-checked saddle certificate | `Interval/`, `Fam/Interval/`, `Z7/Interval/`, `scripts/saddle/` | **done** (`Z7.Interval.Z7_saddleData`, standard axioms; verified by main) |
 | main assembly + audit | `Z7/MainCond.lean`, `Z7/MainUnconditional.lean`, `Axioms.lean` | todo |
 
@@ -111,3 +112,7 @@ must reproduce A_cert above (or be slightly larger and still give Q < 0).
   Re Ω ∈ [−10.1167486, −10.1167485], sin(240 Im Ω) < −0.9, η_far ≈ 0.0199, ρ = 1/20, K ≥ 28, M ≤ 311, sectors
   |α| ≥ 1/100, |arg α| ≤ 2.76; top ray Im Ψ′ ≥ 12 from x_top ≈ 2.0512 + 12.0012i. Interval phase is now a parameter
   ω (`fL ω l z = Ψ(z) − ωπi z`). Build ≈ 4.5 min wall at LEAN_NUM_THREADS=8. Main re-ran the build and audit.
+- 2026-10-22: W3 done (`350d939`, `81918a6`, `8330ad0`, `12b8d69`): cot-kernel contour formula, 4-fold by-parts on
+  the line, integrand (2z+n)E_n T, Laplace, size via Stirling upper bound for log n!. Stirling generalised to
+  β ∈ [0, 2]. Main added `Z7/Lemma6.lean` (`size_Z7`, `nonvan_Z7`, no hypotheses), root import and audit: standard
+  axioms only. Remaining: W1 (Lemma 4 + glue) and W2 (A-certificate).

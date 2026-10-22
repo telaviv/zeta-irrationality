@@ -15,3 +15,10 @@ The main theorem `ZetaIrr.Z7.oneOfZeta7To21` is not assembled yet; see PLAN.md. 
 
 -- Lemmas 1–3 for partial-fraction data
 #print axioms ZetaIrr.PFData.tsum_R4_odd
+
+-- Lemma 6: size and nonvanishing from the kernel-checked saddle certificate
+#print axioms ZetaIrr.Z7.Interval.Z7_saddleData       -- (S0)–(S5), (H4), Re Ω ≤ −10.1167
+#print axioms ZetaIrr.Z7.Analytic.size_of_saddleData  -- Lemma 6(i) from SaddleData
+#print axioms ZetaIrr.Z7.Analytic.nonvan_of_saddleData -- Lemma 6(ii) from SaddleData
+#print axioms ZetaIrr.Z7.size_Z7
+#print axioms ZetaIrr.Z7.nonvan_Z7
