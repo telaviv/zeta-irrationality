@@ -8,7 +8,7 @@
 * `polyImPos` / `poly_im_pos`: all segments except the last endpoint lie in `Im z > 0`.
 * `rayB`, `im_dpsiL_ge_tail`: lower bounds for `Im Ψ'(X + i y)` (box evaluation, and the analytic
   tail `Im Ψ' ≥ (π/2) Σ c - Σ |c| |s X + κ| / y` for factors with `s = ±1`).
-* `ray_h_antitone`: if `Im Ψ' ≥ 2π + η` on the vertical ray, then `y ↦ h(X + i y) + η y` is
+* `ray_h_decreasing`: if `Im Ψ' ≥ ωπ + η` on the vertical ray, then `y ↦ h(X + i y) + η y` is
   antitone (so `h` decreases at rate `η`).
 
 Status: complete (no `sorry`).
@@ -29,19 +29,19 @@ def onPoly : (ℚ × ℚ) → List (ℚ × ℚ) → ℂ → Prop
   | _, [], _ => False
   | a, b :: rest, z => z ∈ segment ℝ (toC a) (toC b) ∨ onPoly b rest z
 
-def polyChk (p n : ℕ) (l : List Fac) (T : ℚ) : (ℚ × ℚ) → List (ℚ × ℚ) → Bool
+def polyChk (ω p n : ℕ) (l : List Fac) (T : ℚ) : (ℚ × ℚ) → List (ℚ × ℚ) → Bool
   | _, [] => true
-  | a, b :: rest => segOK p l T a b (fgAt p n l a) (fgAt p n l b) && polyChk p n l T b rest
+  | a, b :: rest => segOK p l T a b (fgAt ω p n l a) (fgAt ω p n l b) && polyChk ω p n l T b rest
 
-theorem poly_bound (p n : ℕ) (l : List Fac) (T : ℚ) (a : ℚ × ℚ) (pts : List (ℚ × ℚ))
-    (h : polyChk p n l T a pts = true) : ∀ z, onPoly a pts z → (fL l z).re ≤ T := by
+theorem poly_bound (ω p n : ℕ) (l : List Fac) (T : ℚ) (a : ℚ × ℚ) (pts : List (ℚ × ℚ))
+    (h : polyChk ω p n l T a pts = true) : ∀ z, onPoly a pts z → (fL ω l z).re ≤ T := by
   induction pts generalizing a with
   | nil => intro z hz; exact hz.elim
   | cons b rest ih =>
     simp only [polyChk, Bool.and_eq_true] at h
     intro z hz
     rcases hz with hz | hz
-    · exact seg_bound p n l T a b h.1 z hz
+    · exact seg_bound ω p n l T a b h.1 z hz
     · exact ih b h.2 z hz
 
 /-! ## Discs around rational points -/
@@ -67,8 +67,8 @@ lemma norm_le_absHi {B : CB} {z : ℂ} (hz : B.mem z) {a b c d : ℚ} (h1 : B.re
     _ ≤ _ := add_le_add (abs_le_absHi hr) (abs_le_absHi hi)
 
 /-- Check `Re f ≤ T` on `closedBall v D` (with `D ≥ 0`). -/
-def ballOK (p n : ℕ) (l : List Fac) (T : ℚ) (v : ℚ × ℚ) (D : ℚ) : Bool :=
-  let F := fgAt p n l v
+def ballOK (ω p n : ℕ) (l : List Fac) (T : ℚ) (v : ℚ × ℚ) (D : ℚ) : Bool :=
+  let F := fgAt ω p n l v
   let B := CB.ofQRad v.1 v.2 D
   let C := d2psiBr p l B
   match F.1.re, F.2.re, F.2.im, C.re, C.im with
@@ -77,10 +77,10 @@ def ballOK (p n : ℕ) (l : List Fac) (T : ℚ) (v : ℚ × ℚ) (D : ℚ) : Boo
       + (absHi (ival c1 c2) + absHi (ival c3 c4)) * D ^ 2 ≤ T) && goodB l B
   | _, _, _, _, _ => false
 
-theorem ball_bound (p n : ℕ) (l : List Fac) (T : ℚ) (v : ℚ × ℚ) (D : ℚ)
-    (h : ballOK p n l T v D = true) : ∀ z ∈ closedBall (toC v) D, (fL l z).re ≤ T := by
+theorem ball_bound (ω p n : ℕ) (l : List Fac) (T : ℚ) (v : ℚ × ℚ) (D : ℚ)
+    (h : ballOK ω p n l T v D = true) : ∀ z ∈ closedBall (toC v) D, (fL ω l z).re ≤ T := by
   intro z hz
-  have hF := mem_fgAt p n l v
+  have hF := mem_fgAt ω p n l v
   have hbox : ∀ w ∈ closedBall (toC v) D, (CB.ofQRad v.1 v.2 D).mem w := by
     intro w hw
     apply CB.mem_ofQRad
@@ -101,17 +101,17 @@ theorem ball_bound (p n : ℕ) (l : List Fac) (T : ℚ) (v : ℚ × ℚ) (D : �
       intro w hw
       have := norm_le_absHi (mem_d2psiBr p l (hbox w (hsub hw))) e4 e5
       rw [hCq]; push_cast; exact this
-    have hTay := taylor2_seg (F := fL l) (G := gL l) (G' := d2psiL l) (a := toC v) (z := z)
+    have hTay := taylor2_seg (F := fL ω l) (G := gL ω l) (G' := d2psiL l) (a := toC v) (z := z)
       (fun w hw => hasDerivAt_fL (hgood w hw)) (fun w hw => hasDerivAt_gL (hgood w hw)) hC
-    have hG : ‖gL l (toC v)‖ ≤ (Gq : ℝ) := by
+    have hG : ‖gL ω l (toC v)‖ ≤ (Gq : ℝ) := by
       have := norm_le_absHi hF.2 e2 e3
       rw [hGq]; push_cast; exact this
-    have hfv : (fL l (toC v)).re ≤ hv := by
+    have hfv : (fL ω l (toC v)).re ≤ hv := by
       have := hF.1.1; rw [e1] at this; exact_mod_cast this.2
     have hzv : ‖z - toC v‖ ≤ D := by rw [← dist_eq_norm]; exact hz
     have hre := (Complex.re_le_norm _).trans hTay
     simp only [sub_re] at hre
-    have hlin : (gL l (toC v) * (z - toC v)).re ≤ (Gq : ℝ) * D := by
+    have hlin : (gL ω l (toC v) * (z - toC v)).re ≤ (Gq : ℝ) * D := by
       refine (Complex.re_le_norm _).trans ?_
       rw [norm_mul]
       exact mul_le_mul hG hzv (norm_nonneg _) ((norm_nonneg _).trans hG)
@@ -320,21 +320,21 @@ theorem im_dpsiL_ge_tail (l : List Fac) (hs : ∀ f ∈ l, f.s = 1 ∨ f.s = -1)
     have := abs_le.1 hat
     linarith [this.1]
 
-/-- If `Im Ψ' ≥ 2π + η` on the vertical ray `X + i y`, `y ≥ y0`, then `h` decreases at rate `η`:
+/-- If `Im Ψ' ≥ ωπ + η` on the vertical ray `X + i y`, `y ≥ y0`, then `h` decreases at rate `η`:
 `h(X + i y₂) ≤ h(X + i y₁) - η (y₂ - y₁)` for `y0 ≤ y₁ ≤ y₂`. -/
-theorem ray_h_decreasing (l : List Fac) (X y0 η : ℝ)
+theorem ray_h_decreasing (ω : ℕ) (l : List Fac) (X y0 η : ℝ)
     (hgood : ∀ y, y0 ≤ y → Good l ((X : ℂ) + y * I))
-    (hη : ∀ y, y0 ≤ y → 2 * π + η ≤ (dpsiL l ((X : ℂ) + y * I)).im)
+    (hη : ∀ y, y0 ≤ y → ω * π + η ≤ (dpsiL l ((X : ℂ) + y * I)).im)
     {y1 y2 : ℝ} (h1 : y0 ≤ y1) (h12 : y1 ≤ y2) :
-    (fL l ((X : ℂ) + y2 * I)).re ≤ (fL l ((X : ℂ) + y1 * I)).re - η * (y2 - y1) := by
-  set φ : ℝ → ℝ := fun y => (fL l ((X : ℂ) + y * I)).re with hφ
-  have hd : ∀ y, y0 ≤ y → HasDerivAt φ (gL l ((X : ℂ) + y * I) * I).re y := by
+    (fL ω l ((X : ℂ) + y2 * I)).re ≤ (fL ω l ((X : ℂ) + y1 * I)).re - η * (y2 - y1) := by
+  set φ : ℝ → ℝ := fun y => (fL ω l ((X : ℂ) + y * I)).re with hφ
+  have hd : ∀ y, y0 ≤ y → HasDerivAt φ (gL ω l ((X : ℂ) + y * I) * I).re y := by
     intro y hy
     have hz : HasDerivAt (fun w : ℂ => (X : ℂ) + w * I) I (y : ℂ) := by
       simpa using ((hasDerivAt_id (y : ℂ)).mul_const I).const_add (X : ℂ)
-    have hc := (hasDerivAt_fL (hgood y hy)).comp (y : ℂ) hz
+    have hc := (hasDerivAt_fL (ω := ω) (hgood y hy)).comp (y : ℂ) hz
     exact hc.real_of_complex
-  have hval : ∀ y, y0 ≤ y → (gL l ((X : ℂ) + y * I) * I).re ≤ -η := by
+  have hval : ∀ y, y0 ≤ y → (gL ω l ((X : ℂ) + y * I) * I).re ≤ -η := by
     intro y hy
     have := hη y hy
     simp only [mul_I_re, gL, sub_im, mul_im, ofReal_re, ofReal_im, I_re, I_im]

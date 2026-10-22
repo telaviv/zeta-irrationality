@@ -29,8 +29,8 @@ def lastPt (a : ℚ × ℚ) : List (ℚ × ℚ) → ℚ × ℚ
   | [] => a
   | b :: rest => lastPt b rest
 
-lemma polyChk_append (p n : ℕ) (l : List Fac) (T : ℚ) (a : ℚ × ℚ) (l₁ l₂ : List (ℚ × ℚ)) :
-    polyChk p n l T a (l₁ ++ l₂) = (polyChk p n l T a l₁ && polyChk p n l T (lastPt a l₁) l₂) := by
+lemma polyChk_append (ω p n : ℕ) (l : List Fac) (T : ℚ) (a : ℚ × ℚ) (l₁ l₂ : List (ℚ × ℚ)) :
+    polyChk ω p n l T a (l₁ ++ l₂) = (polyChk ω p n l T a l₁ && polyChk ω p n l T (lastPt a l₁) l₂) := by
   induction l₁ generalizing a with
   | nil => simp [polyChk, lastPt]
   | cons b rest ih => simp [polyChk, lastPt, ih, Bool.and_assoc]

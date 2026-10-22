@@ -1,7 +1,8 @@
 /-
 # Certified bounds for `h = Re f` along polylines (far part (S2) machinery)
 
-For a factor list `l`, `fL l z = Ψ(z) - 2πi z` and `gL l z = Ψ'(z) - 2πi`.
+For a factor list `l` and a phase multiplier `ω : ℕ`, `fL ω l z = Ψ(z) - ωπi z` and
+`gL ω l z = Ψ'(z) - ωπi` (`ω = 2` for the β family of lean_beta, `ω = 3` for the ζ family).
 
 **Segment bound.** For `z = a + t (b - a)`, `t ∈ [0, 1/2]`, the second-order Taylor bound
 (`taylor2_seg`, from the mean value inequality applied twice) gives
@@ -59,26 +60,27 @@ lemma taylor2_seg {F G G' : ℂ → ℂ} {a z : ℂ} {C : ℝ}
 
 /-! ## Phase functions and point evaluation -/
 
-noncomputable def fL (l : List Fac) (z : ℂ) : ℂ := psiL l z - 2 * π * I * z
-noncomputable def gL (l : List Fac) (z : ℂ) : ℂ := dpsiL l z - 2 * π * I
+noncomputable def fL (ω : ℕ) (l : List Fac) (z : ℂ) : ℂ := psiL l z - ω * π * I * z
+noncomputable def gL (ω : ℕ) (l : List Fac) (z : ℂ) : ℂ := dpsiL l z - ω * π * I
 
-lemma hasDerivAt_fL {l : List Fac} {z : ℂ} (hz : Good l z) : HasDerivAt (fL l) (gL l z) z := by
-  have := (hasDerivAt_psiL l hz).sub ((hasDerivAt_id z).const_mul (2 * π * I))
+lemma hasDerivAt_fL {ω : ℕ} {l : List Fac} {z : ℂ} (hz : Good l z) : HasDerivAt (fL ω l) (gL ω l z) z := by
+  have := (hasDerivAt_psiL l hz).sub ((hasDerivAt_id z).const_mul ((ω : ℂ) * π * I))
   rw [mul_one] at this
   exact this
 
-lemma hasDerivAt_gL {l : List Fac} {z : ℂ} (hz : Good l z) :
-    HasDerivAt (gL l) (d2psiL l z) z :=
-  (hasDerivAt_dpsiL l hz).sub_const (2 * π * I)
+lemma hasDerivAt_gL {ω : ℕ} {l : List Fac} {z : ℂ} (hz : Good l z) :
+    HasDerivAt (gL ω l) (d2psiL l z) z :=
+  (hasDerivAt_dpsiL l hz).sub_const ((ω : ℂ) * π * I)
 
-def twoPiIB : CB := ⟨ofRat 0, piI.smul 2⟩
+/-- Box for `ωπi`. -/
+def phIB (ω : ℕ) : CB := ⟨ofRat 0, piI.smul ω⟩
 
-lemma mem_twoPiIB : twoPiIB.mem (2 * π * I) := by
+lemma mem_phIB (ω : ℕ) : (phIB ω).mem ((ω : ℂ) * π * I) := by
   refine ⟨?_, ?_⟩
-  · have h : (2 * (π : ℂ) * I).re = ((0 : ℚ) : ℝ) := by simp
+  · have h : ((ω : ℂ) * (π : ℂ) * I).re = ((0 : ℚ) : ℝ) := by simp
     rw [h]; exact mem_ofRat 0
-  · have h : (2 * (π : ℂ) * I).im = ((2 : ℚ) : ℝ) * π := by simp
-    rw [h]; exact mem_smul 2 mem_piI
+  · have h : ((ω : ℂ) * (π : ℂ) * I).im = ((ω : ℚ) : ℝ) * π := by simp
+    rw [h]; exact mem_smul (ω : ℚ) mem_piI
 
 /-- Shared evaluation of `(Ψ, Ψ')` on a box: the logs are computed once. -/
 def fgB (p n : ℕ) : List Fac → CB → CB × CB
@@ -128,16 +130,16 @@ lemma mem_d2psiBr (p : ℕ) (l : List Fac) {B : CB} {z : ℂ} (hz : B.mem z) :
 def toC (v : ℚ × ℚ) : ℂ := ⟨(v.1 : ℝ), (v.2 : ℝ)⟩
 
 /-- `(f, g)` boxes at a rational vertex. -/
-def fgAt (p n : ℕ) (l : List Fac) (v : ℚ × ℚ) : CB × CB :=
+def fgAt (ω p n : ℕ) (l : List Fac) (v : ℚ × ℚ) : CB × CB :=
   let P := CB.ofQ v.1 v.2
   let r := fgB p n l P
-  (r.1.sub (twoPiIB.mul P), r.2.sub twoPiIB)
+  (r.1.sub ((phIB ω).mul P), r.2.sub (phIB ω))
 
-lemma mem_fgAt (p n : ℕ) (l : List Fac) (v : ℚ × ℚ) :
-    (fgAt p n l v).1.mem (fL l (toC v)) ∧ (fgAt p n l v).2.mem (gL l (toC v)) := by
+lemma mem_fgAt (ω p n : ℕ) (l : List Fac) (v : ℚ × ℚ) :
+    (fgAt ω p n l v).1.mem (fL ω l (toC v)) ∧ (fgAt ω p n l v).2.mem (gL ω l (toC v)) := by
   have hP : (CB.ofQ v.1 v.2).mem (toC v) := CB.mem_ofQ v.1 v.2
   have h := mem_fgB p n l hP
-  exact ⟨CB.mem_sub h.1 (CB.mem_mul mem_twoPiIB hP), CB.mem_sub h.2 mem_twoPiIB⟩
+  exact ⟨CB.mem_sub h.1 (CB.mem_mul (mem_phIB ω) hP), CB.mem_sub h.2 (mem_phIB ω)⟩
 
 /-! ## Boxes around segments and the slit-plane condition -/
 
@@ -214,32 +216,32 @@ lemma normSq_toC_sub (a b : ℚ × ℚ) :
   rw [Complex.sq_norm, Complex.normSq_apply, toC_sub]; push_cast; ring
 
 /-- One-sided half-segment bound. -/
-lemma half_bound {l : List Fac} {a b z : ℂ} {t C ha la : ℝ} (ht0 : 0 ≤ t) (ht : t ≤ 1 / 2)
+lemma half_bound {ω : ℕ} {l : List Fac} {a b z : ℂ} {t C ha la : ℝ} (ht0 : 0 ≤ t) (ht : t ≤ 1 / 2)
     (hzt : z = a + t * (b - a))
     (hgood : ∀ w ∈ segment ℝ a b, Good l w) (hC : ∀ w ∈ segment ℝ a b, ‖d2psiL l w‖ ≤ C)
-    (hha : (fL l a).re ≤ ha) (hla : (gL l a * (b - a)).re ≤ la) :
-    (fL l z).re ≤ ha + max 0 la / 2 + C * ‖b - a‖ ^ 2 / 4 := by
+    (hha : (fL ω l a).re ≤ ha) (hla : (gL ω l a * (b - a)).re ≤ la) :
+    (fL ω l z).re ≤ ha + max 0 la / 2 + C * ‖b - a‖ ^ 2 / 4 := by
   have hsub : segment ℝ a z ⊆ segment ℝ a b := by
     apply (convex_segment a b).segment_subset (left_mem_segment ℝ a b)
     rw [hzt, segment_eq_image']
     exact ⟨t, ⟨ht0, by linarith⟩, by simp⟩
-  have hT := taylor2_seg (F := fL l) (G := gL l) (G' := d2psiL l) (a := a) (z := z) (C := C)
+  have hT := taylor2_seg (F := fL ω l) (G := gL ω l) (G' := d2psiL l) (a := a) (z := z) (C := C)
     (fun w hw => hasDerivAt_fL (hgood w (hsub hw)))
     (fun w hw => hasDerivAt_gL (hgood w (hsub hw))) (fun w hw => hC w (hsub hw))
   have hC0 : 0 ≤ C := (norm_nonneg _).trans (hC a (left_mem_segment ℝ a b))
   have hre := (Complex.re_le_norm _).trans hT
   have hza : z - a = (t : ℂ) * (b - a) := by rw [hzt]; ring
   rw [hza, norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg ht0] at hre
-  have hlin : (gL l a * ((t : ℂ) * (b - a))).re = t * (gL l a * (b - a)).re := by
-    rw [show gL l a * ((t : ℂ) * (b - a)) = (t : ℂ) * (gL l a * (b - a)) by ring, re_ofReal_mul]
+  have hlin : (gL ω l a * ((t : ℂ) * (b - a))).re = t * (gL ω l a * (b - a)).re := by
+    rw [show gL ω l a * ((t : ℂ) * (b - a)) = (t : ℂ) * (gL ω l a * (b - a)) by ring, re_ofReal_mul]
   simp only [sub_re] at hre
   rw [hlin] at hre
-  have h1 : t * (gL l a * (b - a)).re ≤ max 0 la / 2 := by
-    rcases le_total 0 (gL l a * (b - a)).re with hp | hn
-    · calc t * (gL l a * (b - a)).re ≤ (1 / 2) * (gL l a * (b - a)).re :=
+  have h1 : t * (gL ω l a * (b - a)).re ≤ max 0 la / 2 := by
+    rcases le_total 0 (gL ω l a * (b - a)).re with hp | hn
+    · calc t * (gL ω l a * (b - a)).re ≤ (1 / 2) * (gL ω l a * (b - a)).re :=
             mul_le_mul_of_nonneg_right ht hp
         _ ≤ max 0 la / 2 := by linarith [le_max_right 0 la]
-    · have : t * (gL l a * (b - a)).re ≤ 0 := mul_nonpos_of_nonneg_of_nonpos ht0 hn
+    · have : t * (gL ω l a * (b - a)).re ≤ 0 := mul_nonpos_of_nonneg_of_nonpos ht0 hn
       linarith [le_max_left 0 la]
   have h2 : C * (t * ‖b - a‖) ^ 2 ≤ C * ‖b - a‖ ^ 2 / 4 := by
     have : (t * ‖b - a‖) ^ 2 ≤ ‖b - a‖ ^ 2 / 4 := by
@@ -249,12 +251,12 @@ lemma half_bound {l : List Fac} {a b z : ℂ} {t C ha la : ℝ} (ht0 : 0 ≤ t) 
     nlinarith
   linarith
 
-theorem seg_bound (p n : ℕ) (l : List Fac) (T : ℚ) (a b : ℚ × ℚ)
-    (h : segOK p l T a b (fgAt p n l a) (fgAt p n l b) = true) :
-    ∀ z ∈ segment ℝ (toC a) (toC b), (fL l z).re ≤ T := by
+theorem seg_bound (ω p n : ℕ) (l : List Fac) (T : ℚ) (a b : ℚ × ℚ)
+    (h : segOK p l T a b (fgAt ω p n l a) (fgAt ω p n l b) = true) :
+    ∀ z ∈ segment ℝ (toC a) (toC b), (fL ω l z).re ≤ T := by
   intro z hz
-  have hA := mem_fgAt p n l a
-  have hB := mem_fgAt p n l b
+  have hA := mem_fgAt ω p n l a
+  have hB := mem_fgAt ω p n l b
   have heM : (CB.ofQ (b.1 - a.1) (b.2 - a.2)).mem (toC b - toC a) := by
     rw [toC_sub]; exact CB.mem_ofQ _ _
   have hla := (CB.mem_mul hA.2 heM).1
@@ -265,13 +267,13 @@ theorem seg_bound (p n : ℕ) (l : List Fac) (T : ℚ) (a b : ℚ × ℚ)
   · rename_i ha0 ha la0 la hb0 hb lb0 lb S0 S e1 e2 e3 e4 e5
     simp only [Bool.and_eq_true, decide_eq_true_eq] at h
     obtain ⟨⟨hX, hS2⟩, hgB⟩ := h
-    have hFa : (fL l (toC a)).re ≤ ha := by
+    have hFa : (fL ω l (toC a)).re ≤ ha := by
       have := hA.1.1; rw [e1] at this; exact_mod_cast this.2
-    have hFb : (fL l (toC b)).re ≤ hb := by
+    have hFb : (fL ω l (toC b)).re ≤ hb := by
       have := hB.1.1; rw [e3] at this; exact_mod_cast this.2
-    have hLa : (gL l (toC a) * (toC b - toC a)).re ≤ la := by
+    have hLa : (gL ω l (toC a) * (toC b - toC a)).re ≤ la := by
       rw [e2] at hla; exact_mod_cast hla.2
-    have hLb : (gL l (toC b) * (toC a - toC b)).re ≤ lb := by
+    have hLb : (gL ω l (toC b) * (toC a - toC b)).re ≤ lb := by
       rw [e4, show -(toC b - toC a) = toC a - toC b by ring] at hlb; exact_mod_cast hlb.2
     have hgood : ∀ w ∈ segment ℝ (toC a) (toC b), Good l w :=
       fun w hw => good_of_goodB (hseg w hw) hgB
@@ -309,7 +311,7 @@ theorem seg_bound (p n : ℕ) (l : List Fac) (T : ℚ) (a b : ℚ × ℚ)
     rw [segment_eq_image'] at hz
     obtain ⟨t, ⟨ht0, ht1⟩, rfl⟩ := hz
     rcases le_total t (1 / 2) with ht | ht
-    · have := half_bound (l := l) (C := √(S : ℝ)) (z := toC a + t • (toC b - toC a)) ht0 ht
+    · have := half_bound (ω := ω) (l := l) (C := √(S : ℝ)) (z := toC a + t • (toC b - toC a)) ht0 ht
         (by rw [Complex.real_smul]) hgood hC hFa hLa
       have hXa : (ha : ℝ) + max 0 (la : ℝ) / 2 ≤ X := by
         have : ha + max 0 la / 2 ≤ X := le_max_left _ _
@@ -317,7 +319,7 @@ theorem seg_bound (p n : ℕ) (l : List Fac) (T : ℚ) (a b : ℚ × ℚ)
       linarith
     · have h1 : (0 : ℝ) ≤ 1 - t := by linarith
       have h2 : 1 - t ≤ 1 / 2 := by linarith
-      have := half_bound (l := l) (C := √(S : ℝ)) (a := toC b) (b := toC a)
+      have := half_bound (ω := ω) (l := l) (C := √(S : ℝ)) (a := toC b) (b := toC a)
         (z := toC a + t • (toC b - toC a)) h1 h2
         (by rw [Complex.real_smul]; push_cast; ring) hgood' hC' hFb hLb
       have hXb : (hb : ℝ) + max 0 (lb : ℝ) / 2 ≤ X := by
