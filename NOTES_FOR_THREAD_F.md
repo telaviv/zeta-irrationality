@@ -23,3 +23,17 @@ sin⁵·cot⁗ checked numerically to 30 digits at three complex points; the by-
 simplifies §10 item 4 (the near-real-axis piece): T is entire, so near x_c the integrand is bounded by
 |2z+n|·|E_n|·24e^{3π Im z} with no singular kernel, and the first polyline segment (start included) is covered by
 the same (S2)-type bound h ≤ Re Ω − η as the rest of the far part.
+
+## 2. Lemma 6 is formalised (2026-10-22, workstream W3) [Proved in Lean, given (S0)–(S5) as `SaddleData`]
+
+`ZetaIrr.Z7.Analytic.size_of_saddleData` (Lemma 6(i): log|L_n| ≤ −G log n! + n(Vcert + o(1))) and
+`nonvan_of_saddleData` (Lemma 6(ii)) in `lean_zeta7/ZetaIrrational/Z7/Analytic/NonvanZ7.lean`, standard axioms only,
+via the route of §1 above. No gap in PROOF_ZETA §6 was found. Remarks for the write-up:
+* §10 item 1 (Stirling forms (6.4.2)) is moot: only the log Γ expansion is used, with the DLMF-type constant of
+  lean_beta's `Stirling/` (generalised to Γ-shifts β ∈ [0, 2], since the ζ factor list has β = 0 for Γ(z) and
+  Γ(z + δn)).
+* §10 item 4 (near-real-axis piece) is covered exactly as in lean_beta: (S2) on the first segment (`S2_first`, start
+  point moved by |e| ≤ δ₀ along ℝ) bounds h = Re Ψ + 3π Im x there, because the integrand R_n k⁗ = (2z+n) E_n T has
+  no singular kernel.
+* The size bound uses Stirling's upper bound log n! ≤ n log n − n + (log n)/2 + 1 (Mathlib's `stirlingSeq`
+  monotonicity) and only Re Ω ≤ −10.1167; constants are explicit but crude.
