@@ -22,3 +22,9 @@ The main theorem `ZetaIrr.Z7.oneOfZeta7To21` is not assembled yet; see PLAN.md. 
 #print axioms ZetaIrr.Z7.Analytic.nonvan_of_saddleData -- Lemma 6(ii) from SaddleData
 #print axioms ZetaIrr.Z7.size_Z7
 #print axioms ZetaIrr.Z7.nonvan_Z7
+
+-- Lemmas 3–5 and the conditional assembly
+#print axioms ZetaIrr.Z7.expansion_Z7                -- Lemma 3: L_n ∈ ℚ + ℚζ(7) + … + ℚζ(21)
+#print axioms ZetaIrr.Z7.oneOfZeta7To21_of_parts     -- Lemmas 4–5 + assembly, given (H2)
+#print axioms ZetaIrr.Z7.CertA.certFact_of_units     -- (H2) from the unit count
+#print axioms ZetaIrr.Z7.oneOfZeta7To21_of_certUnits -- main theorem given the unit count

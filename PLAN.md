@@ -116,3 +116,7 @@ must reproduce A_cert above (or be slightly larger and still give Q < 0).
   the line, integrand (2z+n)E_n T, Laplace, size via Stirling upper bound for log n!. Stirling generalised to
   β ∈ [0, 2]. Main added `Z7/Lemma6.lean` (`size_Z7`, `nonvan_Z7`, no hypotheses), root import and audit: standard
   axioms only. Remaining: W1 (Lemma 4 + glue) and W2 (A-certificate).
+- 2026-10-22: W1 done (`f5ac8a8`, `f49f781`, `b5dd18a`): expansion_Z7, Lemma A/B (with (b′) as `a_int_of_nodvd`),
+  Lemma 4, PNT step, glue `oneOfZeta7To21_of_parts`. Main added `Z7/MainCond.lean`:
+  `oneOfZeta7To21_of_certUnits : CertA.UnitsFact → OneOfZeta7To21`, standard axioms only. The unit count
+  778841997893779320302794447562 · 2⁻⁹⁶ + tail equals Acert exactly. Remaining: W2's kernel run `bodyUnits_400`.
