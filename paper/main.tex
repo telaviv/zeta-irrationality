@@ -103,7 +103,8 @@ $\zeta(7)$ are the following.
 \begin{itemize}
 \item Zudilin \cite[Thm.~1]{Zudilin2002} proved that one of $\zeta(7),\zeta(9),\dots,\zeta(37)$ is irrational,
   and more generally \cite[Thm.~2]{Zudilin2002} that for every odd $b\ge1$ one of
-  $\zeta(b+2),\zeta(b+4),\dots,\zeta(8b-1)$ is irrational.
+  $\zeta(b+2),\zeta(b+4),\dots,\zeta(8b-1)$ is irrational. (Theorem numbers and statements of \cite{Zudilin2002}
+  refer to the arXiv version, arXiv:math/0104249, where we checked them.)
 \item Lai and Zhou \cite{LaiZhou2022} proved that at least two of $\zeta(5),\zeta(7),\dots,\zeta(35)$ are
   irrational. This implies, with no hypothesis on $\zeta(5)$, that one of $\zeta(7),\dots,\zeta(35)$ is
   irrational: if $\zeta(7),\dots,\zeta(35)$ were all rational, at most one number in the list
@@ -179,8 +180,8 @@ the kernel. The formal statement uses Mathlib's \lean{riemannZeta} and is descri
 The prose proof below is self-contained, except that certain finite computations are only described: the exact
 value of a rational sum with $30{,}137$ terms (Proposition~\ref{prop:certA}) and the interval-arithmetic checks of
 the saddle-point data (Theorem~\ref{thm:saddle}). Both are decidable statements about rational data, proved by
-\lean{decide +kernel}. The formalisation differs from the informal write-up from which it was ported in a few
-places; the paper follows the formalisation, and the differences are listed in Section~\ref{sec:lean-diff}.
+\lean{decide +kernel}. The proof in this paper is the one that is formalised; Section~\ref{sec:lean-diff} notes
+where the formal proof is organised differently.
 
 \subsection{Organisation and notation}
 Section~\ref{sec:construction} defines the class of rational functions and the instance used for
@@ -902,11 +903,11 @@ Hence $\int_{c-i\infty}^{c+i\infty}G_n\,dz=i\int_\RR G_n(c+iy)\,dy=2i\Re\int_0^\
 \end{proof}
 
 \begin{remark}\label{rem:split}
-The informal write-up from which the formalisation was ported argued differently: on the upper half of the line
-it split $\pi\cot\pi z=-\pi i+K_+(z)$ with $K_+(z)=-2\pi i\mathbf q/(1-\mathbf q)$, integrated the constant part
-exactly, and obtained $L_n=-R_n'''(c)-\frac1\pi\Im\bigl(\int R_n''''K_+\bigr)$, with a boundary term $-R_n'''(c)$
-(an Euler--Maclaurin term) that had to be bounded separately. The phase is the same: $\sin^5(\pi z)\,e^{2\pi iz}$
-has leading exponential $e^{-3\pi iz}$, which is the origin of the phase $3\pi$ in both routes. Moving the four
+One can also work with $R_n''''k$ directly: on the upper half of the line split $\pi\cot\pi z=-\pi i+K_+(z)$ with
+$K_+(z)=-2\pi i\mathbf q/(1-\mathbf q)$ and integrate the constant part exactly. This gives
+$L_n=-R_n'''(c)-\frac1\pi\Im\bigl(\int R_n''''K_+\bigr)$, with a boundary term $-R_n'''(c)$ (an Euler--Maclaurin term)
+that has to be bounded separately. The phase is the same: $\sin^5(\pi z)\,e^{2\pi iz}$ has leading exponential
+$e^{-3\pi iz}$, which is the origin of the phase $3\pi$ in both routes. Moving the four
 derivatives onto the kernel, as above, removes the boundary term, the Fa\`a di Bruno expression for $R_n''''$ and
 all asymptotics of the digamma function and its derivatives; only Stirling's formula for $\log\Gamma$ is needed.
 \end{remark}
@@ -1038,8 +1039,12 @@ For Z7 put $a:=1/100$, $\eta:=\pi-2.76$, $\rho:=1/20$, $\delta_0:=10^{-7}$, $\et
 \[
   c_0:=0.8921643007941758286102076+0.1829120718451090538924822\,i .
 \]
-There are $x_0\in\CC$, $d\in\CC$ with $|d|=1$, and $v_0,\dots,v_{23}\in\CC$ such that the following hold, where
-$\Omega:=f(x_0)$ and $K:=|\Psi''(x_0)|$.
+There are $x_0\in\CC$, $d\in\CC$ with $|d|=1$, and a polyline $v_0,\dots,v_{23}\in\CC$ with
+\begin{gather*}
+  v_0=x_c:=0.817411103201,\qquad v_5=x_0-\rho d,\qquad v_6=x_0+\rho d,\\
+  v_{23}=\xtop:=2.051154018351+12.001186644670\,i,
+\end{gather*}
+and $\Re v_k\ge0$ for all $k$, such that the following hold, where $\Omega:=f(x_0)$ and $K:=|\Psi''(x_0)|$.
 \begin{enumerate}
 \item[(S0)] $|x_0-c_0|\le10^{-12}$, and $x_0$ is the unique zero of $\Psi'-3\pi i$ in this disc. Moreover
   \begin{gather*}
@@ -1049,18 +1054,17 @@ $\Omega:=f(x_0)$ and $K:=|\Psi''(x_0)|$.
   \end{gather*}
 \item[(S1)] $K\ge28$, $\Psi''(x_0)d^2=-K$, and there is $M\le311$ with $|\Psi'''(x)|\le M$ for $|x-x_0|\le\rho$ and
   $M\rho\le\frac32K$.
-\item[(S1$'$)] $\rho<\Im x_0$; in particular the closed disc $|x-x_0|\le\rho$ lies in $\Im x>0$.
-\item[(P)] $v_0=x_c:=0.817411103201$, so $\delta_0\le x_c<r=\frac{11}{12}$; $v_5=x_0-\rho d$, $v_6=x_0+\rho d$;
-  $v_{23}=\xtop:=2.051154018351+12.001186644670\,i$; $\Re v_k\ge0$ for all $k$; and
+\item[(S1$'$)] $\rho<\Im x_0$, so the closed disc $|x-x_0|\le\rho$ lies in $\Im x>0$; and
   $\Im(v_k+t(v_{k+1}-v_k))>0$ for $0\le k<23$ and $0<t\le1$.
-\item[(S2)] For $1\le k<23$, $k\ne5$, and every $x\in[v_k,v_{k+1}]$: $\Re f(x)\le\Re\Omega-\etafar$ and the sector
-  condition $(a,\eta)$ holds at $x$. The same holds for every $x\ne v_0+\epsilon$ on the segment
-  $[v_0+\epsilon,v_1]$, for every real $\epsilon$ with $|\epsilon|\le\delta_0$.
-\item[(S3)] For every $y\ge0$: $\Re f(\xtop+iy)\le\Re\Omega-\etafar-(12-3\pi)y$, and the sector condition
-  $(a,\eta)$ holds at $\xtop+iy$.
-\item[(S4)] The sector condition $(a,\eta)$ holds at $x_0+sd$ for $|s|\le\rho$.
+\item[(S2)] For $1\le k<23$, $k\ne5$, and every $x\in[v_k,v_{k+1}]$: $\Re f(x)\le\Re\Omega-\etafar$.
+\item[(S3)] For every $y\ge0$: $\Re f(\xtop+iy)\le\Re\Omega-\etafar-(12-3\pi)y$.
+\item[(S4)] The sector condition $(a,\eta)$ holds on the whole contour: at $x_0+sd$ for $|s|\le\rho$, on the
+  segments of (S2), at $\xtop+iy$ for $y\ge0$, and on the segments of (S5).
+\item[(S5)] $\delta_0\le x_c<r=\frac{11}{12}$, and for every real $\epsilon$ with $|\epsilon|\le\delta_0$ and every
+  $x\ne v_0+\epsilon$ on the segment $[v_0+\epsilon,v_1]$: $\Re f(x)\le\Re\Omega-\etafar$.
 \end{enumerate}
 \end{theorem}
+
 
 \begin{proof}[Method of proof]
 All statements are verified by exact rational interval arithmetic, with verified enclosures of $\pi$, $\log$,
@@ -1075,7 +1079,7 @@ is carried out by the Lean kernel; see Section~\ref{sec:lean-cert}.
 \item (S1), (S1$'$): $\Psi''(x_0)$ is enclosed in a box; $d:=v/|v|$ with $v:=1-\overline{\Psi''(x_0)}/K$ satisfies
   $\Psi''(x_0)d^2=-K$; and $M$ bounds $\sum_i|c_i|/|\alpha_i|^2$ on the disc, via lower bounds for $|\alpha_i|$
   there. Numerically $K\approx28.31$ and $M\approx310.2$, so $M\rho\approx15.5\le42$; and $\Im x_0\approx0.1829$.
-\item (P), (S2): the vertices $v_1,\dots,v_4$ and $v_7,\dots,v_{23}$ are rational points with $12$ decimals, obtained
+\item (S1$'$), (S2), (S4), (S5): the vertices $v_1,\dots,v_4$ and $v_7,\dots,v_{23}$ are rational points with $12$ decimals, obtained
   from a Runge--Kutta trace of the steepest-descent curves of $\Re f$ from $x_0\pm\rho d$ and a greedy
   simplification ($4$ segments on the lower curve down to $x_c$, $16$ on the upper curve up to $\xtop$). On each
   segment, Taylor bounds on boxes show $\Re f\le T_0:=-10.1367$; since $\Re\Omega\ge-10.1167486$, this gives
@@ -1093,6 +1097,15 @@ is carried out by the Lean kernel; see Section~\ref{sec:lean-cert}.
   $|\arg\alpha_i|\le\frac\pi2+\frac13\le2.76$.\qedhere
 \end{itemize}
 \end{proof}
+
+These labels are those of the Lean structure \lean{Z7.Analytic.SaddleData}
+(\lean{ZetaIrrational\slash{}Z7\slash{}Analytic\slash{}SaddleData.lean}): (S0) is \lean{S0}, \lean{sin\_ne},
+\lean{Re$\Omega$\_le}; (S1) is \lean{S1\_dir}, \lean{S1\_M}, \lean{S1\_$\rho$}; (S1$'$) is \lean{S1'\_disc},
+\lean{path\_im}; (S2) and (S3) are the fields \lean{S2} and \lean{S3}; (S4) is \lean{S4\_disc} together with the
+sector parts of \lean{S2}, \lean{S3} and \lean{S2\_first}; and (S5) is \lean{v0\_im}, \lean{$\delta_0$\_le},
+\lean{v0\_lt} and
+\lean{S2\_first}. The path fields \lean{v\_disc\_lo}, \lean{v\_disc\_hi}, \lean{re\_nonneg} are the conditions on
+the polyline stated before (S0).
 
 At the saddle, $A(x_0)=(2x_0+1)e^{\psi_0(x_0)}\ne0$, since $\Re x_0>0$. The numerical values are
 $x_0\approx0.8921643+0.1829121i$, $\Re\Omega\approx-10.11674855$ and $\sin(240\Im\Omega)\approx-0.932453$.
@@ -1155,7 +1168,7 @@ as $n\to\infty$ in $240\NN$,
 Let $c_n:=\lfloor nx_c\rfloor+\frac12$. Since $0<x_c<r$, we have $0<c_n<rn+1$ and $c_n\notin\ZZ$, and
 $\chi_n:=c_n/n-x_c$ satisfies $|\chi_n|\le\frac1{2n}\le\delta_0$ for large $n$. Let
 $J_n:=i\int_0^\infty G_n(c_n+iy)\,dy$. By Proposition~\ref{prop:contour}, $L_n=-\frac1\pi\Im J_n$. Apply
-Lemma~\ref{lem:deform} with $w_0=c_n$ and $w_k=nv_k$ $(1\le k\le23)$; the hypotheses hold by (P), since
+Lemma~\ref{lem:deform} with $w_0=c_n$ and $w_k=nv_k$ $(1\le k\le23)$; the hypotheses hold by (S1$'$) and $\Re v_k\ge0$, since
 $\Im(c_n+t(nv_1-c_n))=tn\Im v_1>0$ for $t>0$. Thus $J_n$ is the sum of the $23$ segment integrals and the integral
 over the vertical ray from $n\xtop$.
 
@@ -1174,9 +1187,9 @@ hence bounded and Lipschitz on the disc, and Lemma~\ref{lem:laplace} gives
 $\mathcal D_n=A(x_0)\sqrt{2\pi/(nK)}+O(n^{-1})$.
 
 \emph{The far part.} Let $\mathcal E_n$ be the sum of the other $22$ segment integrals and the ray integral. On each
-of these segments, (S2) and (U) give $|G_n(z)|\le Cn\,e^{\lambda_n+n(\Re\Omega-\etafar)}$, and the segments have
-length $O(n)$. (For the first segment, $z=n((x_c+\chi_n)+t(v_1-x_c-\chi_n))$ with $|\chi_n|\le\delta_0$.) On the ray,
-$z=n(\xtop+iu)$ with $u\ge0$, and (S3), (U) give
+of these segments, (S2), (S4) and (U) give $|G_n(z)|\le Cn\,e^{\lambda_n+n(\Re\Omega-\etafar)}$, and the segments
+have length $O(n)$. (For the first segment, $z=n((x_c+\chi_n)+t(v_1-x_c-\chi_n))$ with $|\chi_n|\le\delta_0$, and (S5)
+applies.) On the ray, $z=n(\xtop+iu)$ with $u\ge0$, and (S3), (S4), (U) give
 $|G_n(z)|\le n\,e^{\lambda_n+n(\Re\Omega-\etafar)}e^{-n(12-3\pi)u}B(|\xtop|+u)$; since $12-3\pi>2.5$, its integral over
 $dz=in\,du$ is $O(n^2e^{\lambda_n+n(\Re\Omega-\etafar)})$ for large $n$. Hence
 $|\mathcal E_n|=O(n^2e^{\lambda_n+n\Re\Omega-n\etafar})$.
@@ -1273,8 +1286,9 @@ Let $\cP$ be a parameter set (Definition~\ref{def:param}), and suppose:
   $\sum_{\ell}e^*(\xi_\ell)(\frac1{x_{\ell-1}}-\frac1{x_\ell})+\frac{S+15}{X}+\frac{G}{2(X-1)}\le\Acert$, for the event
   set of Section~\ref{sec:A} with $X=400$;
 \item[(H3)] there are saddle data $(x_0,d,K,M,\rho,v_0,\dots,v_{K_{\mathrm{top}}})$ and constants
-  $a,\eta,\etafar,\delta_0>0$ satisfying (S0)--(S4) of Theorem~\ref{thm:saddle}, with $x_c=v_0<r$, a disc segment
-  $[v_{K_d},v_{K_d+1}]=[x_0-\rho d,x_0+\rho d]$, and some positive decay rate on the top ray in (S3);
+  $a,\eta,\etafar,\delta_0>0$ satisfying the analogues of (S0)--(S5) of Theorem~\ref{thm:saddle} (without the
+  numerical values), with $\Re v_k\ge0$, a disc segment $[v_{K_d},v_{K_d+1}]=[x_0-\rho d,x_0+\rho d]$, and some
+  positive decay rate on the top ray in (S3);
 \item[(H4)] $\sin(q\Im\Omega)\ne0$;
 \item[(H5)] $Q:=\Re\Omega+\Acert<0$;
 \item[(H6)] $qG\in2\ZZ$, and $e\equiv1+S\pmod2$.
@@ -1337,7 +1351,7 @@ Z7 & $9.9185803$ & $-10.1167485$ & $-0.1981$ & $-0.932453$ & $0.8921643+0.182912
 \medskip
 \begin{tabular}{@{}lllllll@{}}
 \toprule
- & (S1) $\kappa$, $M$, $\rho$ & (S1$'$) & (S2) $\etafar$ & (S3) $\Im\Psi'$ & (S4) $a$, $\eta$ & (S5) $\eta_5$; $x_c$\\
+ & (S1) $\kappa$, $M$, $\rho$ & (S1$'$) & (S2) $\etafar$ & (S3) $\Im\Psi'$ & (S4) $a$, $\eta$ & $\eta_{\mathrm{cr}}$; $x_c$\\
 \midrule
 Z1 & $118.54$, $5527$, $0.01031$ & $0.0302$ & $5.65\cdot10^{-3}$ & $15.47$ & $1.92\cdot10^{-2}$, $0.672$ & $0.2211$; $1.2290$\\
 Z2 & $114.57$, $5128$, $0.01066$ & $0.0314$ & $5.82\cdot10^{-3}$ & $15.53$ & $1.99\cdot10^{-2}$, $0.718$ & $0.2256$; $0.9783$\\
@@ -1348,11 +1362,12 @@ Z6 & $42.43$, $670.7$, $0.02977$ & $0.0892$ & $1.65\cdot10^{-2}$ & $15.63$ & $5.
 Z7 & $28.31$, $301.4$, $0.04614$ & $0.1368$ & $2.63\cdot10^{-2}$ & $15.64$ & $9.48\cdot10^{-2}$, $1.210$ & $0.8265$; $0.8174$\\
 \bottomrule
 \end{tabular}
-\caption{The certified instances: certificates of the Python/Arb implementation. $\Acert$ is the exact rational
+\caption{The certified instances: certificates of the Python and Arb computations. $\Acert$ is the exact rational
 of (H2), rounded up; $\Re\Omega$ is the upper end of the Arb enclosure (radius $\le2\cdot10^{-7}$), rounded up;
 $Q=\Re\Omega+\Acert$, rounded up. Second part: the Taylor-disc data $\kappa=-\Re(\Psi''(x_0)d^2)$, $M$, $\rho$; the margin
 $\Im x_0-\rho$ of (S1$'$); the far margin; the tail value of $\Im\Psi'$ on the top ray (it must exceed $3\pi$); the
-sector constants; and the crossing gap $\eta_5=\Re\Omega-\Psi(x_c)$ with the start point $x_c$. $V_{\mathrm{up}}$ is
+sector constants; and the crossing gap $\eta_{\mathrm{cr}}=\Re\Omega-\Psi(x_c)$ with the start point $x_c$ (a cross-check,
+not needed by the proof). $V_{\mathrm{up}}$ is
 the real-axis exponent of the numerical model [numerical].}\label{tab:certs}
 \end{table}
 
@@ -1370,15 +1385,14 @@ and, for Z7, \eqref{eq:Acert}.
 \emph{Status of the instances.} For Z7 everything is kernel-checked (Section~\ref{sec:lean}); the Lean saddle
 certificate of Theorem~\ref{thm:saddle} uses its own contour (with $\rho=1/20$ and $23$ segments) and agrees with the
 Arb value of $\Re\Omega$ in Table~\ref{tab:certs}, and the Lean value of $\Acert$ is the same exact rational. For
-Z1--Z6 the certificates are those of one Python implementation each: \texttt{f4\_certA\_exact.py} (exact rational
-arithmetic with python-flint) for (H2), and \texttt{f5\_saddle\_cert.py} (ball arithmetic with Arb) for (H3), (H4).
-These verify the conditions in the form of the informal write-up, which differs from (S0)--(S4) in two harmless
-ways: the Taylor radius is chosen with $\rho\le\kappa/M$, which is stronger than $M\rho\le\frac32\kappa$, and (S2) is
-checked on the polyline starting at $x_c$, with the crossing condition (S5) $\Psi(x_c)\le\Re\Omega-\eta_5$ in addition;
-the perturbation of the start point by $\le1/(2n)$ is not part of that certificate. It changes $\Re f$ on the first
-segment by $O(1/n)$, because the sector condition holds on a neighbourhood of that segment, so it costs nothing in the
-limit [proof sketch]. So Z1--Z6 rest on these certificates and
-are not formalised. The corresponding windows $\zeta(7),\dots,\zeta(N)$ for $N=23,\dots,37$ are weaker than
+Z1--Z6 the certificates come from two programs that are not part of the repository: an exact-rational Python
+implementation (python-flint) of the sum in (H2), and a ball-arithmetic computation with Arb of the saddle data for
+(H3), (H4). The latter checks a variant of (S0)--(S5): the Taylor radius is chosen with $\rho\le\kappa/M$, which is
+stronger than $M\rho\le\frac32\kappa$, and (S2) is checked on the whole polyline starting at $x_c$, together with the
+crossing gap $\Psi(x_c)\le\Re\Omega-\eta_{\mathrm{cr}}$; the perturbation of the start point in (S5) is not part of
+that certificate. That perturbation changes $\Re f$ on the first segment by $O(1/n)$, because the sector condition
+holds on a neighbourhood of that segment, so it costs nothing in the limit [proof sketch]. So Z1--Z6 rest on these
+certificates and are not formalised. The corresponding windows $\zeta(7),\dots,\zeta(N)$ for $N=23,\dots,37$ are weaker than
 Theorem~\ref{thm:main} in any case; their only interest is the larger margins.
 
 As an independent check of the arithmetic part, for every profile type of Table~\ref{tab:instances} and for Z7
@@ -1393,10 +1407,10 @@ $\sum_tR_n''''(t)$ to $30$ digits.
 % ===========================================================================
 
 \subsection{What is formalised}
-The repository \lean{lean\_zeta7} \cite{ZetaRepo}, at commit \lean{1efbed2}, contains a proof of
+The repository \lean{lean\_zeta7} \cite{ZetaRepo}, at release tag \lean{v1.0}, contains a proof of
 Theorem~\ref{thm:main} in Lean~4 \cite{LeanFour} (version v4.35.0) with Mathlib \cite{Mathlib} (version v4.35.0
-\cite{Mathlib4}). The repository is not yet public. All declaration names and file paths in this section refer
-to that commit; paths are relative to the repository root. The formalisation covers every step of the proof of
+\cite{Mathlib4}). All declaration names and file paths in this section refer to that release; paths are relative
+to the repository root. The formalisation covers every step of the proof of
 Theorem~\ref{thm:main}, including the parts that a written proof would cite: the prime number theorem, Stirling's
 formula with explicit remainder in sectors, the contour-integral representation, the deformation of contours, and all
 numerical certificates. Much of the instance-independent infrastructure (prime number theorem, Stirling, interval
@@ -1465,32 +1479,29 @@ Section~\ref{sec:proof} & \lean{exists\_irrational\_of\_small\_forms}, \lean{one
 \caption{Formal counterparts of the main steps.}\label{tab:lean}
 \end{table}
 
-\subsection{Differences from the informal write-up}\label{sec:lean-diff}
-The formalisation was ported from an informal write-up of the general theorem. Where the two differ, this paper
-follows the formalisation.
+\subsection{Notes on the formal proof}\label{sec:lean-diff}
+The formal proof is the proof of this paper. The following points are worth noting when reading the two side by
+side.
 \begin{itemize}
 \item \emph{The analytic part} uses the four integrations by parts of Proposition~\ref{prop:contour}, not the kernel
-  split of Remark~\ref{rem:split}. There is no boundary term, and only Stirling's formula for $\log\Gamma$ is needed
-  (generalised from $\beta\in(0,2]$ to $\beta\in[0,2]$, since the factor list contains $\Gamma(z)$ and
-  $\Gamma(z+\delta_jn)$). The near-real-axis piece of the contour is covered by (S2) on the first segment, so the
-  crossing condition (S5) of the informal write-up is not used.
+  split of Remark~\ref{rem:split}. There is no boundary term, and only Stirling's formula for $\log\Gamma$ is needed,
+  for shifts $\beta\in[0,2]$ (the factor list contains $\Gamma(z)$ and $\Gamma(z+\delta_jn)$, with $\beta=0$). The
+  start of the contour near the real axis is handled by (S5); no separate condition at the crossing point $x_c$ is
+  needed, because the integrand $G_n$ has no singular kernel.
 \item \emph{The size of $L_n$} comes from the saddle point (Proposition~\ref{prop:size}), with
   $\Vcert=-10.1167$; see Remark~\ref{rem:realaxis}.
-\item \emph{Corollary~\ref{cor:A}(b$'$)} is used only in its integrality form, without the condition $p^2>\cN$ that the
-  informal write-up attached to it. The informal write-up also stated the stronger bound
-  $v_p(a_{i,k})\ge\max(0,c_p(k)-(B_k-i))$ in this case; it is not needed.
-\item \emph{The pointwise bound} (Proposition~\ref{prop:pointwise}) holds for every prime $p\le n$, without
-  $p^2>\cN$.
+\item \emph{Corollary~\ref{cor:A}(b$'$)} is proved without any condition on $p$, and only its integrality form is
+  used.
+\item \emph{The pointwise bound} (Proposition~\ref{prop:pointwise}) holds for every prime $p\le n$.
 \item \emph{Small primes.} Definition~\ref{def:Ep} uses $(S+4)\lambda_p$ (for Z7, $22\lambda_p$) and drops the
   $e$-factor from $\nu_p(k)$; Proposition~\ref{prop:smallprimes} has the explicit constant $182$.
-\item \emph{The tail} is $e^*(x)\le S+14+G\{x\}$ at real points (Lemma~\ref{lem:tail}); the certificate keeps the
-  constant $S+15=33$ of the informal write-up, which bounded the out-of-block counts with an extra $S/p$.
-\item \emph{The event set} for Z7 has $30{,}138$ points ($30{,}137$ intervals). The Python certificate reports
-  $30{,}971$ ``events'' because it counts the endpoints of its chunks twice; its value of $\Acert$ is the same exact
-  rational.
+\item \emph{The tail.} Lemma~\ref{lem:tail} gives $e^*(x)\le S+14+G\{x\}$; the certificate uses the slightly larger
+  constant $S+15=33$, which costs $1/400$ in $\Acert$.
+\item \emph{The event set} for Z7 has $30{,}138$ points, so the sum of Proposition~\ref{prop:certA} has $30{,}137$
+  terms.
 \item \emph{The saddle certificate} uses its own steepest-descent contour (Theorem~\ref{thm:saddle}: $\rho=1/20$,
   $23$ segments, $\etafar=0.0199414$, $a=1/100$, top ray from $\xtop\approx2.0512+12.0012i$), generated independently
-  of the Arb certificate of Table~\ref{tab:certs}; the two enclosures of $\Re\Omega$ agree.
+  of the Arb computation of Table~\ref{tab:certs}; the two enclosures of $\Re\Omega$ agree.
 \end{itemize}
 Further, as for the $\beta$-analogue, a few standard tools are organised differently because Mathlib (at the
 version used) lacks them. Mathlib has no residue theorem, so the first equality of Proposition~\ref{prop:contour}
@@ -1509,7 +1520,7 @@ The arithmetic certificate and the saddle certificate are decidable statements a
 \lean{decide +kernel}, i.e.\ by evaluation in the Lean kernel. The data (event lists, polyline vertices, rational
 enclosures) were produced by scripts that are not trusted: a wrong value would make the build fail, but could not
 make a false statement provable. The generators are in the repository (\lean{scripts\slash{}certA\slash{}},
-\lean{scripts\slash{}saddle\slash{}}).
+\lean{scripts\slash{}saddle\slash{}gen\_saddle\_Z7.py}).
 
 \emph{The arithmetic certificate} (Proposition~\ref{prop:certA}). The specification of $e^*$ and of the event list
 (built with \lean{List.mergeSort}) is what the soundness proofs use, but the kernel cannot evaluate it efficiently.
@@ -1518,7 +1529,9 @@ that uses only natural-number arithmetic per block (the kernel has fast \lean{Na
 \lean{Int}); a decomposition of the event list into $133$ windows $[1+3j,4+3j)$, each sorted in the kernel and
 compared with literal data, together with a check that their concatenation is strictly increasing; and a
 decomposition of the rounded sum into $1{,}029$ chunks, each checked by a separate \lean{decide +kernel}. The resulting
-value $U$ agrees exactly with the exact-rational Python implementation.
+value $U$ agrees exactly with an independent exact-rational Python implementation, and with the Python
+recomputation \lean{scripts\slash{}certA\slash{}z7\_model.py} included in the repository, which mirrors the Lean
+definitions.
 
 \emph{The saddle certificate} (Theorem~\ref{thm:saddle}). This uses a verified interval arithmetic with rational
 endpoints (rounded outwards to dyadic grids), complex boxes, verified enclosures of $\log$, $\arctan$, $\pi$ and
@@ -1605,15 +1618,15 @@ untrusted and not needed for correctness), the exact checks at small $n$ quoted 
 certificates of the instances Z1--Z6, which are not used for Theorem~\ref{thm:main}.
 
 \subsection{Review}
-Before the formalisation, the informal proof of Theorem~\ref{thm:general} was reviewed adversarially by four
-independent AI reviewers (algebra, arithmetic, analysis, certificates and logic), who tested its claims with their
+Before the formalisation, a prose version of the proof of Theorem~\ref{thm:general} (with the kernel split of
+Remark~\ref{rem:split}) was reviewed adversarially by four independent AI reviewers (algebra, arithmetic, analysis, certificates and logic), who tested its claims with their
 own code. They found no fatal or major mathematical issue; one presentation error (the values of $Q$ had been rounded
 to nearest instead of up) and about twenty minor points were corrected. Among their checks: Lemma~A and Lemma~B in
 $186$ small instances at every prime in range; the integrality of $p^{E_p}(\rho_n,\tau_i)$ at every prime for $16$
 instances with $n\le32$; an independent evaluation of $e^*$ that reproduces the certified body sums; the identity
 behind Remark~\ref{rem:split} at Z7 for $n=240$ and $480$, to $10^{-16}$; and a re-run of both certificates for
-Z1, Z6 and Z7 [numerical]. The formalisation then found no gap in the informal proof, only the differences listed in
-Section~\ref{sec:lean-diff}.
+Z1, Z6 and Z7 [numerical]. The formalisation then found no gap; the points where the formal proof is organised
+differently are those of Section~\ref{sec:lean-diff}.
 
 \section*{Acknowledgements and disclosure}
 The construction, the proofs, the parameter search, the certificate programs, the Lean formalisation and the text of
