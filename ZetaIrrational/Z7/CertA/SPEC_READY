@@ -1,0 +1,45 @@
+W2 (A-certificate) interface for W1's glue. Namespace ZetaIrr.Z7.CertA. Status: ALL BUILT, standard axioms;
+only `bodyUnits_400` (Z7/CertAK/CertCompute.lean, kernel run) is still pending.
+
+Files: Z7/CertA/{Defs,Sound,Step,Attain,Tail,Cert,Pointwise}.lean (+ Z7/CertAK/ for the kernel run).
+
+-- per-k exponent (PROOF_ZETA §4), CertA-side counts (Pointwise.lean)
+def cp (m p k : ℕ) : ℕ :=
+  5 * #{l ∈ Icc (1 : ℤ) (220 * ((m : ℤ) + 1)) | (p : ℤ) ∣ (k : ℤ) + l} +
+    5 * #{l ∈ Icc ((nOf m : ℤ) + 1) (460 * ((m : ℤ) + 1)) | (p : ℤ) ∣ l - k}
+      -- zero hits without the e-term; W1's c_p(k) (with e-term) is ≥ this, so its e_p(k) is ≤ epk
+def Ppj (m p d k : ℕ) : ℕ :=
+  #{k' ∈ (Icc ((3 * d * (m + 1) : ℕ) : ℤ) ((nOf m - 3 * d * (m + 1) : ℕ) : ℤ)).erase (k : ℤ) | (p : ℤ) ∣ k' - k}
+def Pp (m p k : ℕ) : ℤ := (blocks.map fun b => (b.2 : ℤ) * (Ppj m p b.1 k : ℤ)).sum
+def epk (m p k : ℕ) : ℤ :=
+  if p ≤ k then (Bk m k : ℤ) + 4 - cp m p k + Pp m p k
+  else if 1 ≤ Pp m p k then (Bk m k : ℤ) - 1 - cp m p k + Pp m p k
+  else 0
+theorem pointwise_le_eStar (m p k : ℕ) (hp : 0 < p) (hpn : p ≤ nOf m) (hk : 1 ≤ Bk m k) :
+    (epk m p k : ℚ) - G * ⌊(nOf m : ℚ) / p⌋ ≤ eStar ((nOf m : ℚ) / p)
+theorem pointwise_le_eStar_prime (m p k : ℕ) (hp : p.Prime) (hpn : p ≤ nOf m) (hk : 1 ≤ Bk m k) : (same)
+  -- Note: no hypothesis 𝒩 < p² is needed for this inequality; E_p = max(0, max_k e_p(k)), and
+  -- eStar x ≥ -G⌊x⌋ (eStarInt ≥ 0, `eStarInt_nonneg`), so the max with 0 is covered:
+lemma eStarInt_nonneg (x : ℚ) : 0 ≤ eStarInt x                     -- Sound.lean
+def eStar (x : ℚ) : ℚ := if 1 ≤ x then (eStarInt x : ℚ) - G * ⌊x⌋ else 0
+
+-- step function / events (Step.lean, Attain.lean)
+def events (X : ℕ) : List ℚ
+lemma events_pairwise (X : ℕ) : (events X).Pairwise (· < ·)
+lemma events_bounds (z : ℚ) (hz : z ∈ events 400) : 1 ≤ z ∧ z ≤ 400
+lemma int_mem_events (n : ℤ) (h1 : 1 ≤ n) (h2 : n ≤ 400) : (n : ℚ) ∈ events 400
+def Consec (l : List ℚ) (a b : ℚ) : Prop := ∃ l₁ l₂, l = l₁ ++ a :: b :: l₂
+theorem eStar_eq_mid (a b : ℚ) (hc : Consec (events 400) a b) (x : ℚ) (hax : a < x) (hxb : x < b) :
+    eStar x = eStar ((a + b) / 2)
+
+-- tail (Tail.lean): E_tail = S + 15 = 33
+theorem eStar_le_tail (x : ℚ) (hx : 1 ≤ x) : eStar x ≤ 33 + G * Int.fract x
+
+-- the certificate (Cert.lean; CertAK proves UnitsFact)
+def pairSum {β : Type} [AddCommMonoid β] (g : ℚ → ℚ → β) : List ℚ → β
+def ABody (X : ℕ) : ℚ := pairSum (fun a b => eStar ((a + b) / 2) * (1 / a - 1 / b)) (events X)
+def tail (X : ℕ) : ℚ := 33 / X + G / (2 * ((X : ℚ) - 1))
+def CertFact : Prop := ABody 400 + tail 400 ≤ Acert          -- Acert = ZetaIrr.Acert (FamilyZ7)
+def UnitsFact : Prop := bodyUnits 400 = 778841997893779320302794447562
+theorem certFact_of_units (h : UnitsFact) : CertFact
+-- (planned, Z7/CertAK/CertCompute.lean) theorem bodyUnits_400 : bodyUnits 400 = 778841997893779320302794447562
