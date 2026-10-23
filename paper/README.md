@@ -22,5 +22,5 @@ pdflatex -output-directory=build main.tex
 
 or simply `latexmk -pdf -outdir=build main.tex`. The output is `build/main.pdf`; `build/` is not tracked.
 
-Section 9 of the paper describes the formalisation; its Lean names and file paths refer to the release of this
-repository cited there.
+Section 9 of the paper describes the formalisation; its Lean names and file paths refer to the commit of this
+repository (https://github.com/telaviv/zeta-irrationality) cited there.

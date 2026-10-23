@@ -1409,9 +1409,10 @@ $\sum_tR_n''''(t)$ to $30$ digits.
 % ===========================================================================
 
 \subsection{What is formalised}
-The repository \lean{lean\_zeta7} \cite{ZetaRepo}, at release tag \lean{v1.0}, contains a proof of
+The repository \url{https://github.com/telaviv/zeta-irrationality} \cite{ZetaRepo}, at commit \lean{1b48910},
+contains a proof of
 Theorem~\ref{thm:main} in Lean~4 \cite{LeanFour} (version v4.35.0) with Mathlib \cite{Mathlib} (version v4.35.0
-\cite{Mathlib4}). All declaration names and file paths in this section refer to that release; paths are relative
+\cite{Mathlib4}). All declaration names and file paths in this section refer to that commit; paths are relative
 to the repository root. The formalisation covers every step of the proof of
 Theorem~\ref{thm:main}, including the parts that a written proof would cite: the prime number theorem, Stirling's
 formula with explicit remainder in sectors, the contour-integral representation, the deformation of contours, and all
@@ -1542,17 +1543,23 @@ Theorem~\ref{thm:saddle}. The phase multiplier ($2\pi$ for the $\beta$-analogue,
 interval code.
 
 \subsection{Cost}
-With Mathlib cached, a full build takes about $50$ minutes on a $32$-core desktop computer with $32$\,GB of RAM at
-\lean{LEAN\_NUM\_THREADS=12}. The arithmetic certificate dominates (about $30$ minutes wall time, $3.3$ CPU-hours for
-the chunk sums); the saddle certificate takes about $5$ minutes and the rest about $15$ minutes. On Windows the number
-of parallel Lean processes must be limited ($8$--$12$); with one process per core the build fails for lack of
-resources, not because of a proof error.
+With Mathlib cached, the arithmetic certificate dominates the build: its $1{,}029$ chunk lemmas live in $30$ files,
+which take about $3.3$ CPU-hours in total and about $9.5$\,GB of memory each while the kernel evaluates them. The wall
+time is therefore set by how many of these files fit in memory at once (\lean{LEAN\_NUM\_THREADS}): $2$ on a machine with
+$32$\,GB of RAM, giving a build of a few hours, and $5$ with $64$\,GB. Everything else takes about $15$ minutes at $6$
+threads. Running out of memory makes the build fail, but it is not a proof error, and rerunning the build continues
+where it stopped.
 
 \subsection{What has to be trusted}
 Beyond the Lean kernel and the three axioms, the reader has to trust that the definition displayed above expresses
 Theorem~\ref{thm:main}, and the Mathlib definitions it uses (\lean{riemannZeta}, real and complex numbers,
 \lean{Complex.re}, \lean{Irrational}, \lean{Finset}). Nothing else, in particular no numerical data and no generating
-script, needs to be trusted. Apart from the check by the Lean kernel, all verification of the formalisation so far
+script, needs to be trusted. Besides \lean{lake build}, the proof was replayed module by module with Lean's
+\lean{leanchecker} ($134$ of the $141$ modules, including the main theorem and both certificates) and, in passes, with
+the independent kernel \lean{nanoda} ($60{,}465$ of the $61{,}819$ theorems in the closure of the main theorem,
+including the main theorem and every obligation of both certificates), with no error; these replays used the build of
+an earlier commit that differs from the cited one only in comments and two lemma names (see \lean{TRUST.md} in the
+repository). Apart from the check by the Lean kernel, all verification of the formalisation so far
 was carried out by AI systems; no human expert has yet reviewed the Lean code.
 
 % ===========================================================================
