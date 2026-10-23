@@ -85,13 +85,17 @@ from this one only in comments and two lemma names):
 
 Every theorem was accepted by at least one of the two kernels, and they never disagreed.
 
+## Reproducibility
+
+A fresh clone of the release tree was built from scratch following the README (Mathlib from `lake exe cache get`,
+then `lake build`), with no build errors; `lake env lean Axioms.lean` printed only the three standard axioms, and
+`leanchecker` replayed `ZetaIrrational.Statement`, `ZetaIrrational.Defs`, `Z7.Interval.SaddleDataZ7`,
+`Z7.CertAK.CertCompute` and `Z7.MainUnconditional` without error.
+
 ## Cost
 
-With Mathlib cached (`lake exe cache get`), on a 32-core desktop with 32 GB RAM:
-- the A-certificate (`Z7/CertAK`) takes about 30–40 min wall at `LEAN_NUM_THREADS=8`–`12` (about 3.3 CPU-hours of chunk
-  sums; each chunk file can use several GB, see the README's memory note);
+With Mathlib cached (`lake exe cache get`):
+- the 30 A-certificate chunk files (`Z7/CertAK/EvSum*.lean`) take about 3.3 CPU-hours in total and about 9.5 GB of
+  memory each while they build, so their wall time is set by how many fit in RAM (see the README's memory note);
 - the saddle certificate (`Z7/Interval`) takes about 5 min wall;
-- everything else takes about 15 min wall.
-
-Keep `LEAN_NUM_THREADS` at 8 or below on a 32 GB machine. With one job per core, the parallel Lean processes fail with
-"failed to read file ….olean" or exit code 0xC0000142, or exhaust memory; this is a resource limit, not a proof error.
+- everything else takes about 15 min wall at 6 threads.
