@@ -98,15 +98,21 @@ Mathlib (v4.35.0) are pinned in `lean-toolchain`, `lakefile.toml` and `lake-mani
 ```sh
 git clone <repository URL> lean_zeta7 && cd lean_zeta7
 lake exe cache get                  # download prebuilt Mathlib
-LEAN_NUM_THREADS=12 lake build      # about 40 minutes on a 32-core desktop; the A-certificate dominates
+LEAN_NUM_THREADS=8 lake build       # about 45 minutes on a 32-core desktop; the A-certificate dominates
 lake env lean Axioms.lean           # print the axioms of the main theorem and its ingredients
 ```
 
-In PowerShell, set the variable first: `$env:LEAN_NUM_THREADS = 12; lake build`. We built on a 32-core desktop with
-32 GB of RAM; the A-certificate files use up to about 2 GB each, so lower `LEAN_NUM_THREADS` on smaller machines. On
-Windows, keep it at 8–12: with one Lean process per core, `lake build` (and occasionally `lake env lean`) can fail with
-"failed to read file ….olean". This is a resource limit, not a proof error; rerunning the command continues where it
-stopped.
+On Windows, clone into a short path (for example `C:\src\lean_zeta7`) or run `git config --global core.longpaths
+true` first: some Mathlib file paths exceed the 260-character limit, and with a long base path Lake's checkout of Mathlib
+silently omits those files (Lake then warns "repository has local changes" and starts compiling Mathlib from source).
+
+In PowerShell, set the variable first: `$env:LEAN_NUM_THREADS = 8; lake build`.
+
+**Memory.** Most files need 2–4 GB each, but each of the 30 A-certificate chunk files (`Z7/CertAK/EvSum*.lean`) can
+use several GB more while the kernel evaluates it. On a 32 GB machine use `LEAN_NUM_THREADS=8` with nothing else
+running, or 4 alongside other programs; scale proportionally with RAM. Too many parallel processes show up as "failed to
+read file ….olean" (or, on Windows, exit code 0xC0000142) or as the machine running out of memory; this is a resource
+limit, not a proof error, and rerunning `lake build` continues where it stopped.
 
 ## Repository layout
 

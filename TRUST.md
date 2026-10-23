@@ -88,9 +88,10 @@ Every theorem was accepted by at least one of the two kernels, and they never di
 ## Cost
 
 With Mathlib cached (`lake exe cache get`), on a 32-core desktop with 32 GB RAM:
-- the A-certificate (`Z7/CertAK`) takes about 30 min wall at `LEAN_NUM_THREADS=12` (about 3.3 CPU-hours of chunk sums);
+- the A-certificate (`Z7/CertAK`) takes about 30–40 min wall at `LEAN_NUM_THREADS=8`–`12` (about 3.3 CPU-hours of chunk
+  sums; each chunk file can use several GB, see the README's memory note);
 - the saddle certificate (`Z7/Interval`) takes about 5 min wall;
 - everything else takes about 15 min wall.
 
-On Windows, keep `LEAN_NUM_THREADS` at 8–12. With one job per core, the parallel Lean processes fail with
-"failed to read file ….olean" or exit code 0xC0000142; this is a resource limit, not a proof error.
+Keep `LEAN_NUM_THREADS` at 8 or below on a 32 GB machine. With one job per core, the parallel Lean processes fail with
+"failed to read file ….olean" or exit code 0xC0000142, or exhaust memory; this is a resource limit, not a proof error.
