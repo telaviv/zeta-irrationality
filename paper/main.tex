@@ -59,18 +59,14 @@ saddle-point method, formal verification, Lean}
 
 \begin{abstract}
 We prove that at least one of the eight numbers $\zeta(7),\allowbreak\zeta(9),\allowbreak\dots,\allowbreak\zeta(21)$
-is irrational. The best previous result of this form that does not involve $\zeta(5)$ was ``one of
-$\zeta(7),\dots,\zeta(35)$'', a consequence of the theorem of Lai and Zhou that at least two of
-$\zeta(5),\dots,\zeta(35)$ are irrational; Zudilin had earlier proved ``one of $\zeta(7),\dots,\zeta(37)$''. The
-proof uses the linear forms $L_n=\sum_{t\ge1}R_n''''(t)$ attached to very-well-poised rational functions $R_n$
-of Zudilin's type with quintuple zeros. The fourth derivative and a symmetry keep $\zeta(3)$, $\zeta(5)$ and the
-even zeta values out of the forms. The new ingredients are a near-continuous profile of eighteen pole blocks, a
-sharper $p$-adic bound at the poles $-k$ with $k<p$, and a saddle-point analysis for the kernel $\pi\cot\pi z$:
-four integrations by parts turn the integrand into $R_n(z)$ times an entire trigonometric factor, which fixes the
-phase $3\pi$. The common denominators are controlled by an arithmetic integral that we bound with an exact
-rational certificate, and the size and nonvanishing of $L_n$ by a certified steepest-descent contour. The whole
-proof, including every numerical certificate, has been formalised in Lean~4 with Mathlib and checked by the Lean
-kernel, using only Lean's three standard axioms.
+is irrational. The previous best result of this kind not involving $\zeta(5)$, a consequence of a theorem of Lai
+and Zhou, was that one of $\zeta(7),\dots,\zeta(35)$ is irrational. We use Zudilin's hypergeometric construction:
+sums of fourth derivatives of rational functions with quintuple zeros give linear forms in
+$1,\zeta(7),\dots,\zeta(21)$ with no $\zeta(3)$ or $\zeta(5)$ term. The improvement comes from spreading the poles
+over eighteen blocks with nearby offsets, a sharper $p$-adic bound on the denominators, and a saddle-point analysis
+of a cotangent contour integral. The estimates rest on exact rational and interval-arithmetic certificates. The
+whole proof, including these certificates, is formalised in Lean~4 with Mathlib and checked by the Lean kernel using
+only the standard axioms.
 \end{abstract}
 
 \maketitle
